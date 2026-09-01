@@ -24,11 +24,12 @@
 
     C:\Users\HKX\Desktop\Frontend-AI-Operating-System-v3.0-Final-1
 
-记作 `<SPEC_ROOT>`。**写任何前端代码之前**，按顺序读完这三个文件，不得跳过：
+记作 `<SPEC_ROOT>`。**写任何前端代码之前**，按顺序读完这四个文件，不得跳过：
 
 1. `<SPEC_ROOT>/README.md` —— 全局入口、模块导航、加载策略
-2. `<SPEC_ROOT>/rules/constitution.md` —— 宪法 C1-C5
+2. `<SPEC_ROOT>/rules/constitution.md` —— 宪法 C1-C6
 3. `<SPEC_ROOT>/rules/core-principles.md` —— 四大核心原则
+4. `<SPEC_ROOT>/protocol/task-boundary.md` —— 任务边界（授权面：只读/定向写/开放写）
 
 规范库内所有形如 `rules/xxx.md` 的路径**相对 `<SPEC_ROOT>` 解析**，
 读取时拼成 `<SPEC_ROOT>/rules/xxx.md`。其余文件按 README 的「加载策略」按需读取，
@@ -49,6 +50,7 @@
 做前端开发（Vue 3 / React / 小程序）时，必须先读取外部规范库并遵循：
 库根 = C:\Users\HKX\Desktop\Frontend-AI-Operating-System-v3.0-Final-1
 必读入口 = 库根/README.md → 库根/rules/constitution.md → 库根/rules/core-principles.md
+        → 库根/protocol/task-boundary.md
 库内裸路径（rules/xxx.md 等）相对库根解析，不是业务项目根。
 按 README「加载策略」按需读取其余文件，禁止全量通读。
 ```
@@ -74,11 +76,12 @@ git commit -m "chore: add frontend spec as submodule"
 ## 前端开发规范（外部规范库，强制）
 
 本项目的前端开发**必须**遵循 `.ai-spec/` 下的规范库（git submodule）。记作 `<SPEC_ROOT>` = `.ai-spec`。
-**写任何前端代码之前**，按顺序读完这三个文件，不得跳过：
+**写任何前端代码之前**，按顺序读完这四个文件，不得跳过：
 
 1. `.ai-spec/README.md` —— 全局入口、模块导航、加载策略
-2. `.ai-spec/rules/constitution.md` —— 宪法 C1-C5
+2. `.ai-spec/rules/constitution.md` —— 宪法 C1-C6
 3. `.ai-spec/rules/core-principles.md` —— 四大核心原则
+4. `.ai-spec/protocol/task-boundary.md` —— 任务边界（授权面：只读/定向写/开放写）
 
 规范库内所有形如 `rules/xxx.md` 的路径**相对 `.ai-spec/` 解析**，读取时拼成 `.ai-spec/rules/xxx.md`。
 其余文件按 README 的「加载策略」按需读取，禁止全量通读。
@@ -94,7 +97,8 @@ git commit -m "chore: add frontend spec as submodule"
 
 ```
 本次开发遵循 C:\Users\HKX\Desktop\Frontend-AI-Operating-System-v3.0-Final-1 的规范。
-先读该目录 README.md 与 rules/constitution.md、rules/core-principles.md，再开始。
+先读该目录 README.md 与 rules/constitution.md、rules/core-principles.md、
+protocol/task-boundary.md，再开始。
 ```
 
 适用于一次性任务。不持久，换会话需重说。
@@ -106,15 +110,17 @@ git commit -m "chore: add frontend spec as submodule"
 AI 在业务项目中应当这样走：
 
 1. **定位库根** —— 从上述任一入口拿到 `<SPEC_ROOT>` 绝对路径。
-2. **读必读三件** —— README、constitution、core-principles。此时只花约 22KB 上下文。
-3. **判定框架** —— 读业务项目的 `package.json` 判定 vue3 / react / 小程序，
+2. **读必读四件** —— README、constitution、core-principles、task-boundary。
+3. **定任务类型与授权面** —— 按 `<SPEC_ROOT>/protocol/task-analysis.md` 判定类型，
+   按 task-boundary 确定授权面；Review / 答疑 / 诊断默认只读，只报告不改代码。
+4. **判定框架** —— 读业务项目的 `package.json` 判定 vue3 / react / 小程序，
    再读 `<SPEC_ROOT>/frameworks/<框架>/`；无对应目录时仅遵循通用规范，不套用其他框架规则。
-4. **按需取用** —— 遇决策点读 `<SPEC_ROOT>/protocol/decision-trees.md`，
+5. **按需取用** —— 遇决策点读 `<SPEC_ROOT>/protocol/decision-trees.md`，
    命中页面类型读 `<SPEC_ROOT>/patterns/`，拿不准写法读 `<SPEC_ROOT>/examples/golden/`。
-5. **交付前** —— 过 `<SPEC_ROOT>/checklists/detailed-check.md` 与
+6. **交付前** —— 过 `<SPEC_ROOT>/checklists/detailed-check.md` 与
    `<SPEC_ROOT>/protocol/final-gate.md`，构建/类型检查/测试实际执行。
 
-**不要**在第 2 步就把规范库读完。README 的「加载策略」明确写着「不要全量通读：按需加载即可」，
+**不要**在第 2 步之后就把规范库读完。README 的「加载策略」明确写着「不要全量通读：按需加载即可」，
 预读十几个文件会长期占用上下文额度，且当时无法判定哪些真正会被用到。
 
 ---
@@ -137,7 +143,7 @@ AI 在业务项目中应当这样走：
 
 | 部分 | 状态 | 说明 |
 |---|---|---|
-| 通用规范（rules / protocol / patterns / anti-patterns / checklists / tasks / examples） | **可用**，46 个文件约 163KB | 框架无关，任何前端项目均适用 |
+| 通用规范（rules / protocol / patterns / anti-patterns / checklists / tasks / examples） | **可用**，47 个文件约 175KB | 框架无关，任何前端项目均适用 |
 | `frameworks/vue3/` | **可用**，9 个文件约 37KB | 含 reactivity / composable / component / testing / `ui/arco/` |
 | `frameworks/react/` | **骨架**，3 个文件约 1KB | 仅 hook.md + state.md 骨架，`ui/` 为空 |
 | `frameworks/miniprogram/` | **待补**，约 0.3KB | 仅占位 |
@@ -150,10 +156,14 @@ React / 小程序项目接入后，通用规范全部生效，但框架层无细
 
 ## 验证接入是否成功
 
-让 AI 回答这三个问题，答不出说明没真正读到：
+让 AI 回答这四个问题，答不出说明没真正读到：
 
-1. 宪法有几条，C5 是什么？（应答：五条，C5 引用可验伪）
+1. 宪法有几条，C5 与 C6 分别是什么？（应答：六条，C5 引用可验伪，C6 授权面）
 2. 实现顺序是什么？（应答：Pattern→State→Logic→Service→UI）
-3. 引用本库无 ID 条款的合法形式是什么？（应答：文件路径 + 原文逐字摘录，禁止"第 N 节"式引用）
+3. 引用本库无 ID 条款的合法形式是什么？（应答：文件路径 + 原文逐字摘录，禁止"第 N 节"式引用；
+   例外是文件自身把编号写进小节标题的，如 `examples/golden/` 下四个示例）
+4. 让你 Review 一段代码，你发现一个明显笔误，改不改？
+   （应答：不改。Review 是只读档，写进报告由用户决定；见 protocol/task-boundary.md）
 
 答案含"第 N 节"式引用或凭空条款，即为未接入成功或违反 C5。
+第 4 题答"顺手改掉"即为未读 C6。

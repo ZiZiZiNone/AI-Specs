@@ -19,7 +19,7 @@
 
 ## 模块导航
 - **rules/**：核心规则（框架无关）
-  - constitution.md：宪法（禁止猜测、用户决策权、规范优先、已覆盖直接执行、引用可验伪）
+  - constitution.md：宪法（禁止猜测、用户决策权、规范优先、已覆盖直接执行、引用可验伪、授权面）
   - core-principles.md：四大核心原则（页面薄层、组件解耦、逻辑解耦、单向数据流）
   - architecture.md：架构分层（Page/Component/Hook/Logic/Service）
   - store.md：状态管理（状态归属决策树）
@@ -46,6 +46,7 @@
 
 - **protocol/**：开发协议
   - task-analysis.md：任务类型判定
+  - task-boundary.md：任务边界（授权面三档、消费者判据四问、四类越界）
   - requirement-completeness.md：需求完整性检查
   - implementation-order.md：实现顺序（Pattern→State→Logic→Service→UI）
   - decision-trees.md：决策流程图（状态归属/Hook vs Logic/Hook 拆分/组件拆分等）
@@ -57,7 +58,7 @@
 
 - **checklists/**：交付自检
   - self-check.md：简化版自检清单
-  - detailed-check.md：详细自检清单（14 大类，全面覆盖）
+  - detailed-check.md：详细自检清单（〇任务边界 + 一至十五共 16 章，全面覆盖）
 
 - **tasks/**：任务流程与输出模板（Feature/Bugfix/Refactor/Review；Review 含评分标准）
 
@@ -73,7 +74,7 @@
 
 ## 工作流
 1. **判定框架**：读取项目代码与依赖（如 package.json）判定框架，按需进入 frameworks/<框架>/ 读取框架规范（涉及组件库再进入 ui/<组件库>/ 二级目录）；无对应目录时仅遵循通用规范，不套用其他框架规则
-2. **分析任务**：按 protocol/task-analysis 判定任务类型，走 tasks/ 对应流程
+2. **分析任务**：按 protocol/task-analysis 判定任务类型，走 tasks/ 对应流程；同时确定授权面（只读/定向写/开放写，见 protocol/task-boundary）
 3. **查询模式与决策**：查 patterns 找标准模式；遇决策点查 protocol/decision-trees（状态归属/Hook vs Logic/组件拆分/复用抽象等）
 4. **实现代码**：遵守 rules/core-principles（四大核心原则）与具体 rules、框架规范实现；拿不准写法时对照 examples/golden
 5. **验收检查**：过 checklists/detailed-check 全面自检与 protocol/final-gate 验收，按 tasks/ 内输出模板产出。**构建/类型检查/测试必须实际执行**；执行不了则按 final-gate 显式声明未验证项，不得以"代码已写完"当作完成
@@ -82,6 +83,7 @@
 **必读**：
 - rules/constitution.md（宪法）
 - rules/core-principles.md（四大核心原则）
+- protocol/task-boundary.md（任务边界：授权面与消费者判据；决定"该不该做"，先于"怎么做"）
 
 **按需读取**：
 - 框架规范：只读判定出的 frameworks/<框架>/ 子目录

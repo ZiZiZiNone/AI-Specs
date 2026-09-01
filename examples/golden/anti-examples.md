@@ -138,6 +138,8 @@ return { code: 'TIMEOUT', message: '请求超时', type: 'network', retryable: t
 
 问题：字段成为装饰。规范要求的不是"有这个字段"，而是"重试策略由它驱动"。
 
+这是「无消费者产物」的典型形态，判据见 `protocol/task-boundary.md`：加东西前先指出消费者。
+
 **正确做法**：`retryable` 作为重试循环的判据，并与幂等性共同决定是否重试。
 参见 `service-layer.md` 第 3 节。
 
