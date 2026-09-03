@@ -46,5 +46,18 @@ export function resolveTicketRowAbility(user: SessionUser | null, row: Ticket) {
 
 判据：区别在于"你不该知道这件事"还是"你现在还不能做这件事"。
 
+## 三处消费的调用点清单
+
+同一份判定函数落盘后，按以下清单逐处登记消费点，不新增判定实现：
+
+- 路由守卫：登记拦截直接访问 URL 的守卫位置。
+- 菜单 / 入口渲染：登记决定是否显示的渲染位置。
+- 页面 / 组件内控件：登记决定按钮可见或禁用的控件位置。
+
+正例调用点见 test/vue/src/router/index.ts（守卫侧）与
+test/vue/src/store/session.store.ts（权限来源侧）；
+判定实现侧见 test/vue/src/logic/ticketPermission.logic.ts。
+
 ## 框架实现
-路由守卫写法等框架细则见 frameworks/<框架>/router.md。
+路由守卫写法等框架细则见 frameworks/<框架>/router.md，
+具体为 frameworks/vue3/router.md 与 frameworks/miniprogram/router.md。

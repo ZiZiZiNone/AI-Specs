@@ -1,14 +1,6 @@
 # 内部文档和临时文件
 .internal-docs/
 
-# 测试代码
-test/
-*.tsx
-*.ts
-*.jsx
-*.js
-*.css
-
 # 项目配置
 package.json
 package-lock.json

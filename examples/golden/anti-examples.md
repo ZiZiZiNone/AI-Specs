@@ -3,8 +3,8 @@
 来源：`test/react/`（React 18 + TS，**未按本规范落地**，且缺 `package.json`/`main.tsx`，无法构建）
 用途：这些是真实产出的违规代码，用于识别常见偏离。每条给出违反条目与正确做法。
 
-> 说明：该项目是本规范早期未覆盖时的产物。保留它比删除更有价值——
-> 它记录了「不加约束时 AI 会怎么写」，是校验规范有效性的对照组。
+说明：该项目是本规范早期未覆盖时的产物。保留它比删除更有价值——
+它记录了「不加约束时 AI 会怎么写」，是校验规范有效性的对照组。
 
 ---
 
@@ -35,7 +35,7 @@ const handleDelete = useCallback(async (userId: string) => {
 问题：删除的编排（确认→请求→反馈→刷新→页码修正）落在页面里，
 换一个入口（详情页删除）就要复制一遍；且 `window.confirm`/`alert` 不可测试。
 
-**正确做法**：编排进 Hook，页面只调用。参见 `list-page.md` 第 6 节。
+**正确做法**：编排进 Hook，页面只调用。参见 `examples/golden/list-page.md` 第 6 节。
 
 ```typescript
 // ✅ 页面
@@ -95,7 +95,7 @@ if (currentParamsRef.current !== params) return;
 - 用对象引用做新旧判定，语义不稳定（同值不同引用 / 同引用重复调用）。
 
 **正确做法**：Service 统一接受 `{ signal }`，Hook 用单调序号判定。
-参见 `list-page.md` 第 4 节 `useRequestGuard`。
+参见 `examples/golden/list-page.md` 第 4 节 `useRequestGuard`。
 
 ---
 
@@ -165,7 +165,7 @@ export const UserFilter: React.FC<UserFilterProps> = ({
 浏览器前进/后退、外部重置筛选时，URL 变了而组件内部不变。
 
 **正确做法**：筛选条件以 URL 为唯一来源，组件全受控（`value` + `onChange`）。
-仅"输入中的草稿值"可短暂本地持有，防抖后立即上报。参见 `list-page.md` 第 1 节。
+仅"输入中的草稿值"可短暂本地持有，防抖后立即上报。参见 `examples/golden/list-page.md` 第 1 节。
 
 ---
 
@@ -223,7 +223,7 @@ if (isEmptyValue(value)) return null;
 
 ## 9. useEffect 依赖注释掩盖问题
 
-违反：rules/async-operations.md、frameworks/react/hook.md
+违反：rules/async-operations.md
 
 来源：`pages/UserListPage.tsx:44-46`
 
@@ -265,8 +265,8 @@ useEffect(() => {
 业务规则（谁能删、什么状态能改优先级、删除末页最后一条后去哪页）散落在页面与组件里。
 
 **正确做法**：可判定的业务规则一律下沉 Logic 并可单测。
-参见 `list-page.md` 第 2 节 `resolvePageAfterRemoval`、
-`form-validation.md` 第 4 节 `resolveVisibleFields`。
+参见 `examples/golden/list-page.md` 第 2 节 `resolvePageAfterRemoval`、
+`examples/golden/form-validation.md` 第 4 节 `resolveVisibleFields`。
 
 ---
 

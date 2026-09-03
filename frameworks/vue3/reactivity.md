@@ -67,8 +67,9 @@ const viewModel = reactive({
 });
 ```
 
-> 「嵌套 reactive」这一条属机制类结论（依据 Vue 的代理身份语义），
-> 成立理由已写明，可用一个最小复现验证。
+「嵌套 reactive」这一条属机制类结论（依据 Vue 的代理身份语义），
+成立理由已写明，可用一个最小复现验证。
+
 > 见 examples/golden/README.md「示例教什么、不教什么」。
 
 ### computed

@@ -227,9 +227,17 @@ else state.value = 'loading';
 
 **详见**：rules/error-handling.md
 
-**示例**（待补充）：
-```typescript
-// ✅ error 态展示
+**示例**（页面级错误占位，见 `test/vue/src/components/feedback/ErrorPlaceholder.vue`）：
+```vue
+<!-- ✅ error 态展示：说明 + 重试 + 按场景返回，三者齐全 -->
+<ErrorPlaceholder
+  v-if="uiState.status === 'error'"
+  :message="uiState.error"
+  retry-text="重新加载"
+  back-text="返回列表"
+  @retry="reload"
+  @back="goBack"
+/>
 ```
 
 ---

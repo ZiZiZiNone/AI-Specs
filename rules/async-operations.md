@@ -647,13 +647,6 @@ abortController.abort();
 onScopeDispose(abortAll);
 ```
 
-React 侧对应形态：
-
-```typescript
-// ✅ 卸载时中断
-useEffect(() => () => abortControllerRef.current?.abort(), []);
-```
-
 **取消不是错误**：被取消的请求须在上层被识别为预期行为，不进入 error 态。
 
 ```typescript

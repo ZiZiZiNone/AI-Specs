@@ -29,8 +29,10 @@ export function useTicketList(query: { value: TicketListQuery }) {}
 - 非响应式配置用普通对象参数（`options: { delayMs?: number }`）。
 - 禁止把整个 Store 实例作为入参；只传所需的 ref 或 computed。
 
-> 本条属机制类结论（依据 Vue 的 `ComputedRef` 只读性），成立理由已写在规则内，
-> 可用一次 `vue-tsc` 复核。见 examples/golden/README.md「示例教什么、不教什么」。
+本条属机制类结论（依据 Vue 的 `ComputedRef` 只读性），成立理由已写在规则内，
+可用一次 `vue-tsc` 复核。
+
+> 见 examples/golden/README.md「示例教什么、不教什么」。
 
 ### 入参不做业务判断
 入参进来后若需要判断/换算，下沉到 Logic，composable 只负责调用。

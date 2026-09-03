@@ -23,16 +23,20 @@
   - router.md：路由定义、params/query 分工、守卫、权限三处一致
   - testing.md：各层测试方式与不测清单
   - ui/arco/README.md：Arco Design Vue 与本规范的冲突取舍
-- **react/**
-  - hook.md：Hook 规范
-  - state.md：骨架（Store 库细则待补）
-  - ui/：按组件库细分（待补）
-- **miniprogram/**：待补
+- **miniprogram/**（微信原生 + TS，已定稿 2026-09-03）
+  - README.md：读取顺序、Hook 层映射（logic 纯函数承担）、通用规范索引
+  - state.md：setData 语义、data 归属、页面间传参与全局状态边界
+  - logic.md：B 方案纯函数约定、setData 回写、清理与竞态（对应 vue3/composable.md 的位置）
+  - component.md：properties/observers/lifetimes、受控组件、可选性表达
+  - router.md：四类导航 API 分工、params/query、登录守卫、app.json 与分包
+  - service.md：wx.request 封装、登录态与 baseURL、Service 层映射
+  - testing.md：各层测试方式与不测清单
+  - ui/tdesign-miniprogram/：TDesign 小程序端与本规范的冲突取舍
+  - ui/vant-weapp/：Vant 小程序端与本规范的冲突取舍
 
-## 待补缺口（已知）
-- react/ 缺组件规范（props 可选性、受控组件、memo 边界）与响应式心智对应文件；
-  ui/ 下无任何组件库目录。
-- 补充时以 vue3/ 的文件划分为模板，但**不要照搬 Vue 的机制结论**——
-  两者的响应式模型不同，需按 React 自身语义重写。
-- react 侧的常见偏离已在 examples/golden/anti-examples.md 记录（来自 test/react），
-  补写 react/ 规范时应优先覆盖这 12 条。
+## 说明
+- React 框架规范已移除（2026-09-03）：本库当前只覆盖 Vue 3 与微信小程序。
+  `test/react/` 作为 `examples/golden/anti-examples.md` 的反例证据保留，不在框架规范覆盖内。
+- miniprogram/ 已定稿（2026-09-03，见 miniprogram/README.md）；
+  填充时沿用"以 vue3/ 的文件划分为模板，但**不要照搬 Vue 的机制结论**"原则——
+  小程序的 setData / Component 语义与 Vue 不同，需按小程序自身语义重写。

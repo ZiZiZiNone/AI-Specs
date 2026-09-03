@@ -245,3 +245,10 @@ async function handleSubmit(): Promise<void> {
   <TicketTable :rows="list.list.value" :user="session.user" @remove="rowOps.remove" />
 </DataLoader>
 ```
+
+## 小程序映射
+
+与本示例同属列表分页与筛选主题的小程序侧已落地用例，机制结论以小程序框架规范为准：
+
+- 分页纯函数：`test/miniprogram/src/logic/pagination.ts`（入参只收值与前状态快照，失败走 error 字段不抛异常，取消静默），用例见 `test/miniprogram/src/logic/pagination.spec.ts`（5 个）。框架约定见 `frameworks/miniprogram/logic.md`。
+- 受控筛选条：`test/miniprogram/src/components/filter-bar/`（keyword 经 properties 传入，变更经 change 事件上报），用例见 `test/miniprogram/src/components/filter-bar/filter-bar.spec.ts`（miniprogram-simulate v1.6.2）。框架约定见 `frameworks/miniprogram/component.md`，用例状态见 `test/miniprogram/README.md`。

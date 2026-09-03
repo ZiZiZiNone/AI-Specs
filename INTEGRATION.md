@@ -47,7 +47,7 @@
 写入 AI 工具的全局记忆或全局 AGENTS，内容为：
 
 ```markdown
-做前端开发（Vue 3 / React / 小程序）时，必须先读取外部规范库并遵循：
+做前端开发（Vue 3 / 小程序）时，必须先读取外部规范库并遵循：
 库根 = C:\Users\HKX\Desktop\Frontend-AI-Operating-System-v3.0-Final-1
 必读入口 = 库根/README.md → 库根/rules/constitution.md → 库根/rules/core-principles.md
         → 库根/protocol/task-boundary.md
@@ -113,7 +113,7 @@ AI 在业务项目中应当这样走：
 2. **读必读四件** —— README、constitution、core-principles、task-boundary。
 3. **定任务类型与授权面** —— 按 `<SPEC_ROOT>/protocol/task-analysis.md` 判定类型，
    按 task-boundary 确定授权面；Review / 答疑 / 诊断默认只读，只报告不改代码。
-4. **判定框架** —— 读业务项目的 `package.json` 判定 vue3 / react / 小程序，
+4. **判定框架** —— 读业务项目的 `package.json` 判定 vue3 / 小程序，
    再读 `<SPEC_ROOT>/frameworks/<框架>/`；无对应目录时仅遵循通用规范，不套用其他框架规则。
 5. **按需取用** —— 遇决策点读 `<SPEC_ROOT>/protocol/decision-trees.md`，
    命中页面类型读 `<SPEC_ROOT>/patterns/`，拿不准写法读 `<SPEC_ROOT>/examples/golden/`。
@@ -132,7 +132,7 @@ AI 在业务项目中应当这样走：
 | 只写「遵循 XX 规范」不给绝对路径 | AI 找不到库，凭训练知识编一套"前端规范" | 必须给 `<SPEC_ROOT>` 绝对路径 |
 | 写「优先读取 README.md」（裸路径） | 解析到业务项目自己的 README（讲装依赖的那个） | 写全 `<SPEC_ROOT>/README.md` |
 | 把入口指向 `AGENTS.md` 就完事 | AGENTS 只是行为规则索引，四大原则/分层/模式全在别处，AI 以为读完了 | 入口必须是 README，它才有模块导航 |
-| 让 AI「先通读规范库」 | 上下文被约 222KB 规范占满，真正写代码时额度不足 | 按 README 加载策略按需读 |
+| 让 AI「先通读规范库」 | 上下文被规范占满，真正写代码时额度不足 | 按 README 加载策略按需读 |
 | 业务项目已有冲突的风格约定，未声明 | AI 静默取舍，两套规范混用 | 按 C2 先说明冲突，由你决定优先级 |
 
 ---
@@ -143,12 +143,11 @@ AI 在业务项目中应当这样走：
 
 | 部分 | 状态 | 说明 |
 |---|---|---|
-| 通用规范（rules / protocol / patterns / anti-patterns / checklists / tasks / examples） | **可用**，47 个文件约 175KB | 框架无关，任何前端项目均适用 |
-| `frameworks/vue3/` | **可用**，9 个文件约 37KB | 含 reactivity / composable / component / testing / `ui/arco/` |
-| `frameworks/react/` | **骨架**，3 个文件约 1KB | 仅 hook.md + state.md 骨架，`ui/` 为空 |
-| `frameworks/miniprogram/` | **待补**，约 0.3KB | 仅占位 |
+| 通用规范（rules / protocol / patterns / anti-patterns / checklists / tasks / examples） | **可用** | 框架无关，任何前端项目均适用 |
+| `frameworks/vue3/` | **可用** | 含 reactivity / composable / component / testing / `ui/arco/` |
+| `frameworks/miniprogram/` | **已定稿** | 微信原生 + TS，README + state / logic / component / router / service / testing + ui/tdesign-miniprogram + ui/vant-weapp；复用走 logic 纯函数（B 方案）；setData 默认整体替换；全局状态走 globalData |
 
-React / 小程序项目接入后，通用规范全部生效，但框架层无细则——
+小程序项目接入后，通用规范全部生效，框架细则随编写进度生效——
 按 README 工作流第 1 步「无对应目录时仅遵循通用规范，不套用其他框架规则」处理，
 遇到框架专属决策点时应提问而非自行发挥（C1）。
 

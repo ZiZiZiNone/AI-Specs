@@ -54,10 +54,9 @@ it('should_round_trip_query_through_url_serialization', () => {
 
 ## composable 测试
 
-> **本节为规范示范，非既有实现。** `test/vue/` 目前只有 Logic 与 Service 的
-> 纯函数测试（6 个 spec），未落地 composable 与组件测试，
-> `@vue/test-utils` 也未列入其 devDependencies。下方写法给出应遵循的形态，
-> 首次落地时须同步补依赖。
+`test/vue/src/hooks/useRequestGuard.spec.ts` 已落地：最小 setup 宿主、清理与竞态断言。
+下方写法即该文件的形态；新增 composable 测试时照此形态，
+并确认 `@vue/test-utils`、`jsdom` 仍在 devDependencies。
 
 composable 依赖组件实例作用域（`onScopeDispose`、`inject` 等），
 须在一个最小 setup 内调用：
@@ -98,8 +97,8 @@ it('should_abort_inflight_request_when_scope_disposed', async () => {
 
 ## 组件测试
 
-> 同上节，`test/vue/` 未落地组件测试，本节为规范示范。
-> 源码中亦无 `data-test` 属性，首次落地时须一并补上。
+`test/vue/src/components/ticket/TicketTable.spec.ts` 已落地：`data-test` 选择器、
+emit 载荷断言。新增组件测试时照此形态；交互元素须带 `data-test` 属性。
 
 只测「给定 props 渲染出什么」与「交互是否上报正确事件」：
 

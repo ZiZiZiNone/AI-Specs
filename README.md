@@ -41,8 +41,7 @@
 
 - **frameworks/**：框架专属规范（进入项目先判定框架，再进入对应子目录）
   - vue3/：README（读取顺序）、reactivity.md、state.md、composable.md、component.md、router.md、testing.md、ui/arco/
-  - react/：hook.md、state.md、ui/
-  - miniprogram/：README
+  - miniprogram/：README（读取顺序）、state.md、logic.md、component.md、router.md、service.md、testing.md、ui/<组件库>/
 
 - **protocol/**：开发协议
   - task-analysis.md：任务类型判定
@@ -69,8 +68,9 @@
   - anti-examples.md：负向示例集（12 条，含违反条目与正确做法）
 
 - **test/**：按本规范落地的验证产物，golden 示例的素材来源
-  - vue/：Vue 3 + Arco + Tailwind 工单管理（正向素材，构建未验证）
+  - vue/：Vue 3 + Arco + Tailwind 工单管理（正向素材；typecheck 零错误、vitest 49/49、build 与 dev 冒烟均已验证 2026-09-03，沙箱实跑，见 test/vue/CONFORMANCE.md）
   - react/：早期未按规范落地的产物（负向素材，不可构建）
+  - miniprogram/：微信原生 + TS 分页 Logic 与受控筛选组件（正向素材；logic 单测与组件挂载均实跑，miniprogram-simulate v1.6.2，见 test/miniprogram/README.md）
 
 ## 工作流
 1. **判定框架**：读取项目代码与依赖（如 package.json）判定框架，按需进入 frameworks/<框架>/ 读取框架规范（涉及组件库再进入 ui/<组件库>/ 二级目录）；无对应目录时仅遵循通用规范，不套用其他框架规则
@@ -80,7 +80,8 @@
 5. **验收检查**：过 checklists/detailed-check 全面自检与 protocol/final-gate 验收，按 tasks/ 内输出模板产出。**构建/类型检查/测试必须实际执行**；执行不了则按 final-gate 显式声明未验证项，不得以"代码已写完"当作完成
 
 ## 加载策略
-**必读**：
+**必读四件**（含本文）：
+- README.md（本文，全局入口与加载策略）
 - rules/constitution.md（宪法）
 - rules/core-principles.md（四大核心原则）
 - protocol/task-boundary.md（任务边界：授权面与消费者判据；决定"该不该做"，先于"怎么做"）
@@ -94,6 +95,8 @@
 - 自检清单：实现完成后读取 checklists/detailed-check
 
 **不要全量通读**：按需加载即可。
+
+统计口径：规范文件数不含 `test/` 与 `.internal-docs/`；后者为过程留痕，不受规范约束，检索时排除。
 
 ## 演化
 发现缺口→提问→用户决策→更新规范。

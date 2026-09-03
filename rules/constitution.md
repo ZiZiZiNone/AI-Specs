@@ -1,7 +1,9 @@
 # 宪法
 
-> 路径基准：本库所有裸路径（如 `rules/xxx.md`）相对**规范库根** `<SPEC_ROOT>` 解析，
-> 即本文件的上一级目录，**不是业务项目根**。详见 `<SPEC_ROOT>/README.md`「路径基准」。
+路径基准：本库所有裸路径（如 `rules/xxx.md`）相对**规范库根** `<SPEC_ROOT>` 解析，
+即本文件的上一级目录，**不是业务项目根**。
+
+> 详见 `<SPEC_ROOT>/README.md`「路径基准」。
 
 C1 禁止猜测
 C2 用户最终决策权
@@ -29,7 +31,8 @@ C6 授权面
 **编号小节例外**：文件自身把编号写进了小节标题时（形如 `## 3. 幂等性决定是否重试`），
 「第 3 节」是可被 `grep -n "^## 3\."` 验证的定位，允许使用。
 当前具备此条件的文件：`examples/golden/` 下的 list-page.md、form-validation.md、
-service-layer.md、anti-examples.md。判定方式是打开目标文件确认编号存在，不凭印象。
+service-layer.md、anti-examples.md，以及 `rules/core-principles.md` 的 `## P1`–`## P4`
+（`grep -n "^## P[1-4]\b"` 可验证；引用时写 P1–P4，不写成"第 N 节"）。判定方式是打开目标文件确认编号存在，不凭印象。
 其余文件的小节无编号，「第 N 节」一律为编造。
 
 **引用无 ID 条款的唯一合法形式**：文件路径 + 原文逐字摘录（可被 `grep -F` 命中）。

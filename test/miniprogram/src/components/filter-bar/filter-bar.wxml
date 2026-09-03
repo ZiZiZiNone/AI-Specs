@@ -1,0 +1,4 @@
+<view class="filter-bar">
+  <input value="{{keyword}}" bindinput="onInput" placeholder="搜索关键词" />
+  <button wx:if="{{keyword}}" bindtap="onClear">清除</button>
+</view>
