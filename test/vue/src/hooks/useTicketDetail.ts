@@ -1,9 +1,9 @@
 import { computed, ref, shallowRef, watch, type Ref } from 'vue';
-import type { TicketDetail } from '@/types/Ticket.types';
-import type { UIState } from '@/types/UIState.types';
-import { fetchTicketDetail } from '@/services/ticket.service';
-import { resolveDetailState } from '@/logic/uiState.logic';
-import { useRequestGuard } from './useRequestGuard';
+import type { TicketDetail } from '@/types/Ticket.types.ts';
+import type { UIState } from '@/types/UIState.types.ts';
+import { fetchTicketDetail } from '@/services/ticket.service.ts';
+import { resolveDetailState } from '@/logic/uiState.logic.ts';
+import { useRequestGuard } from '@/hooks/useRequestGuard.ts';
 
 /** 详情加载。id 变化时取消旧请求，避免快速切换后回填错误工单。 */
 export function useTicketDetail(id: Readonly<Ref<string>>) {

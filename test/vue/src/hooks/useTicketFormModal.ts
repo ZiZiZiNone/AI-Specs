@@ -1,15 +1,15 @@
 import { computed, ref, watch, type Ref } from 'vue';
 import { Message } from '@arco-design/web-vue';
-import type { TicketAssignee, TicketFormValues } from '@/types/Ticket.types';
-import type { TicketFormViewModel } from '@/types/TicketForm.types';
-import type { UIState } from '@/types/UIState.types';
-import type { SessionUser } from '@/types/Session.types';
-import { canAssign as resolveCanAssign } from '@/logic/ticketPermission.logic';
-import { validateField } from '@/logic/ticketValidation.logic';
-import { checkTicketCode, fetchTicketDetail } from '@/services/ticket.service';
-import { useTicketForm } from './useTicketForm';
-import { useAsyncSearch } from './useAsyncSearch';
-import { focusFirstErrorField } from './focusFirstErrorField';
+import type { TicketAssignee, TicketFormValues } from '@/types/Ticket.types.ts';
+import type { TicketFormViewModel } from '@/types/TicketForm.types.ts';
+import type { UIState } from '@/types/UIState.types.ts';
+import type { SessionUser } from '@/types/Session.types.ts';
+import { canAssign as resolveCanAssign } from '@/logic/ticketPermission.logic.ts';
+import { validateField } from '@/logic/ticketValidation.logic.ts';
+import { checkTicketCode, fetchTicketDetail } from '@/services/ticket.service.ts';
+import { useTicketForm } from '@/hooks/useTicketForm.ts';
+import { useAsyncSearch } from '@/hooks/useAsyncSearch.ts';
+import { focusFirstErrorField } from '@/hooks/focusFirstErrorField.ts';
 
 /**
  * 表单弹窗的完整编排：打开/关闭、编辑回填、编号异步唯一性校验、提交。

@@ -1,13 +1,13 @@
 import { computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import type { TicketListQuery, TicketSortField, SortOrder } from '@/types/Ticket.types';
+import type { TicketListQuery, TicketSortField, SortOrder } from '@/types/Ticket.types.ts';
 import {
   applyFilterChange,
   applyPageChange,
   applySortChange,
   parseQueryFromParams,
   serializeQueryToParams,
-} from '@/logic/ticketQuery.logic';
+} from '@/logic/ticketQuery.logic.ts';
 
 /**
  * 查询条件与 URL 的双向绑定。URL 是唯一数据源，

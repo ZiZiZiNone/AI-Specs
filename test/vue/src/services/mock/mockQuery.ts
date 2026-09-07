@@ -1,6 +1,6 @@
-import type { Ticket, TicketListQuery } from '@/types/Ticket.types';
-import { comparePriority } from '@/logic/ticketPriority.logic';
-import { mockDb } from './mockDb';
+import type { Ticket, TicketListQuery } from '@/types/Ticket.types.ts';
+import { comparePriority } from '@/logic/ticketPriority.logic.ts';
+import { mockDb } from '@/services/mock/mockDb.ts';
 
 /** 假后端的列表筛选/排序/分页。真实后端由服务端完成，这里只为跑通链路。 */
 

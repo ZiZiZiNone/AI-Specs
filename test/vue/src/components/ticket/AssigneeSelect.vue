@@ -1,8 +1,31 @@
+<template>
+  <a-select
+    :model-value="modelValue"
+    :options="options.map((item) => ({ value: item.id, label: item.name }))"
+    :loading="isSearching"
+    :disabled="disabled"
+    :error="hasError"
+    allow-search
+    allow-clear
+    placeholder="搜索并选择处理人"
+    :filter-option="false"
+    @search="trigger"
+    @blur="emit('blur')"
+    @update:model-value="emit('update:modelValue', String($event ?? ''))"
+  >
+    <template #empty>
+      <div class="px-3 py-2 text-xs text-[var(--color-text-3)]">
+        {{ isSearching ? '搜索中…' : '未找到匹配的处理人' }}
+      </div>
+    </template>
+  </a-select>
+</template>
+
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import type { TicketAssignee } from '@/types/Ticket.types';
-import { searchAssignees } from '@/services/assignee.service';
-import { useAsyncSearch } from '@/hooks/useAsyncSearch';
+import type { TicketAssignee } from '@/types/Ticket.types.ts';
+import { searchAssignees } from '@/services/assignee.service.ts';
+import { useAsyncSearch } from '@/hooks/useAsyncSearch.ts';
 
 /**
  * 处理人异步搜索下拉框。
@@ -44,26 +67,3 @@ onMounted(() => {
   trigger('');
 });
 </script>
-
-<template>
-  <a-select
-    :model-value="modelValue"
-    :options="options.map((item) => ({ value: item.id, label: item.name }))"
-    :loading="isSearching"
-    :disabled="disabled"
-    :error="hasError"
-    allow-search
-    allow-clear
-    placeholder="搜索并选择处理人"
-    :filter-option="false"
-    @search="trigger"
-    @blur="emit('blur')"
-    @update:model-value="emit('update:modelValue', String($event ?? ''))"
-  >
-    <template #empty>
-      <div class="px-3 py-2 text-xs text-[var(--color-text-3)]">
-        {{ isSearching ? '搜索中…' : '未找到匹配的处理人' }}
-      </div>
-    </template>
-  </a-select>
-</template>

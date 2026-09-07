@@ -1,4 +1,4 @@
-import type { TicketFormValues } from '@/types/Ticket.types';
+import type { TicketFormValues } from '@/types/Ticket.types.ts';
 
 /**
  * 提交失败后聚焦第一个错误字段（rules/form-validation.md）。

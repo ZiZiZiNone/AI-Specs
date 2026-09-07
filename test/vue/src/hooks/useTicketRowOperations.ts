@@ -1,10 +1,10 @@
 import { Message } from '@arco-design/web-vue';
 import type { Ref } from 'vue';
-import type { Ticket, TicketListQuery, TicketPriority } from '@/types/Ticket.types';
-import { resolvePageAfterRemoval } from '@/logic/ticketQuery.logic';
-import { resolveToggleTarget } from '@/logic/ticketStatus.logic';
-import { useTicketActions } from './useTicketActions';
-import { useTicketConfirm } from './useTicketConfirm';
+import type { Ticket, TicketListQuery, TicketPriority } from '@/types/Ticket.types.ts';
+import { resolvePageAfterRemoval } from '@/logic/ticketQuery.logic.ts';
+import { resolveToggleTarget } from '@/logic/ticketStatus.logic.ts';
+import { useTicketActions } from '@/hooks/useTicketActions.ts';
+import { useTicketConfirm } from '@/hooks/useTicketConfirm.ts';
 
 /**
  * 行操作编排：确认 → 执行 → 反馈 → 刷新/翻页。

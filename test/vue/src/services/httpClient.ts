@@ -1,11 +1,11 @@
-import type { Result } from '@/types/Result.types';
+import type { Result } from '@/types/Result.types.ts';
 import {
   CANCELED_ERROR,
   NETWORK_ERROR,
   TIMEOUT_ERROR,
   toStandardError,
-} from './errorMapper';
-import { MockNetworkError, sendMockRequest } from './mock/mockTransport';
+} from '@/services/errorMapper.ts';
+import { MockNetworkError, sendMockRequest } from '@/services/mock/mockTransport.ts';
 
 /**
  * 唯一的请求出口。统一承担超时、指数退避重试、取消与错误归一，

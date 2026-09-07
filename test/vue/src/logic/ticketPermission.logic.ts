@@ -1,5 +1,5 @@
-import type { PermissionCode, SessionUser } from '@/types/Session.types';
-import type { Ticket, TicketStatus } from '@/types/Ticket.types';
+import type { PermissionCode, SessionUser } from '@/types/Session.types.ts';
+import type { Ticket, TicketStatus } from '@/types/Ticket.types.ts';
 
 /**
  * 权限判定。权限数据来自 Store，判定逻辑集中在此处，

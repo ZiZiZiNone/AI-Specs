@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { TicketFormValues } from '@/types/Ticket.types';
+import type { TicketFormValues } from '@/types/Ticket.types.ts';
 import {
   createEmptyFormValues,
   resolveFirstErrorField,
@@ -7,7 +7,7 @@ import {
   toSubmitPayload,
   validateField,
   validateForm,
-} from '@/logic/ticketValidation.logic';
+} from '@/logic/ticketValidation.logic.ts';
 
 function validValues(): TicketFormValues {
   return {

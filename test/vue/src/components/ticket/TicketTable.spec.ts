@@ -4,8 +4,8 @@ import { describe, expect, it } from 'vitest';
 import { mount } from '@vue/test-utils';
 import Arco from '@arco-design/web-vue';
 import TicketTable from '@/components/ticket/TicketTable.vue';
-import type { SessionUser } from '@/types/Session.types';
-import type { Ticket } from '@/types/Ticket.types';
+import type { SessionUser } from '@/types/Session.types.ts';
+import type { Ticket } from '@/types/Ticket.types.ts';
 
 /** 只测给定 props 渲染出什么与交互上报什么；断言 emit 载荷，不断言内部状态。 */
 

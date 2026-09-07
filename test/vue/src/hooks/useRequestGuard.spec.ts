@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { type App, createApp } from 'vue';
 import { describe, expect, it } from 'vitest';
-import { useRequestGuard } from '@/hooks/useRequestGuard';
+import { useRequestGuard } from '@/hooks/useRequestGuard.ts';
 
 /** composable 在最小 setup 宿主内测试；清理与竞态行为必须有断言。 */
 function withSetup<T>(composable: () => T): [T, App] {

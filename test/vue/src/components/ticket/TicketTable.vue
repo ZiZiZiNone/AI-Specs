@@ -1,69 +1,3 @@
-<script setup lang="ts">
-import type { TableChangeExtra, TableData, TableSortable } from '@arco-design/web-vue';
-import type {
-  SortOrder,
-  Ticket,
-  TicketPriority,
-  TicketSortField,
-} from '@/types/Ticket.types';
-import type { SessionUser } from '@/types/Session.types';
-import { STATUS_COLORS, STATUS_LABELS, resolveToggleTarget } from '@/logic/ticketStatus.logic';
-import { PRIORITY_COLORS, PRIORITY_LABELS, PRIORITY_OPTIONS } from '@/logic/ticketPriority.logic';
-import { resolveTicketRowAbility } from '@/logic/ticketPermission.logic';
-
-/**
- * 工单表格。只渲染数据与列配置，所有行为通过回调上报（patterns/table.md）。
- * 权限与状态判定调用 Logic，不在模板里写条件表达式。
- */
-interface Props {
-  rows: Ticket[];
-  loading?: boolean;
-  pendingId?: string;
-  user: SessionUser | null;
-  sortBy: TicketSortField;
-  sortOrder: SortOrder;
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  loading: false,
-  pendingId: '',
-});
-
-const emit = defineEmits<{
-  view: [id: string];
-  edit: [id: string];
-  remove: [row: Ticket];
-  toggleStatus: [row: Ticket];
-  changePriority: [row: Ticket, priority: TicketPriority];
-  sortChange: [sortBy: TicketSortField, sortOrder: SortOrder];
-}>();
-
-function abilityOf(row: Ticket) {
-  return resolveTicketRowAbility(props.user, row);
-}
-
-function sortableOf(field: TicketSortField): TableSortable {
-  return {
-    sortDirections: ['ascend', 'descend'],
-    defaultSortOrder:
-      props.sortBy === field ? (props.sortOrder === 'asc' ? 'ascend' : 'descend') : '',
-    sorter: true,
-  };
-}
-
-function handleSort(_data: TableData[], extra: TableChangeExtra): void {
-  const field = extra.sorter?.field as TicketSortField | undefined;
-  if (!field) return;
-  emit('sortChange', field, extra.sorter?.direction === 'ascend' ? 'asc' : 'desc');
-}
-
-function formatDateTime(iso: string): string {
-  const date = new Date(iso);
-  const pad = (n: number) => String(n).padStart(2, '0');
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
-}
-</script>
-
 <template>
   <a-table
     :data="rows"
@@ -165,3 +99,69 @@ function formatDateTime(iso: string): string {
     </template>
   </a-table>
 </template>
+
+<script setup lang="ts">
+import type { TableChangeExtra, TableData, TableSortable } from '@arco-design/web-vue';
+import type {
+  SortOrder,
+  Ticket,
+  TicketPriority,
+  TicketSortField,
+} from '@/types/Ticket.types.ts';
+import type { SessionUser } from '@/types/Session.types.ts';
+import { STATUS_COLORS, STATUS_LABELS, resolveToggleTarget } from '@/logic/ticketStatus.logic.ts';
+import { PRIORITY_COLORS, PRIORITY_LABELS, PRIORITY_OPTIONS } from '@/logic/ticketPriority.logic.ts';
+import { resolveTicketRowAbility } from '@/logic/ticketPermission.logic.ts';
+
+/**
+ * 工单表格。只渲染数据与列配置，所有行为通过回调上报（patterns/table.md）。
+ * 权限与状态判定调用 Logic，不在模板里写条件表达式。
+ */
+interface Props {
+  rows: Ticket[];
+  loading?: boolean;
+  pendingId?: string;
+  user: SessionUser | null;
+  sortBy: TicketSortField;
+  sortOrder: SortOrder;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  loading: false,
+  pendingId: '',
+});
+
+const emit = defineEmits<{
+  view: [id: string];
+  edit: [id: string];
+  remove: [row: Ticket];
+  toggleStatus: [row: Ticket];
+  changePriority: [row: Ticket, priority: TicketPriority];
+  sortChange: [sortBy: TicketSortField, sortOrder: SortOrder];
+}>();
+
+function abilityOf(row: Ticket) {
+  return resolveTicketRowAbility(props.user, row);
+}
+
+function sortableOf(field: TicketSortField): TableSortable {
+  return {
+    sortDirections: ['ascend', 'descend'],
+    defaultSortOrder:
+      props.sortBy === field ? (props.sortOrder === 'asc' ? 'ascend' : 'descend') : '',
+    sorter: true,
+  };
+}
+
+function handleSort(_data: TableData[], extra: TableChangeExtra): void {
+  const field = extra.sorter?.field as TicketSortField | undefined;
+  if (!field) return;
+  emit('sortChange', field, extra.sorter?.direction === 'ascend' ? 'asc' : 'desc');
+}
+
+function formatDateTime(iso: string): string {
+  const date = new Date(iso);
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+</script>

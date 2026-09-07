@@ -47,6 +47,12 @@ export type ValidationRules<T> = { [K in keyof T]?: ValidationRule<T[K]>[] };
 export type FieldRules = { [fieldName: string]: { validator?: (v: any) => boolean }[] };
 ```
 
+## 模块内容顺序
+
+纯 TS 模块（`logic` / `service` / `types` / `hooks`）按此序：
+文件头注释 → imports → 类型（`interface` / `type`）→ 常量与映射表 → 私有函数 → 公开导出函数。
+`async` 不提前，失败经返回值表达（见 frameworks/miniprogram/logic.md 入参/返回值约定）。
+
 ## 检查清单
 - [ ] 无无理由的 any（需要时用 unknown 并窄化）
 - [ ] 领域数据可空字段用 `Type | null`
@@ -54,3 +60,4 @@ export type FieldRules = { [fieldName: string]: { validator?: (v: any) => boolea
 - [ ] 枚举用联合类型或 enum，不用裸 string
 - [ ] 映射/规则表按键泛型化，未退化为索引签名
 - [ ] 公共函数与组件 props 有类型定义
+- [ ] 模块内容顺序为头注释 → imports → 类型 → 常量 → 私有 → 公开导出

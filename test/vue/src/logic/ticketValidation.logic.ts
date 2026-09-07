@@ -2,8 +2,8 @@ import type {
   ValidationErrors,
   ValidationRule,
   ValidationRules,
-} from '@/types/Validation.types';
-import type { TicketDetail, TicketFormValues } from '@/types/Ticket.types';
+} from '@/types/Validation.types.ts';
+import type { TicketDetail, TicketFormValues } from '@/types/Ticket.types.ts';
 
 /**
  * 表单校验规则与执行。规则集中定义在此处（rules/form-validation.md），

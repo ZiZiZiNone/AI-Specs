@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { httpClient } from '@/services/httpClient';
-import { registerHandler, mockFaultConfig } from '@/services/mock/mockTransport';
+import { httpClient } from '@/services/httpClient.ts';
+import { registerHandler, mockFaultConfig } from '@/services/mock/mockTransport.ts';
 
 /** 验证重试、超时与非幂等写操作不重试这三条关键行为。 */
 

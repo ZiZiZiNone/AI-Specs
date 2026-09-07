@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import type { SessionUser } from '@/types/Session.types';
-import type { UIState } from '@/types/UIState.types';
-import { fetchSession } from '@/services/session.service';
+import type { SessionUser } from '@/types/Session.types.ts';
+import type { UIState } from '@/types/UIState.types.ts';
+import { fetchSession } from '@/services/session.service.ts';
 
 /**
  * 当前用户与权限。跨页面共享且需响应式，按 rules/store.md 决策树第 4 条进 Store。

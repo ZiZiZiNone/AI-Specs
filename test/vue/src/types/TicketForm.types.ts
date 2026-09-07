@@ -1,5 +1,5 @@
-import type { TicketAssignee, TicketFormValues } from './Ticket.types';
-import type { ValidationErrors } from './Validation.types';
+import type { TicketAssignee, TicketFormValues } from '@/types/Ticket.types.ts';
+import type { ValidationErrors } from '@/types/Validation.types.ts';
 
 /**
  * 表单弹窗的视图模型。

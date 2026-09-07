@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import type { SessionUser } from '@/types/Session.types';
-import { canAssign, resolveTicketRowAbility } from '@/logic/ticketPermission.logic';
-import { canTransition, resolveToggleTarget } from '@/logic/ticketStatus.logic';
-import { requiresPriorityConfirm } from '@/logic/ticketPriority.logic';
+import type { SessionUser } from '@/types/Session.types.ts';
+import { canAssign, resolveTicketRowAbility } from '@/logic/ticketPermission.logic.ts';
+import { canTransition, resolveToggleTarget } from '@/logic/ticketStatus.logic.ts';
+import { requiresPriorityConfirm } from '@/logic/ticketPriority.logic.ts';
 
 const fullAccess: SessionUser = {
   id: 'u-01',

@@ -1,4 +1,4 @@
-import type { UIState } from '@/types/UIState.types';
+import type { UIState } from '@/types/UIState.types.ts';
 
 /**
  * success 与 empty 的判定收敛到一处。

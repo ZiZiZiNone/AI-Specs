@@ -1,9 +1,9 @@
 import { ref, shallowRef, watch, type Ref } from 'vue';
-import type { Ticket, TicketListQuery } from '@/types/Ticket.types';
-import type { UIState } from '@/types/UIState.types';
-import { fetchTicketList } from '@/services/ticket.service';
-import { resolveListState } from '@/logic/uiState.logic';
-import { useRequestGuard } from './useRequestGuard';
+import type { Ticket, TicketListQuery } from '@/types/Ticket.types.ts';
+import type { UIState } from '@/types/UIState.types.ts';
+import { fetchTicketList } from '@/services/ticket.service.ts';
+import { resolveListState } from '@/logic/uiState.logic.ts';
+import { useRequestGuard } from '@/hooks/useRequestGuard.ts';
 
 /**
  * 列表数据加载。承担 loading/error/empty 组合与竞态保护，

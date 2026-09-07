@@ -83,6 +83,16 @@ const keyword = ref(props.initialKeyword);
 
 ---
 
+## SFC 块顺序与 script 内部顺序
+
+- 块顺序强制 `template → script → style`；缺 `style` 不罚；
+  `i18n` / `docs` 等自定义块一律放末尾。
+- `<script setup>` 内部：imports → 类型定义（`Props` / `Emits` 接口）→
+  `defineProps` / `defineEmits` / `withDefaults` →
+  store / hooks 实例 → `computed` / `watch` → 生命周期 → 函数与事件处理。
+
+---
+
 ## 插槽
 
 - 用具名插槽表达结构扩展点，不用 props 传 render 函数。
@@ -117,3 +127,5 @@ const keyword = ref(props.initialKeyword);
 - [ ] 状态容器只在 success 态渲染默认插槽
 - [ ] 无 import Store、无业务数据请求、无路由参数访问
 - [ ] 未用 defineExpose 暴露业务方法
+- [ ] SFC 块顺序为 template → script → style（缺 style 不罚，自定义块殿后）
+- [ ] script 内部按类型 → props/emit 声明 → 实例 → computed/watch → 生命周期 → 函数

@@ -1,7 +1,37 @@
+<template>
+  <div>
+    <div v-if="state === 'idle' || state === 'loading'" class="px-2 py-4">
+      <slot name="loading">
+        <a-skeleton animation>
+          <a-skeleton-line :rows="skeletonRows" :line-height="28" :line-spacing="16" />
+        </a-skeleton>
+      </slot>
+    </div>
+
+    <ErrorPlaceholder
+      v-else-if="state === 'error'"
+      :message="errorMessage || '数据加载失败，请稍后重试'"
+      :back-text="errorBackText"
+      @retry="emit('retry')"
+      @back="emit('errorBack')"
+    />
+
+    <EmptyPlaceholder
+      v-else-if="state === 'empty'"
+      :title="emptyTitle"
+      :description="emptyDescription"
+      :action-text="emptyActionText"
+      @action="emit('emptyAction')"
+    />
+
+    <slot v-else />
+  </div>
+</template>
+
 <script setup lang="ts">
-import type { UIState } from '@/types/UIState.types';
-import EmptyPlaceholder from './EmptyPlaceholder.vue';
-import ErrorPlaceholder from './ErrorPlaceholder.vue';
+import type { UIState } from '@/types/UIState.types.ts';
+import EmptyPlaceholder from '@/components/feedback/EmptyPlaceholder.vue';
+import ErrorPlaceholder from '@/components/feedback/ErrorPlaceholder.vue';
 
 /**
  * 五态容器（rules/ui-states.md 的 DataLoader）。
@@ -34,33 +64,3 @@ const emit = defineEmits<{
   errorBack: [];
 }>();
 </script>
-
-<template>
-  <div>
-    <div v-if="state === 'idle' || state === 'loading'" class="px-2 py-4">
-      <slot name="loading">
-        <a-skeleton animation>
-          <a-skeleton-line :rows="skeletonRows" :line-height="28" :line-spacing="16" />
-        </a-skeleton>
-      </slot>
-    </div>
-
-    <ErrorPlaceholder
-      v-else-if="state === 'error'"
-      :message="errorMessage || '数据加载失败，请稍后重试'"
-      :back-text="errorBackText"
-      @retry="emit('retry')"
-      @back="emit('errorBack')"
-    />
-
-    <EmptyPlaceholder
-      v-else-if="state === 'empty'"
-      :title="emptyTitle"
-      :description="emptyDescription"
-      :action-text="emptyActionText"
-      @action="emit('emptyAction')"
-    />
-
-    <slot v-else />
-  </div>
-</template>

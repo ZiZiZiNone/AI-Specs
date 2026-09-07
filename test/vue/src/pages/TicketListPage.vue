@@ -1,42 +1,3 @@
-<script setup lang="ts">
-import { computed } from 'vue';
-import { useRouter } from 'vue-router';
-import { Message } from '@arco-design/web-vue';
-import { IconPlus } from '@arco-design/web-vue/es/icon';
-import { PAGE_SIZE_OPTIONS } from '@/logic/ticketQuery.logic';
-import { hasPermission } from '@/logic/ticketPermission.logic';
-import { useSessionStore } from '@/store/session.store';
-import { useTicketQuery } from '@/hooks/useTicketQuery';
-import { useTicketList } from '@/hooks/useTicketList';
-import { useTicketRowOperations } from '@/hooks/useTicketRowOperations';
-import { useTicketFormModal } from '@/hooks/useTicketFormModal';
-import DataLoader from '@/components/feedback/DataLoader.vue';
-import TicketSearchBar from '@/components/ticket/TicketSearchBar.vue';
-import TicketTable from '@/components/ticket/TicketTable.vue';
-import TicketFormModal from '@/components/ticket/TicketFormModal.vue';
-
-/** 列表页：只做组装与事件转发，业务判定全部来自 Logic / Hook。 */
-
-const router = useRouter();
-const session = useSessionStore();
-const { query, changeFilter, changePage, changeSort, goToPage } = useTicketQuery();
-const list = useTicketList(query);
-const formModal = useTicketFormModal(computed(() => session.user));
-const rowOps = useTicketRowOperations({
-  rows: list.list,
-  query,
-  total: list.total,
-  reload: list.reload,
-  goToPage,
-});
-
-const canCreate = computed(() => hasPermission(session.user, 'ticket:create'));
-
-async function handleSubmit(): Promise<void> {
-  if (await formModal.submit()) await list.reload();
-}
-</script>
-
 <template>
   <div class="flex flex-col gap-4 p-6">
     <header class="flex items-center justify-between">
@@ -113,3 +74,42 @@ async function handleSubmit(): Promise<void> {
     />
   </div>
 </template>
+
+<script setup lang="ts">
+import { computed } from 'vue';
+import { useRouter } from 'vue-router';
+import { Message } from '@arco-design/web-vue';
+import { IconPlus } from '@arco-design/web-vue/es/icon';
+import { PAGE_SIZE_OPTIONS } from '@/logic/ticketQuery.logic.ts';
+import { hasPermission } from '@/logic/ticketPermission.logic.ts';
+import { useSessionStore } from '@/store/session.store.ts';
+import { useTicketQuery } from '@/hooks/useTicketQuery.ts';
+import { useTicketList } from '@/hooks/useTicketList.ts';
+import { useTicketRowOperations } from '@/hooks/useTicketRowOperations.ts';
+import { useTicketFormModal } from '@/hooks/useTicketFormModal.ts';
+import DataLoader from '@/components/feedback/DataLoader.vue';
+import TicketSearchBar from '@/components/ticket/TicketSearchBar.vue';
+import TicketTable from '@/components/ticket/TicketTable.vue';
+import TicketFormModal from '@/components/ticket/TicketFormModal.vue';
+
+/** 列表页：只做组装与事件转发，业务判定全部来自 Logic / Hook。 */
+
+const router = useRouter();
+const session = useSessionStore();
+const { query, changeFilter, changePage, changeSort, goToPage } = useTicketQuery();
+const list = useTicketList(query);
+const formModal = useTicketFormModal(computed(() => session.user));
+const rowOps = useTicketRowOperations({
+  rows: list.list,
+  query,
+  total: list.total,
+  reload: list.reload,
+  goToPage,
+});
+
+const canCreate = computed(() => hasPermission(session.user, 'ticket:create'));
+
+async function handleSubmit(): Promise<void> {
+  if (await formModal.submit()) await list.reload();
+}
+</script>

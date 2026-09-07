@@ -1,4 +1,4 @@
-import type { TicketPriority } from '@/types/Ticket.types';
+import type { TicketPriority } from '@/types/Ticket.types.ts';
 
 export const PRIORITY_LABELS: Record<TicketPriority, string> = {
   low: '低',

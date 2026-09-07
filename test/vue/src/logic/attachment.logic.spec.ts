@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import type { TicketAttachment } from '@/types/Ticket.types';
+import type { TicketAttachment } from '@/types/Ticket.types.ts';
 import {
   MAX_ATTACHMENT_SIZE,
   checkAttachment,
   removeAttachment,
-} from '@/logic/attachment.logic';
-import { resolveListState, resolvePagedState } from '@/logic/uiState.logic';
+} from '@/logic/attachment.logic.ts';
+import { resolveListState, resolvePagedState } from '@/logic/uiState.logic.ts';
 
 const existing = (count: number): TicketAttachment[] =>
   Array.from({ length: count }, (_, i) => ({

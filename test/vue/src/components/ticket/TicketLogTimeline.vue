@@ -1,38 +1,3 @@
-<script setup lang="ts">
-import type { TicketLog } from '@/types/Ticket.types';
-import type { UIState } from '@/types/UIState.types';
-import DataLoader from '../feedback/DataLoader.vue';
-
-/**
- * 处理记录时间线。区块级五态独立于详情主体，
- * 记录加载失败不影响基本信息（patterns/detail-page.md）。
- */
-interface Props {
-  logs: TicketLog[];
-  state: UIState;
-  errorMessage?: string;
-  hasMore?: boolean;
-  isLoadingMore?: boolean;
-}
-
-withDefaults(defineProps<Props>(), {
-  errorMessage: '',
-  hasMore: false,
-  isLoadingMore: false,
-});
-
-const emit = defineEmits<{
-  retry: [];
-  loadMore: [];
-}>();
-
-function formatDateTime(iso: string): string {
-  const date = new Date(iso);
-  const pad = (n: number) => String(n).padStart(2, '0');
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
-}
-</script>
-
 <template>
   <section class="flex flex-col gap-4 rounded-lg bg-white p-6">
     <h3 class="text-sm font-medium text-[var(--color-text-2)]">处理记录</h3>
@@ -70,3 +35,38 @@ function formatDateTime(iso: string): string {
     </DataLoader>
   </section>
 </template>
+
+<script setup lang="ts">
+import type { TicketLog } from '@/types/Ticket.types.ts';
+import type { UIState } from '@/types/UIState.types.ts';
+import DataLoader from '@/components/feedback/DataLoader.vue';
+
+/**
+ * 处理记录时间线。区块级五态独立于详情主体，
+ * 记录加载失败不影响基本信息（patterns/detail-page.md）。
+ */
+interface Props {
+  logs: TicketLog[];
+  state: UIState;
+  errorMessage?: string;
+  hasMore?: boolean;
+  isLoadingMore?: boolean;
+}
+
+withDefaults(defineProps<Props>(), {
+  errorMessage: '',
+  hasMore: false,
+  isLoadingMore: false,
+});
+
+const emit = defineEmits<{
+  retry: [];
+  loadMore: [];
+}>();
+
+function formatDateTime(iso: string): string {
+  const date = new Date(iso);
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+</script>

@@ -115,6 +115,17 @@ Component({
 
 ---
 
+## 文件与对象键顺序
+
+- `Page()` / `Component()` 键序：imports → 模块常量 →
+  `properties`（组件）/ `data` → `observers` →
+  生命周期（页面 `onLoad` / `onShow` / `onReachBottom`；
+  组件 `lifetimes.attached` / `ready`）→ 自定义方法与事件处理 →
+  清理（`detached` / `onUnload` 调 `abortAll` 收尾）。
+- 纯 logic TS 模块顺序见 rules/typescript.md。
+
+---
+
 ## 检查清单
 
 - [ ] properties 用完整形态，类型定义在 types/
@@ -126,3 +137,4 @@ Component({
 - [ ] attached 内无数据请求，detached 有清理
 - [ ] 无 globalData 业务读取、无业务数据请求、无路由参数访问
 - [ ] 未用 selectComponent 调用业务方法
+- [ ] 对象键序为 properties/data → observers → 生命周期 → 自定义方法 → 清理收尾

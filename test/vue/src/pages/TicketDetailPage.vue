@@ -1,40 +1,3 @@
-<script setup lang="ts">
-import { computed } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import { IconArrowLeft, IconEdit } from '@arco-design/web-vue/es/icon';
-import { resolveTicketRowAbility } from '@/logic/ticketPermission.logic';
-import { useSessionStore } from '@/store/session.store';
-import { useTicketDetail } from '@/hooks/useTicketDetail';
-import { useTicketLogs } from '@/hooks/useTicketLogs';
-import { useTicketFormModal } from '@/hooks/useTicketFormModal';
-import DataLoader from '@/components/feedback/DataLoader.vue';
-import TicketDetailPanel from '@/components/ticket/TicketDetailPanel.vue';
-import TicketLogTimeline from '@/components/ticket/TicketLogTimeline.vue';
-import TicketFormModal from '@/components/ticket/TicketFormModal.vue';
-
-/** 详情页：详情与处理记录并发加载，两个区块状态互不影响。 */
-
-const route = useRoute();
-const router = useRouter();
-const session = useSessionStore();
-const ticketId = computed(() => String(route.params.id ?? ''));
-
-const detail = useTicketDetail(ticketId);
-const logs = useTicketLogs(ticketId);
-const formModal = useTicketFormModal(computed(() => session.user));
-
-const canEdit = computed(() =>
-  detail.detail.value
-    ? resolveTicketRowAbility(session.user, detail.detail.value).canEdit
-    : false,
-);
-
-async function handleSubmit(): Promise<void> {
-  if (!(await formModal.submit())) return;
-  await Promise.all([detail.reload(), logs.reload()]);
-}
-</script>
-
 <template>
   <div class="flex flex-col gap-4 p-6">
     <header class="flex items-center justify-between">
@@ -88,3 +51,40 @@ async function handleSubmit(): Promise<void> {
     />
   </div>
 </template>
+
+<script setup lang="ts">
+import { computed } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { IconArrowLeft, IconEdit } from '@arco-design/web-vue/es/icon';
+import { resolveTicketRowAbility } from '@/logic/ticketPermission.logic.ts';
+import { useSessionStore } from '@/store/session.store.ts';
+import { useTicketDetail } from '@/hooks/useTicketDetail.ts';
+import { useTicketLogs } from '@/hooks/useTicketLogs.ts';
+import { useTicketFormModal } from '@/hooks/useTicketFormModal.ts';
+import DataLoader from '@/components/feedback/DataLoader.vue';
+import TicketDetailPanel from '@/components/ticket/TicketDetailPanel.vue';
+import TicketLogTimeline from '@/components/ticket/TicketLogTimeline.vue';
+import TicketFormModal from '@/components/ticket/TicketFormModal.vue';
+
+/** 详情页：详情与处理记录并发加载，两个区块状态互不影响。 */
+
+const route = useRoute();
+const router = useRouter();
+const session = useSessionStore();
+const ticketId = computed(() => String(route.params.id ?? ''));
+
+const detail = useTicketDetail(ticketId);
+const logs = useTicketLogs(ticketId);
+const formModal = useTicketFormModal(computed(() => session.user));
+
+const canEdit = computed(() =>
+  detail.detail.value
+    ? resolveTicketRowAbility(session.user, detail.detail.value).canEdit
+    : false,
+);
+
+async function handleSubmit(): Promise<void> {
+  if (!(await formModal.submit())) return;
+  await Promise.all([detail.reload(), logs.reload()]);
+}
+</script>

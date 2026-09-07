@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { toStandardError } from '@/services/errorMapper';
+import { toStandardError } from '@/services/errorMapper.ts';
 
 describe('errorMapper', () => {
   it('should_mark_server_error_retryable', () => {

@@ -5,8 +5,8 @@ import type {
   TicketLog,
   TicketPriority,
   TicketStatus,
-} from '@/types/Ticket.types';
-import type { SessionUser } from '@/types/Session.types';
+} from '@/types/Ticket.types.ts';
+import type { SessionUser } from '@/types/Session.types.ts';
 
 /**
  * 内存假后端，仅为让链路可运行（无真实后端）。

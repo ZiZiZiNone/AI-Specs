@@ -1,4 +1,4 @@
-import type { TicketAttachment } from '@/types/Ticket.types';
+import type { TicketAttachment } from '@/types/Ticket.types.ts';
 
 /**
  * 附件校验规则。按 patterns/upload.md，校验在 Logic，UI 只触发与展示。

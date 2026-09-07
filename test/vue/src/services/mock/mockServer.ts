@@ -1,7 +1,7 @@
-import type { TicketDetail, TicketFormValues } from '@/types/Ticket.types';
-import { registerHandler } from './mockTransport';
-import { MOCK_ASSIGNEES, MOCK_SESSION, mockDb } from './mockDb';
-import { queryTickets } from './mockQuery';
+import type { TicketDetail, TicketFormValues } from '@/types/Ticket.types.ts';
+import { registerHandler } from '@/services/mock/mockTransport.ts';
+import { MOCK_ASSIGNEES, MOCK_SESSION, mockDb } from '@/services/mock/mockDb.ts';
+import { queryTickets } from '@/services/mock/mockQuery.ts';
 
 /** 假后端路由表。仅在开发环境注册，注册一次。 */
 

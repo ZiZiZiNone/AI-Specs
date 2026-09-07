@@ -4,7 +4,7 @@ import type {
   TicketPriority,
   TicketSortField,
   TicketStatus,
-} from '@/types/Ticket.types';
+} from '@/types/Ticket.types.ts';
 
 /**
  * 列表查询参数的规范化与 URL 序列化。

@@ -9,6 +9,12 @@
 - 复用机制：B 方案——逻辑复用走 `logic/` 纯函数，**不得用 behaviors 承载业务逻辑**。
   behaviors 仅允许用于合并 lifetimes / observers 等框架钩子场景，且须在原处写明理由。
 
+## 别名构建（`@/`）
+
+- `@/*` 指向 `miniprogram/*`（`tsconfig baseUrl:"."` + `paths`），
+  由开发者工具 `typescript` 编译插件在编译期解析，不引入第三方 alias 插件。
+- 写法与校验（单别名、禁相对、后缀规则）见 rules/import-path.md。
+
 ## Hook 层映射
 
 `rules/architecture.md` 规定 Hook 为 UI 侧的状态/副作用复用单元，

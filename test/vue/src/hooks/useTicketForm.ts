@@ -1,6 +1,6 @@
 import { computed, reactive, ref } from 'vue';
-import type { TicketDetail, TicketFormValues } from '@/types/Ticket.types';
-import type { ValidationErrors } from '@/types/Validation.types';
+import type { TicketDetail, TicketFormValues } from '@/types/Ticket.types.ts';
+import type { ValidationErrors } from '@/types/Validation.types.ts';
 import {
   createEmptyFormValues,
   resolveDependentFields,
@@ -9,8 +9,8 @@ import {
   toSubmitPayload,
   validateField,
   validateForm,
-} from '@/logic/ticketValidation.logic';
-import { createTicket, updateTicket } from '@/services/ticket.service';
+} from '@/logic/ticketValidation.logic.ts';
+import { createTicket, updateTicket } from '@/services/ticket.service.ts';
 
 /**
  * 表单状态与校验时机编排。规则本身在 Logic，

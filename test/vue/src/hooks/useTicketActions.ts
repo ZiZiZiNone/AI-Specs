@@ -1,10 +1,10 @@
 import { ref, type Ref } from 'vue';
-import type { Ticket, TicketPriority, TicketStatus } from '@/types/Ticket.types';
+import type { Ticket, TicketPriority, TicketStatus } from '@/types/Ticket.types.ts';
 import {
   deleteTicket,
   updateTicketPriority,
   updateTicketStatus,
-} from '@/services/ticket.service';
+} from '@/services/ticket.service.ts';
 
 /**
  * 行内操作：删除、状态切换、优先级乐观更新。

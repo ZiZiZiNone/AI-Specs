@@ -1,4 +1,4 @@
-import type { TicketStatus } from '@/types/Ticket.types';
+import type { TicketStatus } from '@/types/Ticket.types.ts';
 
 /**
  * 工单状态流转规则。集中在 Logic，避免"关闭后还能再关闭"这类

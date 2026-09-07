@@ -1,52 +1,3 @@
-<script setup lang="ts">
-import { computed } from 'vue';
-import type { TicketAssignee, TicketFormValues } from '@/types/Ticket.types';
-import type { ValidationErrors } from '@/types/Validation.types';
-import {
-  DESCRIPTION_MAX_LENGTH,
-  TITLE_MAX_LENGTH,
-  TICKET_FIELD_LABELS,
-} from '@/logic/ticketValidation.logic';
-import { PRIORITY_OPTIONS } from '@/logic/ticketPriority.logic';
-import AssigneeSelect from './AssigneeSelect.vue';
-import AttachmentUpload from './AttachmentUpload.vue';
-
-/**
- * 工单表单。受控组件：值与错误由父级（Hook）持有，
- * 本组件只渲染字段、分发 change/blur 事件。
- *
- * 保留在单文件而不再拆分：字段虽多但职责单一（一张表单），
- * 拆成子组件会让 values/errors/change/blur 四组 props 层层透传，
- * 反而更复杂（core-principles P1 超标处理第 3 条）。
- */
-interface Props {
-  values: TicketFormValues;
-  errors: ValidationErrors<TicketFormValues>;
-  isCheckingCode?: boolean;
-  canAssign?: boolean;
-  initialAssignee?: TicketAssignee | null;
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  isCheckingCode: false,
-  canAssign: true,
-  initialAssignee: null,
-});
-
-const emit = defineEmits<{
-  change: [field: keyof TicketFormValues, value: unknown];
-  blur: [field: keyof TicketFormValues];
-  reject: [message: string];
-}>();
-
-const titleCount = computed(() => props.values.title.trim().length);
-const descriptionCount = computed(() => props.values.description.trim().length);
-
-function update(field: keyof TicketFormValues, value: unknown): void {
-  emit('change', field, value);
-}
-</script>
-
 <template>
   <a-form :model="values" layout="vertical">
     <a-form-item
@@ -189,3 +140,52 @@ function update(field: keyof TicketFormValues, value: unknown): void {
     </a-form-item>
   </a-form>
 </template>
+
+<script setup lang="ts">
+import { computed } from 'vue';
+import type { TicketAssignee, TicketFormValues } from '@/types/Ticket.types.ts';
+import type { ValidationErrors } from '@/types/Validation.types.ts';
+import {
+  DESCRIPTION_MAX_LENGTH,
+  TITLE_MAX_LENGTH,
+  TICKET_FIELD_LABELS,
+} from '@/logic/ticketValidation.logic.ts';
+import { PRIORITY_OPTIONS } from '@/logic/ticketPriority.logic.ts';
+import AssigneeSelect from '@/components/ticket/AssigneeSelect.vue';
+import AttachmentUpload from '@/components/ticket/AttachmentUpload.vue';
+
+/**
+ * 工单表单。受控组件：值与错误由父级（Hook）持有，
+ * 本组件只渲染字段、分发 change/blur 事件。
+ *
+ * 保留在单文件而不再拆分：字段虽多但职责单一（一张表单），
+ * 拆成子组件会让 values/errors/change/blur 四组 props 层层透传，
+ * 反而更复杂（core-principles P1 超标处理第 3 条）。
+ */
+interface Props {
+  values: TicketFormValues;
+  errors: ValidationErrors<TicketFormValues>;
+  isCheckingCode?: boolean;
+  canAssign?: boolean;
+  initialAssignee?: TicketAssignee | null;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  isCheckingCode: false,
+  canAssign: true,
+  initialAssignee: null,
+});
+
+const emit = defineEmits<{
+  change: [field: keyof TicketFormValues, value: unknown];
+  blur: [field: keyof TicketFormValues];
+  reject: [message: string];
+}>();
+
+const titleCount = computed(() => props.values.title.trim().length);
+const descriptionCount = computed(() => props.values.description.trim().length);
+
+function update(field: keyof TicketFormValues, value: unknown): void {
+  emit('change', field, value);
+}
+</script>

@@ -1,9 +1,9 @@
 import { computed, ref, shallowRef, watch, type Ref } from 'vue';
-import type { TicketLog } from '@/types/Ticket.types';
-import type { UIState } from '@/types/UIState.types';
-import { fetchTicketLogs } from '@/services/ticket.service';
-import { resolveListState } from '@/logic/uiState.logic';
-import { useRequestGuard } from './useRequestGuard';
+import type { TicketLog } from '@/types/Ticket.types.ts';
+import type { UIState } from '@/types/UIState.types.ts';
+import { fetchTicketLogs } from '@/services/ticket.service.ts';
+import { resolveListState } from '@/logic/uiState.logic.ts';
+import { useRequestGuard } from '@/hooks/useRequestGuard.ts';
 
 const LOG_PAGE_SIZE = 10;
 

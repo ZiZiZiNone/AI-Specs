@@ -1,4 +1,4 @@
-import type { StandardError } from '@/types/Result.types';
+import type { StandardError } from '@/types/Result.types.ts';
 
 /**
  * 错误归一。所有分支收敛到 StandardError（rules/error-handling.md），

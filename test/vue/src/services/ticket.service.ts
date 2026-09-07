@@ -1,4 +1,4 @@
-import type { PageResult, Result } from '@/types/Result.types';
+import type { PageResult, Result } from '@/types/Result.types.ts';
 import type {
   Ticket,
   TicketDetail,
@@ -7,8 +7,8 @@ import type {
   TicketLog,
   TicketPriority,
   TicketStatus,
-} from '@/types/Ticket.types';
-import { httpClient } from './httpClient';
+} from '@/types/Ticket.types.ts';
+import { httpClient } from '@/services/httpClient.ts';
 
 /** 工单接口访问。业务语义命名，参数拼装与类型收敛在此层。 */
 

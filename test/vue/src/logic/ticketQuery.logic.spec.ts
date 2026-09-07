@@ -7,7 +7,7 @@ import {
   parseQueryFromParams,
   resolvePageAfterRemoval,
   serializeQueryToParams,
-} from '@/logic/ticketQuery.logic';
+} from '@/logic/ticketQuery.logic.ts';
 
 describe('ticketQuery.logic', () => {
   it('should_fallback_to_defaults_when_url_params_are_invalid', () => {

@@ -1,7 +1,7 @@
-import type { Result } from '@/types/Result.types';
-import type { TicketAssignee } from '@/types/Ticket.types';
-import { httpClient } from './httpClient';
-import type { RequestContext } from './ticket.service';
+import type { Result } from '@/types/Result.types.ts';
+import type { TicketAssignee } from '@/types/Ticket.types.ts';
+import { httpClient } from '@/services/httpClient.ts';
+import type { RequestContext } from '@/services/ticket.service.ts';
 
 export function searchAssignees(
   keyword: string,

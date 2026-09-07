@@ -1,39 +1,3 @@
-<script setup lang="ts">
-import { computed } from 'vue';
-import { IconRefresh, IconSearch } from '@arco-design/web-vue/es/icon';
-import type { TicketListQuery } from '@/types/Ticket.types';
-import { STATUS_LABELS } from '@/logic/ticketStatus.logic';
-import { PRIORITY_OPTIONS } from '@/logic/ticketPriority.logic';
-import { hasActiveFilter } from '@/logic/ticketQuery.logic';
-import AssigneeSelect from './AssigneeSelect.vue';
-
-/**
- * 筛选栏。完全受控：值由 props 传入，变更通过 change 上报，
- * 自身不持有筛选状态（真实来源是 URL）。
- */
-interface Props {
-  query: TicketListQuery;
-  isRefreshing?: boolean;
-}
-
-const props = withDefaults(defineProps<Props>(), { isRefreshing: false });
-
-const emit = defineEmits<{
-  change: [patch: Partial<Omit<TicketListQuery, 'page'>>];
-  reset: [];
-  refresh: [];
-}>();
-
-const statusOptions = computed(() =>
-  (Object.keys(STATUS_LABELS) as (keyof typeof STATUS_LABELS)[]).map((value) => ({
-    value,
-    label: STATUS_LABELS[value],
-  })),
-);
-
-const canReset = computed(() => hasActiveFilter(props.query));
-</script>
-
 <template>
   <div class="flex flex-wrap items-center gap-3 rounded-lg bg-white p-4">
     <a-input
@@ -82,3 +46,39 @@ const canReset = computed(() => hasActiveFilter(props.query));
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import { computed } from 'vue';
+import { IconRefresh, IconSearch } from '@arco-design/web-vue/es/icon';
+import type { TicketListQuery } from '@/types/Ticket.types.ts';
+import { STATUS_LABELS } from '@/logic/ticketStatus.logic.ts';
+import { PRIORITY_OPTIONS } from '@/logic/ticketPriority.logic.ts';
+import { hasActiveFilter } from '@/logic/ticketQuery.logic.ts';
+import AssigneeSelect from '@/components/ticket/AssigneeSelect.vue';
+
+/**
+ * 筛选栏。完全受控：值由 props 传入，变更通过 change 上报，
+ * 自身不持有筛选状态（真实来源是 URL）。
+ */
+interface Props {
+  query: TicketListQuery;
+  isRefreshing?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), { isRefreshing: false });
+
+const emit = defineEmits<{
+  change: [patch: Partial<Omit<TicketListQuery, 'page'>>];
+  reset: [];
+  refresh: [];
+}>();
+
+const statusOptions = computed(() =>
+  (Object.keys(STATUS_LABELS) as (keyof typeof STATUS_LABELS)[]).map((value) => ({
+    value,
+    label: STATUS_LABELS[value],
+  })),
+);
+
+const canReset = computed(() => hasActiveFilter(props.query));
+</script>

@@ -1,8 +1,8 @@
 import { Message, Modal } from '@arco-design/web-vue';
-import type { Ticket, TicketPriority } from '@/types/Ticket.types';
-import { STATUS_LABELS, resolveToggleTarget } from '@/logic/ticketStatus.logic';
-import { PRIORITY_LABELS, requiresPriorityConfirm } from '@/logic/ticketPriority.logic';
-import type { ActionOutcome } from './useTicketActions';
+import type { Ticket, TicketPriority } from '@/types/Ticket.types.ts';
+import { STATUS_LABELS, resolveToggleTarget } from '@/logic/ticketStatus.logic.ts';
+import { PRIORITY_LABELS, requiresPriorityConfirm } from '@/logic/ticketPriority.logic.ts';
+import type { ActionOutcome } from '@/hooks/useTicketActions.ts';
 
 /**
  * 危险操作的确认文案与反馈提示。

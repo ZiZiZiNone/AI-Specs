@@ -1,22 +1,3 @@
-<script setup lang="ts">
-import type { TicketDetail } from '@/types/Ticket.types';
-import { STATUS_COLORS, STATUS_LABELS } from '@/logic/ticketStatus.logic';
-import { PRIORITY_COLORS, PRIORITY_LABELS } from '@/logic/ticketPriority.logic';
-
-interface Props {
-  detail: TicketDetail;
-}
-
-defineProps<Props>();
-
-function formatDateTime(iso: string | null): string {
-  if (!iso) return '—';
-  const date = new Date(iso);
-  const pad = (n: number) => String(n).padStart(2, '0');
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
-}
-</script>
-
 <template>
   <div class="flex flex-col gap-5 rounded-lg bg-white p-6">
     <div class="flex items-start justify-between gap-4">
@@ -72,3 +53,22 @@ function formatDateTime(iso: string | null): string {
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import type { TicketDetail } from '@/types/Ticket.types.ts';
+import { STATUS_COLORS, STATUS_LABELS } from '@/logic/ticketStatus.logic.ts';
+import { PRIORITY_COLORS, PRIORITY_LABELS } from '@/logic/ticketPriority.logic.ts';
+
+interface Props {
+  detail: TicketDetail;
+}
+
+defineProps<Props>();
+
+function formatDateTime(iso: string | null): string {
+  if (!iso) return '—';
+  const date = new Date(iso);
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+</script>

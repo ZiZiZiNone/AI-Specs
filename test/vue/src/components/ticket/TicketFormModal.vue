@@ -1,53 +1,3 @@
-<script setup lang="ts">
-import { Modal } from '@arco-design/web-vue';
-import type { TicketFormValues } from '@/types/Ticket.types';
-import type { TicketFormViewModel } from '@/types/TicketForm.types';
-import type { UIState } from '@/types/UIState.types';
-import DataLoader from '../feedback/DataLoader.vue';
-import TicketForm from './TicketForm.vue';
-
-/**
- * 表单弹窗。只负责弹窗外壳与关闭前确认，
- * 数据加载与提交由页面的 Hook 完成（core-principles P2）。
- */
-interface Props {
-  visible: boolean;
-  form: TicketFormViewModel;
-  /** 编辑时需要先拉详情回填，故弹窗内容也有五态。 */
-  loadState: UIState;
-  loadErrorMessage?: string;
-}
-
-const props = withDefaults(defineProps<Props>(), { loadErrorMessage: '' });
-
-const emit = defineEmits<{
-  'update:visible': [value: boolean];
-  change: [field: keyof TicketFormValues, value: unknown];
-  blur: [field: keyof TicketFormValues];
-  submit: [];
-  retryLoad: [];
-  reject: [message: string];
-}>();
-
-const title = () => (props.form.values.id ? '编辑工单' : '新增工单');
-
-/** 有未保存输入时关闭需二次确认，避免误关丢失填写内容。 */
-function requestClose(): void {
-  if (!props.form.isDirty) {
-    emit('update:visible', false);
-    return;
-  }
-  Modal.confirm({
-    title: '放弃未保存的修改？',
-    content: '关闭后已填写的内容将不会保留。',
-    okText: '放弃修改',
-    cancelText: '继续编辑',
-    okButtonProps: { status: 'danger' },
-    onOk: () => emit('update:visible', false),
-  });
-}
-</script>
-
 <template>
   <a-modal
     :visible="visible"
@@ -93,3 +43,53 @@ function requestClose(): void {
     </template>
   </a-modal>
 </template>
+
+<script setup lang="ts">
+import { Modal } from '@arco-design/web-vue';
+import type { TicketFormValues } from '@/types/Ticket.types.ts';
+import type { TicketFormViewModel } from '@/types/TicketForm.types.ts';
+import type { UIState } from '@/types/UIState.types.ts';
+import DataLoader from '@/components/feedback/DataLoader.vue';
+import TicketForm from '@/components/ticket/TicketForm.vue';
+
+/**
+ * 表单弹窗。只负责弹窗外壳与关闭前确认，
+ * 数据加载与提交由页面的 Hook 完成（core-principles P2）。
+ */
+interface Props {
+  visible: boolean;
+  form: TicketFormViewModel;
+  /** 编辑时需要先拉详情回填，故弹窗内容也有五态。 */
+  loadState: UIState;
+  loadErrorMessage?: string;
+}
+
+const props = withDefaults(defineProps<Props>(), { loadErrorMessage: '' });
+
+const emit = defineEmits<{
+  'update:visible': [value: boolean];
+  change: [field: keyof TicketFormValues, value: unknown];
+  blur: [field: keyof TicketFormValues];
+  submit: [];
+  retryLoad: [];
+  reject: [message: string];
+}>();
+
+const title = () => (props.form.values.id ? '编辑工单' : '新增工单');
+
+/** 有未保存输入时关闭需二次确认，避免误关丢失填写内容。 */
+function requestClose(): void {
+  if (!props.form.isDirty) {
+    emit('update:visible', false);
+    return;
+  }
+  Modal.confirm({
+    title: '放弃未保存的修改？',
+    content: '关闭后已填写的内容将不会保留。',
+    okText: '放弃修改',
+    cancelText: '继续编辑',
+    okButtonProps: { status: 'danger' },
+    onOk: () => emit('update:visible', false),
+  });
+}
+</script>
