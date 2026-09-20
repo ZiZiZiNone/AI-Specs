@@ -54,15 +54,15 @@ it('should_round_trip_query_through_url_serialization', () => {
 
 ## composable 测试
 
-`frontend/test/vue/src/hooks/useRequestGuard.spec.ts` 已落地：最小 setup 宿主、清理与竞态断言。
-下方写法即该文件的形态；新增 composable 测试时照此形态，
+下方为最小 setup 宿主、清理与竞态断言形态（注：`useRequestGuard` 对应测试尚未落地，新增 composable 测试时照此形态），
 并确认 `@vue/test-utils`、`jsdom` 仍在 devDependencies。
 
 composable 依赖组件实例作用域（`onScopeDispose`、`inject` 等），
 须在一个最小 setup 内调用：
 
 ```typescript
-// ✅ 最小宿主，拿到返回值同时保留作用域以便测清理
+// @vitest-environment jsdom
+// ✅ 最小宿主，拿到返回值同时保留作用域以便测清理（需 DOM，故声明 jsdom）
 function withSetup<T>(composable: () => T): [T, App] {
   let result!: T;
   const app = createApp({

@@ -1,7 +1,8 @@
 # 示例：列表页
 
-来源：`frontend/test/vue/src/`（Vue 3 + Arco + Tailwind，已过 checklists 自检）
-示范：frontend/patterns/list-page.md、frontend/rules/store.md 状态归属、frontend/rules/ui-states.md、core-principles P1
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析，首段为 `common/`、`frontend/` 或 `backend/`。见 `<SPEC_ROOT>/README.md`「路径基准」。本示例自包含，代码即规范结论的完整载体，不依赖外部工程。
+
+示范：`frontend/patterns/list-page.md`「筛选/分页/排序以 URL 为唯一来源」、 `frontend/rules/store.md`「需刷新保持的状态一律以 URL 为唯一来源，不得以 Store 作为替代。」、 `frontend/rules/ui-states.md`「整体态保持 `success`，错误只经 `errorMessage` / Toast 呈现。」、 `frontend/rules/core-principles.md`「P1 页面薄层原则」「页面内直接定义的函数不超过 3 个」。
 
 ## 1. 筛选条件以 URL 为唯一来源
 
@@ -98,7 +99,7 @@ export function resolvePageAfterRemoval(
 ## 3. 刷新失败保留旧数据
 
 **解决的问题**：一次网络抖动不应让用户已看到的数据整片消失。
-整体态与操作反馈是两个维度（frontend/rules/ui-states.md）。
+整体态与操作反馈是两个维度（见 `frontend/rules/ui-states.md`「整体态与操作反馈的区分」，原文："整体态保持 `success`，错误只经 `errorMessage` / Toast 呈现。"）。
 
 来源：`hooks/useTicketList.ts`
 
@@ -230,7 +231,7 @@ async function handleSubmit(): Promise<void> {
 </script>
 ```
 
-五态由容器组件统一承担，页面不写 v-if 链：
+六态由容器组件统一承担，页面不写 v-if 链。以下为 Vue 3 形态，小程序侧映射见 `frontend/frameworks/miniprogram/component.md`「业务组件一律受控」（原文："值由 properties 传入，变更经事件上报，组件自身不持有业务状态。"）与 `frontend/frameworks/miniprogram/logic.md`「入参/返回值约定」（原文："logic 函数入参只收普通值：查询参数对象加前状态快照。"）。
 
 ```vue
 <DataLoader
@@ -248,7 +249,7 @@ async function handleSubmit(): Promise<void> {
 
 ## 小程序映射
 
-与本示例同属列表分页与筛选主题的小程序侧已落地用例，机制结论以小程序框架规范为准：
+小程序侧 `frontend/test/miniprogram/` 工程已删，本节不再引用其路径；机制结论以小程序框架规范为准：
 
-- 分页纯函数：`frontend/test/miniprogram/src/logic/pagination.ts`（入参只收值与前状态快照，失败走 error 字段不抛异常，取消静默），用例见 `frontend/test/miniprogram/src/logic/pagination.spec.ts`（5 个）。框架约定见 `frontend/frameworks/miniprogram/logic.md`。
-- 受控筛选条：`frontend/test/miniprogram/src/components/filter-bar/`（keyword 经 properties 传入，变更经 change 事件上报），用例见 `frontend/test/miniprogram/src/components/filter-bar/filter-bar.spec.ts`（miniprogram-simulate v1.6.2）。框架约定见 `frontend/frameworks/miniprogram/component.md`，用例状态见 `frontend/test/miniprogram/README.md`。
+- 分页纯函数：见 `frontend/frameworks/miniprogram/logic.md`「入参/返回值约定」（原文："logic 函数入参只收普通值：查询参数对象加前状态快照。"；"失败表达走状态内 error 字段，不抛异常。"；"取消不是错误：被取消的请求须在上层被识别为预期行为，不进入 error 态。"）；删除回退见该文件「删除回退」（原文："删除末页最后一条后退回上一页，避免停在空页。"）。
+- 受控筛选条：见 `frontend/frameworks/miniprogram/component.md`「业务组件一律受控」（原文："值由 properties 传入，变更经事件上报，组件自身不持有业务状态。"）。

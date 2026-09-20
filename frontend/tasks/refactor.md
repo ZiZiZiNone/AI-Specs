@@ -29,7 +29,7 @@
 - 引用规范条款前打开原文核对（C5）：见 `common/rules/constitution.md`「文件路径 + 原文逐字摘录」。
 - 报"规范未覆盖"须附检索命令与空结果（C5）：见 `common/rules/constitution.md`「附检索命令与空结果」。
 - 同一事实取证一次即止，不重复检索与重跑（C6）：见 `common/protocol/task-boundary.md`「同一事实已有足够证据，仍反复检索、重读、重跑、重审」。
-- 首次写出的代码必须符合项目风格，写对一次（B3）：见 `AGENTS.md`「禁止每写完一个文件就执行 prettier、eslint --fix 等格式化命令」。
+- 首次写出的代码必须符合项目风格，写对一次（B3）：见业务项目根 `AGENTS.md`「禁止每写完一个文件就执行 prettier、eslint --fix 等格式化命令」。
 - 验证类条目不可跳过：见 `frontend/checklists/detailed-check.md`「验证类条目不可用"不适用"跳过」；执行不了按 `common/protocol/final-gate.md`「无法验证时的处理」声明。
 
 ## 输出模板
@@ -46,12 +46,18 @@
 - 改动点清单（每步可回滚）：
 - 明确未改动的目标外文件：
 
-### 验证清单
-- [ ] 构建：<命令与结果，通过/未执行>
-- [ ] 类型检查：<命令与结果，通过/未执行>
-- [ ] 测试（基线口径回归，行为不变）：<命令与结果，通过/未执行>
+### 验证清单（命令示例按项目实际取用，记录命令本身与结果摘录）
+- [ ] 构建：`pnpm build`（结果粘贴：<通过/失败摘录>，或标未执行）
+- [ ] 类型检查：`vue-tsc --noEmit`（结果粘贴：<通过/失败摘录>，或标未执行）
+- [ ] 测试（基线口径回归，行为不变）：`vitest run <范围，如 src/logic/xxx.test.ts> --coverage=false`（结果粘贴：<通过数/失败摘录>，或标未执行）
 - [ ] 无夹带功能改动
 - 未验证项按 `common/protocol/final-gate.md`「无法验证时的处理」声明，格式见该文件「声明模板」；见该文件「不以"读代码没问题"替代执行」。
+
+#### 填写示例
+- [x] 构建：`pnpm build` → 通过（`✓ built in 12.3s`）。
+- [x] 类型检查：`vue-tsc --noEmit` → 通过（无输出）。
+- [x] 测试：`vitest run src/logic/price.test.ts --coverage=false` → 通过（`9 passed`，摘录粘贴）。
+- 未执行示例按 `common/protocol/final-gate.md`「声明模板」填，不写"读代码没问题"。
 
 ### 报告
 - 未做的顺手优化与建议：

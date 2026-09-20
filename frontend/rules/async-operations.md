@@ -1,5 +1,7 @@
 # 异步操作
 
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析，首段为 `common/`、`frontend/` 或 `backend/`。见 `<SPEC_ROOT>/README.md`「路径基准」。
+
 统一异步语法、错误捕获、并发控制。
 
 ## 异步语法
@@ -7,7 +9,7 @@
 ### 优先使用 async/await
 **强制要求**：
 - 所有异步操作优先使用 async/await
-- 禁止使用 Promise.then().catch() 链式调用（除非必要）
+- 禁止使用 Promise.then().catch() 链式调用。路由懒加载的动态 `import()` 形态除外。
 - 禁止回调函数嵌套
 
 **正确示例**：
@@ -117,7 +119,7 @@ async function loadUserData(id: string) {
 **规则**：
 - 不 try-catch
 - 通过状态展示错误
-- 详见 frontend/rules/error-handling.md
+- 展示方式见 `frontend/rules/error-handling.md`「展示方式」：全局错误走 Modal 对话框、页面级错误走错误占位组件、表单错误走表单顶部错误提示、操作错误走 Toast 提示。
 
 ---
 
@@ -225,7 +227,7 @@ async function search(keyword: string) {
 ```
 
 **示例**
-来源：`frontend/test/vue/src/hooks/useRequestGuard.ts`（完整版见 frontend/examples/golden/list-page.md 第 4 节）
+来源：`frontend/examples/golden/list-page.md`「竞态双保险」：AbortController 中断在途请求，序号判定已返回但已过期的结果。
 
 上述两种方案**须同时使用**：AbortController 负责中断在途请求，
 序号负责判定「已返回但已过期」的结果。封装一次，供列表/详情/记录共用。
@@ -293,7 +295,7 @@ if (currentParamsRef.current !== params) return;   // 引用比较，语义不�
 - 推荐延迟：搜索 300ms，自动保存 1000ms
 
 **示例**
-来源：`frontend/test/vue/src/hooks/useAsyncSearch.ts`
+来源：`frontend/examples/golden/form-validation.md`「异步校验时机」：新输入同时废弃上一次的定时器与在途请求。
 
 ```typescript
 // ✅ 搜索防抖：新输入同时废弃上一次的定时器与在途请求
@@ -376,8 +378,7 @@ export function createThrottle<A extends unknown[]>(
 window.addEventListener('scroll', throttle(onScroll, 200));
 ```
 
-绑定与解绑须成对，解绑时同时 cancel（Vue 侧用 `onScopeDispose`，
-见 frontend/frameworks/vue3/composable.md）。
+绑定与解绑须成对，解绑时同时 cancel（Vue 侧用 `onScopeDispose`，见 `frontend/frameworks/vue3/composable.md`「用 onScopeDispose 而非 onUnmounted」）。
 
 ---
 
@@ -436,7 +437,7 @@ const result = await fetchWithRetry(() => api.createTicket(values), 3);
 
 
 **示例**
-来源：`frontend/test/vue/src/services/httpClient.ts`（完整版见 frontend/examples/golden/service-layer.md 第 3 节）
+来源：`frontend/examples/golden/service-layer.md`「幂等性决定是否重试」：幂等门槛加 retryable 驱动加指数退避加取消可中断。
 
 ```typescript
 // ✅ 自动重试：幂等门槛 + retryable 驱动 + 指数退避 + 取消可中断
@@ -492,7 +493,7 @@ async function fetchWithRetry(fetcher: () => Promise<any>, maxRetries = 3) {
 - 显示重试次数（可选）
 
 **示例**
-来源：`frontend/test/vue/src/hooks/useTicketList.ts` + `components/feedback/ErrorPlaceholder.vue`
+来源：`frontend/examples/golden/list-page.md`「页面组装」：重试入口调用原本的加载函数，不另写重试版逻辑。
 
 ```typescript
 // ✅ 手动重试：复用同一个 load，参数从当前查询条件重新取，不缓存旧参数副本
@@ -520,7 +521,7 @@ return { state, list, total, errorMessage, reload: load };
 - 超时与外部取消须合并为同一个 signal，并可区分二者
 
 **示例**
-来源：`frontend/test/vue/src/services/httpClient.ts`（完整版见 frontend/examples/golden/service-layer.md 第 2 节）
+来源：`frontend/examples/golden/service-layer.md`「超时与外部取消联动」：合并为一个 signal，isTimeout 区分故障与预期取消。
 
 ```typescript
 // ✅ 超时与外部取消联动：合并为一个 signal，isTimeout 用于区分故障与预期取消
@@ -587,7 +588,7 @@ async function loadData() {
 }
 ```
 
-**详见**：frontend/rules/ui-states.md
+五态判定见 `frontend/rules/ui-states.md`「状态定义」：idle、loading、success、error、empty 按数据与错误组合判定。
 
 ---
 
@@ -640,7 +641,7 @@ abortController.abort();
 - 用户主动取消长时间操作
 
 **示例**
-来源：`frontend/test/vue/src/hooks/useRequestGuard.ts`
+来源：`frontend/examples/golden/list-page.md`「竞态双保险」：作用域销毁时统一中断，无需每个 Hook 自己写卸载钩子。
 
 ```typescript
 // ✅ 作用域销毁时统一中断，无需每个 Hook 自己写卸载钩子

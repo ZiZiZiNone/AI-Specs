@@ -2,8 +2,7 @@
 
 边界/架构/状态/异步/命名/模式/测试/类型/反模式检查。
 
-完整版见 frontend/checklists/detailed-check.md。每条只能给 通过 / 不适用（附原因）/ 未通过，
-不得把不适用项标成通过。
+完整版见 `frontend/checklists/detailed-check.md`「适用性判定」："每条只有三种结论——通过 / 不适用（附原因）/ 未通过"。本文件为速查版，措辞与详细版逐条对齐；缺省处以详细版为准。
 
 ## 清单
 ### 任务边界（C6，不可用"不适用"跳过）
@@ -20,7 +19,7 @@
 - [ ] Logic 层非空转：可判定的业务规则确实落在此层。
 - [ ] 单个 Hook ≤150 行、暴露成员 ≤10 个、关注点单一。
 
-### 状态
+### 状态（需刷新保持的状态以 URL 为唯一来源；与 `frontend/protocol/decision-trees.md` 不一致处以 `frontend/rules/store.md` 为准）
 - [ ] 状态归属层级正确（局部/父级/URL/Store），范围最小。
 - [ ] 状态来源单一，无多写点；受控组件不另存 props 副本。
 - [ ] 无冗余派生状态（能算的不存）。
@@ -39,8 +38,8 @@
 - [ ] 模式：命中既有 pattern 已套用，未重复造轮子。
 - [ ] 测试：关键行为有断言，含边界值与错误路径。
 - [ ] 类型：无无理由 any，公共 props/函数有类型定义。
-- [ ] 反模式：无 frontend/anti-patterns/ 所列症状复发；无装饰性代码（算了不用、建了不生效）。
+- [ ] 反模式：无 `frontend/examples/golden/anti-examples.md`「1. 页面直接调用 Service」等所列症状复发（见该文件"页面 import Service，并在事件处理里直接发请求 + 手写反馈"）；无装饰性代码（算了不用、建了不生效）。
 
-### 验证（不可用"不适用"跳过）
+### 验证（不可用"不适用"跳过；措辞与 `frontend/checklists/detailed-check.md`「测试执行」对齐，缺省处以详细版为准）
 - [ ] 构建、类型检查、测试已实际执行并通过。
-- [ ] 执行不了时，已按 common/protocol/final-gate.md 显式声明未验证项与风险。
+- [ ] 执行不了时，已按 `common/protocol/final-gate.md`「无法验证时的处理」"禁止默认视为通过"显式声明未验证项与风险。

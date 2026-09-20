@@ -1,5 +1,7 @@
 # 样式
 
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析，首段为 `common/`、`frontend/` 或 `backend/`。见 `<SPEC_ROOT>/README.md`「路径基准」。本文 `src/*` 指业务项目根下源码。
+
 设计 token 单一来源；样式不泄漏业务语义。
 
 ## 核心原则
@@ -32,7 +34,7 @@
 **约定**：
 - 颜色、文字层级、边框：一律用组件库变量。
 - 间距、栅格、flex 布局：可用工具类（这类无主题语义）。
-- 无组件库时，在 `src/styles/tokens.css` 定义项目自己的变量作为唯一来源。
+- 无组件库时，在业务项目 `src/styles/tokens.css`（即 `@/styles/tokens.css`）定义项目自己的变量作为唯一来源。
 
 ---
 
@@ -63,7 +65,7 @@ export default {
 
 ## 原子类抽取时机
 
-参照 common/rules/reusability.md「真实复用后再抽象」：
+参照 `common/rules/reusability.md`「任何情况下不为"未来可能"预造抽象」：同一串原子类组合第二次出现且语义相同时才抽取。
 
 ```
 问：同一串原子类组合出现第几次？
@@ -80,7 +82,7 @@ export default {
 **约定**：
 - 优先提取组件，而非 `@apply`。组件能带类型与行为，`@apply` 只搬样式。
 - 单元素原子类超过约 12 个且难以阅读时，考虑抽取。
-- 禁止建立无主题的 `utils.css` 堆放杂类（对应 frontend/anti-patterns/god-utils.md）。
+- 禁止建立无主题杂物文件堆放杂类（见 `frontend/anti-patterns/god-utils.md`「无主题公共桶不断堆函数、职责混杂相互依赖即为万能工具库」）。
 
 ---
 

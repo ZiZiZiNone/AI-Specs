@@ -48,13 +48,13 @@ UI → Logic → Upload Service，收敛出口为 Upload Service 的上传方法
 
 ## 正例指针
 
-- 校验判据与集合级优先：frontend/test/vue/src/logic/attachment.logic.ts
-- 上传封装：frontend/test/vue/src/services/upload.service.ts
-- 进度展示形态：frontend/test/vue/src/components/ticket/AttachmentUpload.vue
+- 校验判据与集合级优先：frontend/examples/golden/form-validation.md「7. 附件校验」
+- 上传封装：frontend/examples/golden/service-layer.md「1. 统一请求出口承担 try-catch」上传方法只描述接口语义形态
+- 进度展示形态：frontend/examples/golden/list-page.md「6. 页面只做组装」容器形态
 - 超时与取消联动写法见 frontend/examples/golden/service-layer.md
-  「超时与外部取消联动」一节对应的 withTimeout 形态。
-- 边界断言形态：frontend/test/vue/src/logic/attachment.logic.spec.ts
-- 重试门槛见 frontend/examples/golden/service-layer.md「默认只对幂等方法开启」，
+  「2. 超时与外部取消联动」一节对应的 withTimeout 形态。
+- 边界断言形态：frontend/examples/golden/form-validation.md「7. 附件校验」恰好等于上限应通过断言
+- 重试门槛见 frontend/examples/golden/service-layer.md「3. 幂等性决定是否重试」，
   非幂等写操作显式关闭重试。
 - 手动重试见 frontend/rules/async-operations.md「复用同一个 load」，
   不另写一份重试版逻辑。

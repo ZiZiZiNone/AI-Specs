@@ -55,11 +55,11 @@ Form → Logic → Service，收敛出口为 Service 的提交方法。
 
 ## 正例指针
 
-- 规则与载荷：frontend/test/vue/src/logic/ticketValidation.logic.ts
-- 时机编排与提交分流：frontend/test/vue/src/hooks/useTicketForm.ts
-- 弹窗与异步校验编排：frontend/test/vue/src/hooks/useTicketFormModal.ts
-- 错误展示形态：frontend/test/vue/src/components/ticket/TicketForm.vue
-- 聚焦动作归属：frontend/test/vue/src/hooks/focusFirstErrorField.ts
+- 规则与载荷：frontend/examples/golden/form-validation.md「1. 规则定义在 Logic」
+- 时机编排与提交分流：frontend/examples/golden/form-validation.md「2. 三段校验时机」
+- 弹窗与异步校验编排：frontend/examples/golden/form-validation.md「5. 异步唯一性校验」
+- 错误展示形态：frontend/examples/golden/form-validation.md「6. 提交失败：字段级 vs 表单级」
+- 聚焦动作归属：frontend/examples/golden/form-validation.md「3. 聚焦顺序不依赖对象键序」
 - 结构与判据详见 frontend/examples/golden/form-validation.md
   「非必填字段留空时跳过后续规则」与「隐藏字段不参与校验」两处写法。
 

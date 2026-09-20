@@ -1,12 +1,14 @@
 # UI
 
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析，首段为 `common/`、`frontend/` 或 `backend/`。见 `<SPEC_ROOT>/README.md`「路径基准」。
+
 UI只负责展示与交互。
 
 ## 规则
-- 组件不承载业务判断/数据请求/状态持久化，只渲染与分发事件。
+- 组件不承载业务判断/数据请求/状态持久化，只渲染与分发事件。组件自身交互例外见 `frontend/rules/core-principles.md`「组件调用 Service 的边界」：完成组件自身交互功能（上传/搜索/验证）允许直连 Service，加载或修改页面业务数据一律禁止。
 - 数据由父级或 Logic 提供，交互通过回调上报。
 - 表单即时校验等交互可留在 UI，但规则定义进 Logic。
-- 组件无隐藏副作用：一次性副作用直接调用 Logic，需复用/组合时才提取 Hook，由 Hook 调用 Logic 完成业务调度。
+- 组件无隐藏副作用：一次性副作用直接调用 Logic（见 `frontend/rules/architecture.md`「仅允许两类跨层直连：Page/Component 直接调 Logic，Hook 直接调 Service」），需复用/组合时才提取 Hook，由 Hook 调用 Logic 完成业务调度。
 - 样式与展示关注点不泄漏业务逻辑。
 - 仅自包含交互组件（开关/选择器类）可自持状态并回调上报。
 

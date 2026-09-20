@@ -6,12 +6,8 @@
 
 | 部署方式 | `<SPEC_ROOT>` 取值 | 适用 |
 |---|---|---|
-| 本机固定路径 | `C:\Users\HKX\Desktop\Frontend-AI-Operating-System-v3.0-Final-1` | 单机多项目共用，改规范立即生效 |
+| 本机固定路径 | `C:\Users\HKX\Desktop\AI-Operating-System-v4.0` | 单机多项目共用，改规范立即生效 |
 | git submodule | 业务项目内 `.ai-spec` | 团队共享、跨机器、版本可锁 |
-
-**待办**：本机目录与库名计划改为 `AI-Operating-System-v4.0`（见 `<SPEC_ROOT>/README.md`「TODO」）。
-改名后，本文件与全局 `AGENTS.md` 中的路径须同步替换，并重新打开工作区。
-**远程仓库名不改**——本库约定只做本地操作，不动线上仓库。
 
 移动规范库或换机器后，把下文所有 `<SPEC_ROOT>` 替换为新取值。
 
@@ -34,7 +30,7 @@
 
 本项目的前端与后端开发**必须**遵循外部规范库，库根绝对路径：
 
-    C:\Users\HKX\Desktop\Frontend-AI-Operating-System-v3.0-Final-1
+    C:\Users\HKX\Desktop\AI-Operating-System-v4.0
 
 记作 `<SPEC_ROOT>`。**写任何代码之前**，按顺序读完这四个文件，不得跳过：
 
@@ -60,7 +56,7 @@
 
 ```markdown
 做开发（前端 Vue 3 / 小程序，后端 PHP / Go）时，必须先读取外部规范库并遵循：
-库根 = C:\Users\HKX\Desktop\Frontend-AI-Operating-System-v3.0-Final-1
+库根 = C:\Users\HKX\Desktop\AI-Operating-System-v4.0
 必读入口 = 库根/README.md → 库根/common/rules/constitution.md
         → 库根/common/principles.md → 库根/common/protocol/task-boundary.md
 库内裸路径（common/xxx.md、frontend/xxx.md、backend/xxx.md 等）相对库根解析，不是业务项目根。
@@ -74,7 +70,6 @@
 ## 方式三：git submodule（团队共享 / 跨机器）
 
 远程仓库：`https://git.yztiot.com/mystw/Frontend-AI-Operating-System.git`
-（仓库名未随库名调整，见文首「待办」。）
 
 在业务项目根执行：
 
@@ -110,7 +105,7 @@ git commit -m "chore: add spec as submodule"
 ## 方式四：对话里直接给路径（临时）
 
 ```
-本次开发遵循 C:\Users\HKX\Desktop\Frontend-AI-Operating-System-v3.0-Final-1 的规范。
+本次开发遵循 C:\Users\HKX\Desktop\AI-Operating-System-v4.0 的规范。
 先读该目录 README.md 与 common/rules/constitution.md、common/principles.md、
 common/protocol/task-boundary.md，再开始。
 ```
@@ -163,11 +158,11 @@ common/protocol/task-boundary.md，再开始。
 |---|---|---|
 | `common/` | **可用** | 宪法、四条通用原则、`common/rules/`、`common/protocol/`；与语言、框架、端无关，任何项目均适用 |
 | `frontend/` | **可用** | `frontend/rules/`、`frontend/protocol/`、`frontend/patterns/`、`frontend/anti-patterns/`、`frontend/tasks/`、`frontend/checklists/`、`frontend/examples/`、`frontend/frameworks/vue3/`、`frontend/frameworks/miniprogram/`、`frontend/test/` |
-| `backend/` | **部分可用** | 导航入口与共用分层原则已建立（`backend/README.md`）；语言子树、`backend/tasks/` 与 `backend/checklists/` 待建 |
-| `backend/php/` | **待建** | 语言级通用 + Laravel 13 |
-| `backend/go/` | **待建** | 语言级通用 + GoFrame v2.10 |
+| `backend/` | **可用** | 导航入口、共用分层原则、`backend/tasks/` 输出模板、`backend/checklists/` 自检清单 |
+| `backend/go/` | **可用** | Go 语言级 12 主题文件 + `backend/go/goframe/` 框架差异文件 |
+| `backend/php/` | **可用** | PHP 语言级 11 主题文件（无并发章）+ `backend/php/laravel/` 框架差异文件 |
 
-`backend/` 的语言子树建立后，通用规范全部生效，框架细则随编写进度生效——
+`backend/` 语言子树已建，通用规范全部生效——
 按「加载流程」第 4 步处理，遇到框架专属决策点时应提问而非自行发挥（C1）。
 
 ---

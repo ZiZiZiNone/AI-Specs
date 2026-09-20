@@ -1,7 +1,7 @@
 # 示例：Service 层
 
-来源：`frontend/test/vue/src/services/`（Vue 3 + TS，已过 checklists 自检）
-示范：frontend/rules/api.md、frontend/rules/error-handling.md、frontend/rules/async-operations.md
+来源：本示例自包含，不依赖外部工程；代码即规范结论的完整载体。
+示范：`frontend/rules/api.md`「参数校验、响应数据转换、错误归一统一在 Service 内处理。」、 `frontend/rules/error-handling.md`「根据错误码/类型转换为用户友好的提示」「是否可重试；须被重试逻辑真实消费，不可只标不用」、 `frontend/rules/async-operations.md`「重试的前提是"重复执行不产生额外后果"。判断顺序：」「POST 等非幂等操作**禁止自动重试**，失败后交由用户手动触发」
 
 ## 1. 统一请求出口承担 try-catch
 

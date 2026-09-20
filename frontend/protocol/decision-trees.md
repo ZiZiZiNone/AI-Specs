@@ -32,11 +32,11 @@
 | 场景 | 判定 | 原因 |
 |------|------|------|
 | Modal/Drawer 状态 | 触发组件内状态 | Modal 是临时 UI，不是独立页面 |
-| Tab 切换状态（需保留） | Store | 需要跨 Tab 保持状态 |
+| Tab 切换状态（需保留） | URL 参数 | 需要跨 Tab 保持且刷新后可分享 |
 | Tab 切换状态（不需保留） | 父组件状态 | 切换即重置 |
-| 表单草稿（需保留） | Store 或 LocalStorage | 需要持久化 |
+| 表单草稿（需保留） | URL 参数或 LocalStorage | 需要持久化 |
 | 表单草稿（不需保留） | 组件内状态 | 提交或取消即清除 |
-| 列表筛选条件（需保留） | Store 或 URL 参数 | 刷新后保持 |
+| 列表筛选条件（需保留） | URL 参数为唯一来源 | 刷新后保持（见 `frontend/rules/store.md`「需刷新保持的状态一律以 URL 为唯一来源，不得以 Store 作为替代」） |
 | 列表筛选条件（不需保留） | 组件内状态 | 刷新即重置 |
 
 ---
@@ -341,7 +341,7 @@ interface Options {
 ```
 
 ### 详见
-- frontend/rules/error-handling.md
+见 `frontend/rules/error-handling.md`「展示方式」：全局错误走 Modal 对话框、页面级错误走错误占位组件、表单错误走表单顶部错误提示、操作错误走 Toast 提示。
 
 ---
 

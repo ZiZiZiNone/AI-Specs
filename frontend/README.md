@@ -6,8 +6,8 @@
 
 - 通用规则（宪法、四条通用原则、命名抽象、测试、重构、性能、注释、任务边界）在 `common/`，
   **不在本目录重复**；本目录只放前端专属结论。
-- 进入业务项目先判定框架（读代码与依赖，如 `package.json`），再按需读取 `frontend/frameworks/<框架>/`；
-  涉及 UI 组件库时进入 `frontend/frameworks/<框架>/ui/<组件库>/` 二级目录。
+- 进入业务项目先判定框架（读代码与依赖，如 `package.json`），再按需读取 Vue 3 的 `frontend/frameworks/vue3/` 或小程序的 `frontend/frameworks/miniprogram/`；
+  涉及 UI 组件库时进入 Vue 3 的 `frontend/frameworks/vue3/ui/<组件库>/` 或小程序的 `frontend/frameworks/miniprogram/ui/<组件库>/` 二级目录。
   无对应目录时仅遵循 `common/` 通用规范，**不套用其他框架的规则**。
 
 ## 子目录
@@ -37,17 +37,11 @@
   - `miniprogram/`：README（读取顺序）、state、logic、component、router、service、testing、
     `ui/tdesign-miniprogram/`、`ui/vant-weapp/`
 - `frontend/examples/golden/`：示例与风格指南
-  （README、list-page、form-validation、service-layer、anti-examples）
-- `frontend/test/`：按本规范落地的验证产物
-  - `vue/`：Vue 3 + Arco + Tailwind 工单管理（正向素材；typecheck 零错误、vitest 49/49、
-    build 与 dev 冒烟均已验证 2026-09-03，沙箱实跑，见 `frontend/test/vue/CONFORMANCE.md`）
-  - `react/`：早期未按规范落地的产物（负向素材，不可构建）
-  - `miniprogram/`：微信原生 + TS 分页 Logic 与受控筛选组件
-    （正向素材，见 `frontend/test/miniprogram/README.md`）
+  （README、list-page、form-validation、service-layer、anti-examples）；示例见 `frontend/examples/golden/` 自包含示例
 
 ## 工作流
 
-1. **判定框架** → 读 `frontend/frameworks/<框架>/`
+1. **判定框架** → 读 Vue 3 的 `frontend/frameworks/vue3/` 或小程序的 `frontend/frameworks/miniprogram/`
 2. **分析任务** → `common/protocol/task-analysis.md` 定类型，`common/protocol/task-boundary.md` 定授权面
 3. **查询模式与决策** → `frontend/patterns/`、`frontend/protocol/decision-trees.md`
 4. **实现代码** → 遵守 `common/principles.md` 与 `frontend/rules/`、`frontend/frameworks/`
@@ -57,6 +51,4 @@
 ## 说明
 
 - React 框架规范已移除（2026-09-03）：本库前端侧当前只覆盖 Vue 3 与微信小程序。
-  `frontend/test/react/` 作为 `frontend/examples/golden/anti-examples.md` 的反例证据保留，
-  不在框架规范覆盖内。
 - 框架目录内涉及 UI 组件库时进入其 `ui/<组件库>/` 二级目录；无对应目录时不套用其他库规范。

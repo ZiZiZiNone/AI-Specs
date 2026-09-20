@@ -8,7 +8,7 @@
 
 - Page："路由页面，负责组装组件与编排页面级状态，不承载业务逻辑。"
 - Component："可复用 UI 单元，只负责展示与交互，不直接访问接口。"
-- Hook："挂 UI 侧（供 Page/Component 使用），内部调用 Logic 完成业务；框架具体形态见 frontend/frameworks/<框架>/。"
+- Hook："挂 UI 侧（供 Page/Component 使用），内部调用 Logic 完成业务；框架具体形态 Vue 3 见 frontend/frameworks/vue3/composable.md、小程序见 frontend/frameworks/miniprogram/logic.md。"
 - Logic："业务规则、状态流转、副作用编排，可复用、可测试。"
 - Service："唯一访问后端接口的入口，负责请求与数据转换。"
 
@@ -55,15 +55,15 @@
 
 ## 正例指针
 
-- frontend/examples/golden/list-page.md：URL 唯一来源、回页规则、刷新保留旧数据、竞态双保险、快照回滚、页面只做组装。
-- frontend/test/vue/src/pages/TicketListPage.vue：页面只做组装，状态全部来自 Hook。
-- frontend/test/vue/src/hooks/useTicketQuery.ts：筛选条件由 URL 实时解析得出，不另存 ref。
-- frontend/test/vue/src/logic/ticketQuery.logic.ts：applyFilterChange、applyPageChange、resolvePageAfterRemoval 三个判定。
-- frontend/test/vue/src/logic/ticketQuery.logic.spec.ts：序列化与解析互逆断言。
-- frontend/test/vue/src/hooks/useTicketList.ts：已有数据时走刷新语义，首次失败才整体转错误态。
-- frontend/test/vue/src/hooks/useRequestGuard.ts：Abort 中断加序号判定的双保险封装。
-- frontend/test/vue/src/logic/uiState.logic.ts：resolveListState 判定 success/empty。
-- frontend/test/vue/src/components/feedback/DataLoader.vue：五态统一容器，页面不写 v-if 链。
+- frontend/examples/golden/list-page.md 自包含示例（第 1–6 节）：本页正例以该自包含示例为准，不再另指验证产物。
+- frontend/examples/golden/list-page.md「6. 页面只做组装」：页面只做组装，状态全部来自 Hook。
+- frontend/examples/golden/list-page.md「1. 筛选条件以 URL 为唯一来源」：筛选条件由 URL 实时解析得出，不另存 ref。
+- frontend/examples/golden/list-page.md「2. 改筛选必回第一页」：applyFilterChange、applyPageChange、resolvePageAfterRemoval 三个判定。
+- frontend/examples/golden/list-page.md「1. 筛选条件以 URL 为唯一来源」配套互逆断言：序列化与解析互逆断言。
+- frontend/examples/golden/list-page.md「3. 刷新失败保留旧数据」：已有数据时走刷新语义，首次失败才整体转错误态。
+- frontend/examples/golden/list-page.md「4. 竞态双保险」：Abort 中断加序号判定的双保险封装。
+- frontend/examples/golden/list-page.md「3. 刷新失败保留旧数据」列表态判定形态：resolveListState 判定 success/empty。
+- frontend/examples/golden/list-page.md「6. 页面只做组装」容器形态：五态统一容器，页面不写 v-if 链。
 
 ## 反例指针
 

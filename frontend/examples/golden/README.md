@@ -6,14 +6,10 @@
 按可信度排序，任一即可作为素材：
 
 1. 真实业务项目中已上线、经审阅的代码。
-2. **本仓 `frontend/test/<框架>/` 下按本规范实现、且已过 checklists 自检的产物。**
+2. **本目录自包含示例即载体，不依赖已删除的 `frontend/test/` 工程。**
 3. 从上述两类中提取的违规片段（作为负向示例）。
 
 **禁止**：凭想象编写从未落地的"理想代码"；脱离真实约束的教学式伪示例。
-
-说明：早期版本要求"必须来自真实项目"，在无真实项目时形成死锁——
-占位永远填不上。现放宽为「已落地并通过自检的代码」。
-示例的判定对象是结构（见下节），故不以「是否运行过」作为取用门槛。
 
 ## 示例规则
 - 每个示例标注来源文件路径、示范的规范条目。
@@ -39,10 +35,10 @@
 把未在来源项目中出现过的函数名/接口冒充为来源代码。
 
 ## 现有示例
-- `list-page.md`：列表页（URL 状态、竞态、刷新保留数据、乐观更新）
-- `form-validation.md`：表单三段校验、异步唯一性、动态可见性
-- `service-layer.md`：统一请求出口、错误归一、幂等重试
-- `anti-examples.md`：负向示例集（来自 frontend/test/react）
+- `frontend/examples/golden/list-page.md`：列表页（URL 状态、竞态、刷新保留数据、乐观更新）
+- `frontend/examples/golden/form-validation.md`：表单三段校验、异步唯一性、动态可见性
+- `frontend/examples/golden/service-layer.md`：统一请求出口、错误归一、幂等重试
+- `frontend/examples/golden/anti-examples.md`：负向示例集（本文件内联反例）
 
 ## 风格指南
 - 优先遵循项目既有风格与约定，个人偏好让步。

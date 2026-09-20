@@ -8,7 +8,7 @@
 
 - Page："路由页面，负责组装组件与编排页面级状态，不承载业务逻辑。"
 - Component："可复用 UI 单元，只负责展示与交互，不直接访问接口。"
-- Hook："挂 UI 侧（供 Page/Component 使用），内部调用 Logic 完成业务；框架具体形态见 frontend/frameworks/<框架>/。"
+- Hook："挂 UI 侧（供 Page/Component 使用），内部调用 Logic 完成业务；框架具体形态 Vue 3 见 frontend/frameworks/vue3/composable.md、小程序见 frontend/frameworks/miniprogram/logic.md。"
 - Logic："业务规则、状态流转、副作用编排，可复用、可测试。"
 - Service："唯一访问后端接口的入口，负责请求与数据转换。"
 
@@ -56,15 +56,17 @@
 
 ## 正例指针
 
-- frontend/test/vue/src/pages/TicketDetailPage.vue：页面只做组装，id 取自路由。
-- frontend/test/vue/src/hooks/useTicketDetail.ts：详情加载与五态管理，含不存在判定与 reload。
-- frontend/test/vue/src/logic/uiState.logic.ts：resolveDetailState 判定 success/empty。
-- frontend/test/vue/src/components/ticket/TicketDetailPanel.vue：信息区块只展示与回调。
-- frontend/test/vue/src/components/ticket/TicketLogTimeline.vue：记录时间线展示组件。
-- frontend/test/vue/src/hooks/useTicketLogs.ts：详情关联记录的独立加载关注点。
-- frontend/test/vue/src/components/feedback/DataLoader.vue：五态统一容器。
-- frontend/test/vue/src/components/feedback/ErrorPlaceholder.vue：页面级错误占位，含重试与返回。
-- frontend/test/vue/src/logic/ticketPermission.logic.ts：行级操作许可判定，供详情操作区消费。
+- 注：详情页暂无专用金例，以下正例以 frontend/examples/golden/ 通用自包含示例为准。
+
+- frontend/examples/golden/list-page.md「6. 页面只做组装」：页面只做组装，id 取自路由。
+- frontend/examples/golden/list-page.md「3. 刷新失败保留旧数据」：详情加载与五态管理，含不存在判定与 reload。
+- frontend/examples/golden/list-page.md「3. 刷新失败保留旧数据」同类形态：resolveDetailState 判定 success/empty。
+- frontend/examples/golden/list-page.md「6. 页面只做组装」正向形态：信息区块只展示与回调。
+- frontend/examples/golden/list-page.md「6. 页面只做组装」页面组装形态：记录时间线展示组件。
+- frontend/examples/golden/list-page.md「6. 页面只做组装」独立关注点形态：详情关联记录的独立加载关注点。
+- frontend/examples/golden/list-page.md「6. 页面只做组装」容器形态：五态统一容器。
+- frontend/examples/golden/list-page.md「6. 页面只做组装」错误占位形态：页面级错误占位，含重试与返回。
+- frontend/examples/golden/list-page.md「6. 页面只做组装」同一份判据形态：行级操作许可判定，供详情操作区消费。
 
 ## 反例指针
 

@@ -9,7 +9,7 @@
 表格是 frontend/rules/architecture.md 中的 Component："可复用 UI 单元，只负责展示与交互，不直接访问接口。"与其协作的各层：
 
 - Page/Component（调用方）：组装表格，提供 rows、列配置与回调；"路由页面，负责组装组件与编排页面级状态，不承载业务逻辑。"
-- Hook：持有列表数据与 UI 状态，消费表格上报的回调后触发加载或操作；"挂 UI 侧（供 Page/Component 使用），内部调用 Logic 完成业务；框架具体形态见 frontend/frameworks/<框架>/。"
+- Hook：持有列表数据与 UI 状态，消费表格上报的回调后触发加载或操作；"挂 UI 侧（供 Page/Component 使用），内部调用 Logic 完成业务；框架具体形态 Vue 3 见 frontend/frameworks/vue3/composable.md、小程序见 frontend/frameworks/miniprogram/logic.md。"
 - Logic："业务规则、状态流转、副作用编排，可复用、可测试。"排序规则、行操作许可、可批量条件落在这里。
 - Service："唯一访问后端接口的入口，负责请求与数据转换。"表格永远不直连它。
 
@@ -55,13 +55,13 @@ props 规模按 frontend/protocol/decision-trees.md 组件拆分决策执行："
 
 ## 正例指针
 
-- frontend/test/vue/src/components/ticket/TicketTable.vue：只渲染与回调，行能力由同一份判据结果驱动。
-- frontend/test/vue/src/logic/ticketPermission.logic.ts：resolveTicketRowAbility 一份判定，多处消费。
-- frontend/test/vue/src/pages/TicketListPage.vue：表格经 DataLoader 容器承载五态，页面不写 v-if 链。
-- frontend/test/vue/src/hooks/useTicketRowOperations.ts：行操作编排的独立关注点。
-- frontend/test/vue/src/components/feedback/DataLoader.vue：五态统一容器。
-- frontend/test/vue/src/components/feedback/EmptyPlaceholder.vue：空态说明加引导动作。
-- frontend/test/vue/src/components/ticket/TicketTable.spec.ts：表格交互测试。
+- frontend/examples/golden/list-page.md「6. 页面只做组装」表格只收 rows 渲染：只渲染与回调，行能力由同一份判据结果驱动。
+- frontend/examples/golden/list-page.md「6. 页面只做组装」同一份判据形态：resolveTicketRowAbility 一份判定，多处消费。
+- frontend/examples/golden/list-page.md「6. 页面只做组装」容器形态：表格经 DataLoader 容器承载五态，页面不写 v-if 链。
+- frontend/examples/golden/list-page.md「6. 页面只做组装」独立关注点形态：行操作编排的独立关注点。
+- frontend/examples/golden/list-page.md「6. 页面只做组装」容器形态：五态统一容器。
+- frontend/examples/golden/list-page.md「6. 页面只做组装」空态形态：空态说明加引导动作。
+- frontend/examples/golden/list-page.md「6. 页面只做组装」交互测试形态：表格交互测试。
 - frontend/examples/golden/list-page.md：DataLoader 容器承载五态、表格只收 rows 渲染（见页面组装部分）。
 
 ## 反例指针

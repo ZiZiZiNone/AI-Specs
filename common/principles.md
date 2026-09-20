@@ -6,7 +6,7 @@
 四条通用原则，前端与后端**同等适用**。抽象层只有这四条，具体形态按语言/框架落地：
 
 - 前端落地与量化标准：`frontend/rules/core-principles.md`（P1–P4）
-- 后端落地：`backend/php/`、`backend/go/`
+- 后端落地：`backend/go/structure.md`、`backend/php/structure.md`
 
 本文不设条款级 ID（C5 规定条款级 ID 只存在于 `common/rules/constitution.md` 的 C1–C6
 与 `AGENTS.md` 的 B0–B5）。引用本文时写「文件路径 + 原文逐字摘录」，或直接用小节标题。

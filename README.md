@@ -15,7 +15,6 @@
   业务项目自己的 `README.md`／`AGENTS.md` 与本库同名文件是两回事，不要混用。
 
 接入外部项目的方式见 `<SPEC_ROOT>/INTEGRATION.md`。
-本次全栈化改造的决策与进度见 `<SPEC_ROOT>/HANDOVER.md`。
 
 ## 定位与核心思想
 
@@ -33,9 +32,9 @@
 |---|---|---|
 | `common/` | **可用** | 前后端通用：宪法、四条通用原则、命名 / 注释 / 测试 / 重构 / 性能 / 业务规则 / 项目 README 规范、任务边界与验收协议 |
 | `frontend/` | **可用** | Vue 3 与微信小程序；含 `frontend/rules/`、`frontend/protocol/`、`frontend/patterns/`、`frontend/anti-patterns/`、`frontend/tasks/`、`frontend/checklists/`、`frontend/examples/`、`frontend/frameworks/`、`frontend/test/` |
-| `backend/` | **部分可用** | 导航入口与共用分层原则已建立（`backend/README.md`）；语言子树、`backend/tasks/` 与 `backend/checklists/` 待建 |
-| `backend/php/` | **待建** | 语言级通用 + Laravel 13；覆盖目录结构、命名、风格与格式化、错误处理、日志、依赖、配置、注释与文档、测试、接口设计、性能与安全 |
-| `backend/go/` | **待建** | 语言级通用 + GoFrame v2.10；在 PHP 覆盖项之外另含并发处理 |
+| `backend/` | **可用** | 导航入口、共用分层原则、`backend/tasks/` 输出模板、`backend/checklists/` 自检清单 |
+| `backend/go/` | **可用** | Go 语言级 12 主题文件 + `backend/go/goframe/` 框架差异文件 |
+| `backend/php/` | **可用** | PHP 语言级 11 主题文件（无并发章）+ `backend/php/laravel/` 框架差异文件 |
 
 `backend/` 的语言子树尚未建立时，后端任务按 `common/` 通用规范与 `backend/README.md`
 的共用分层原则执行；遇到框架专属决策点应提问而非自行发挥（C1）。
@@ -45,9 +44,8 @@
 ```
 <SPEC_ROOT>/
 ├── README.md            本文件：全局入口、路径基准、覆盖范围、加载策略、使用说明
-├── AGENTS.md            行为规则 B0–B5（AI 行为约束，非规范正文）
+├── AGENTS.md            行为规则（AI 行为约束，非规范正文）
 ├── INTEGRATION.md       接入外部项目的四种方式与常见接入错误
-├── HANDOVER.md          全栈化改造的决策与进度（阶段②③④完成后作废）
 ├── common/              前后端通用规范（见 common/README.md）
 │   ├── principles.md    四条通用原则 + 极致解耦总纲
 │   ├── rules/           宪法、命名、注释、测试、重构、复用、性能、业务规则、项目 README
@@ -62,8 +60,12 @@
 │   ├── frameworks/      vue3/、miniprogram/（各自含 ui/<组件库>/）
 │   ├── examples/        示例与风格指南（golden）
 │   └── test/            验证产物（vue 正向素材、react 负向素材、miniprogram）
-├── backend/             后端专属规范（语言子树待建）
-│   └── README.md        导航入口：共用分层原则、13 主题文件清单、计划技术栈
+├── backend/             后端专属规范（见 backend/README.md）
+│   ├── README.md        导航入口：共用分层原则、主题文件清单、现有技术栈
+│   ├── tasks/           后端任务输出模板
+│   ├── checklists/      后端自检清单
+│   ├── go/              Go 语言级 12 主题 + goframe/ 框架差异
+│   └── php/             PHP 语言级 11 主题 + laravel/ 框架差异
 └── scripts/             引用校验脚本（见下「校验脚本」）
 ```
 
@@ -120,7 +122,7 @@
 
 | 部署方式 | `<SPEC_ROOT>` 取值 |
 |---|---|
-| 本机固定路径 | `C:\Users\HKX\Desktop\Frontend-AI-Operating-System-v3.0-Final-1` |
+| 本机固定路径 | `C:\Users\HKX\Desktop\AI-Operating-System-v4.0` |
 | git submodule | 业务项目内 `.ai-spec` |
 
 各方式的完整接入片段见 `INTEGRATION.md`。
@@ -135,7 +137,7 @@ python scripts/check-citations.py            # 退出码 0 通过，1 有 FAIL
 python scripts/check-citations.py --strict   # WARN 也计为 FAIL
 
 # 导入路径校验（frontend/rules/import-path.md 的可执行形态）
-python scripts/check-import-path.py <业务源码目录>   # 缺省扫描 frontend/test/vue/src
+python scripts/check-import-path.py <业务源码目录>   # 缺省扫描 <业务源码目录>
 ```
 
 ## 开发到生产的配置与部署变化
@@ -178,8 +180,6 @@ python scripts/check-import-path.py <业务源码目录>   # 缺省扫描 fronte
 | 项 | 影响面 | 状态 |
 |---|---|---|
 | 在 `common/rules/` 下新建 `api-contract.md`（接口设计：HTTP 契约、业务错误码、分页、幂等、版本化） | 前后端接口约定当前无规范可依 | 待做（阶段②） |
-| 建立 `backend/go/`（语言级 13 主题文件 + `backend/go/goframe/` 差异文件）与 `backend/go/test/` 样例工程 | Go 后端任务只能依据 `common/` 与 `backend/README.md` | 待做（阶段②） |
-| 建立 `backend/php/`（语言级 13 主题文件 + `backend/php/laravel/` 差异文件）、`backend/tasks/`、`backend/checklists/` | PHP 后端任务与后端任务模板无规范可依 | 待做（阶段③） |
 | 本机目录与库名改为 `AI-Operating-System-v4.0`（远程仓库名不改） | 需同步 `INTEGRATION.md` 与全局 `AGENTS.md` | 待做（阶段④） |
 | 条款级 ID 方案：若引入新 ID，须同步 C5 细则 | 当前决策为**不引入** | 待决策 |
 

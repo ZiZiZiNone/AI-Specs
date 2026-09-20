@@ -1,5 +1,7 @@
 # UI 状态
 
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析，首段为 `common/`、`frontend/` 或 `backend/`。见 `<SPEC_ROOT>/README.md`「路径基准」。示例均引自 `frontend/examples/golden/` 自包含示例。
+
 统一管理加载态、空态、错误态。
 
 ## 状态枚举
@@ -139,7 +141,7 @@ if (!result.success) {
 - 提供取消按钮（可选，长时间操作必须）
 
 **示例**
-来源：`frontend/test/vue/src/components/feedback/DataLoader.vue`
+来源：`frontend/examples/golden/list-page.md`「页面组装」：骨架屏保留布局，避免内容跳动。
 
 ```vue
 <!-- ✅ loading 态展示：骨架屏保留布局，避免内容跳动 -->
@@ -194,7 +196,7 @@ else state.value = 'loading';
 - ❌ 显示 null/undefined
 
 **示例**
-来源：`frontend/test/vue/src/components/feedback/EmptyPlaceholder.vue` + `pages/TicketListPage.vue`
+来源：`frontend/examples/golden/list-page.md`「页面组装」：empty 态说明现状加给出下一步动作，动作按钮受权限控制。
 
 ```vue
 <!-- ✅ empty 态：说明现状 + 给出下一步动作；动作按钮受权限控制 -->
@@ -208,9 +210,8 @@ else state.value = 'loading';
 
 **区分"本来没有"与"筛出来没有"**：两者的引导动作不同——
 前者引导创建，后者引导清空筛选。判据应放 Logic，例如
-`frontend/test/vue/src/logic/ticketQuery.logic.ts` 的 `hasActiveFilter(query)`
-即可作为区分依据（该项目中它被 `TicketSearchBar` 用于控制重置按钮可用性，
-同一判据可复用于 empty 态文案选择）。
+`frontend/examples/golden/list-page.md`「筛选条件以 URL 为唯一来源」的有筛选判据
+即可作为区分依据，同一判据可复用于 empty 态文案选择。
 
 ---
 
@@ -225,9 +226,9 @@ else state.value = 'loading';
 - **区块级错误**：局部错误提示
 - **操作级错误**：Toast/Message 提示
 
-**详见**：frontend/rules/error-handling.md
+错误分级见 `frontend/rules/error-handling.md`「展示方式」：全局错误走 Modal 对话框、页面级错误走错误占位组件、表单错误走表单顶部错误提示、操作错误走 Toast 提示。
 
-**示例**（页面级错误占位，见 `frontend/test/vue/src/components/feedback/ErrorPlaceholder.vue`）：
+**示例**（页面级错误占位，见 `frontend/examples/golden/list-page.md`「页面组装」）：
 ```vue
 <!-- ✅ error 态展示：说明 + 重试 + 按场景返回，三者齐全 -->
 <ErrorPlaceholder

@@ -36,7 +36,6 @@
 
 ## 说明
 - React 框架规范已移除（2026-09-03）：本库当前只覆盖 Vue 3 与微信小程序。
-  `frontend/test/react/` 作为 `frontend/examples/golden/anti-examples.md` 的反例证据保留，不在框架规范覆盖内。
 - miniprogram/ 已定稿（2026-09-03，见 miniprogram/README.md）；
   填充时沿用"以 vue3/ 的文件划分为模板，但**不要照搬 Vue 的机制结论**"原则——
   小程序的 setData / Component 语义与 Vue 不同，需按小程序自身语义重写。

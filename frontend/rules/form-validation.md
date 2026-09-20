@@ -1,5 +1,7 @@
 # 表单验证
 
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析，首段为 `common/`、`frontend/` 或 `backend/`。见 `<SPEC_ROOT>/README.md`「路径基准」。示例均引自 `frontend/examples/golden/` 自包含示例。
+
 验证规则在 Logic，UI 只触发和展示。
 
 ## 验证时机
@@ -65,7 +67,7 @@
 
 规则表按字段泛型化，`validator` 拿到该字段的精确类型。
 **禁止 `validator?: (value: any) => boolean`**——这会让规则写错字段类型时不被发现
-（对应 frontend/rules/typescript.md 禁止 any；负向实例见 frontend/examples/golden/anti-examples.md 第 7 节）。
+（见 `frontend/rules/typescript.md`「规则」：禁止无理由 any；负向实例见 `frontend/examples/golden/anti-examples.md`「7. 校验层放弃类型」）。
 
 ```typescript
 // ✅ Logic 中定义验证规则，类型随字段收窄
@@ -83,7 +85,7 @@ export type ValidationErrors<T> = { [K in keyof T]?: string };
 ```
 
 **示例**
-来源：`frontend/test/vue/src/logic/ticketValidation.logic.ts`（完整版见 frontend/examples/golden/form-validation.md 第 1 节）
+来源：`frontend/examples/golden/form-validation.md`「1. 规则定义在 Logic」：同一份规则同时服务新增与编辑入口。
 
 ```typescript
 // ✅ 验证规则示例：同一份规则同时服务新增与编辑入口
@@ -130,7 +132,7 @@ if (rule.pattern && !rule.pattern.test(String(value))) return rule.message;
 - 错误消失时平滑过渡
 
 **示例**
-来源：`frontend/test/vue/src/components/ticket/TicketForm.vue`（组件库内建校验的取舍见 frontend/frameworks/vue3/ui/arco/README.md）
+来源：`frontend/examples/golden/form-validation.md`「1. 规则定义在 Logic」与 `frontend/frameworks/vue3/ui/arco/README.md`「一、表单校验：弃用 Arco rules」：字段级错误由外部错误对象驱动，组件内不持有 errors，不调用组件库 validate。
 
 ```vue
 <!-- ✅ 字段级错误展示：错误文案由 Hook 传入，组件只负责呈现 -->
@@ -178,7 +180,7 @@ if (rule.pattern && !rule.pattern.test(String(value))) return rule.message;
 ```
 
 **示例**
-来源：`frontend/test/vue/src/hooks/useTicketForm.ts`（见 frontend/examples/golden/form-validation.md 第 6 节）
+来源：`frontend/examples/golden/form-validation.md`「6. 提交失败：字段级 vs 表单级」：编号冲突落到字段，其余归表单级。
 
 ```typescript
 // ✅ 按归属分流：编号冲突落到字段，其余归表单级
@@ -282,8 +284,7 @@ if (!result.success) {
 - **格式尚未合法时不发起请求**：格式错误的值查唯一性是无意义请求
 
 **示例**
-来源：`frontend/test/vue/src/hooks/useTicketFormModal.ts` + `useAsyncSearch.ts`
-（完整版见 frontend/examples/golden/form-validation.md 第 5 节）
+来源：`frontend/examples/golden/form-validation.md`「5. 异步唯一性校验」：防抖加前置格式门槛加取消在途请求。
 
 ```typescript
 // ✅ 异步验证：防抖 + 前置格式门槛 + 取消在途请求
@@ -329,7 +330,7 @@ function handleChange(field: keyof TicketFormValues, value: unknown): void {
 3. 依赖字段**尚未 touched 且未提交过**时，只清除旧错误、不新增错误
 
 **示例**
-来源：`frontend/test/vue/src/logic/ticketValidation.logic.ts` + `hooks/useTicketForm.ts`
+来源：`frontend/examples/golden/form-validation.md`「1. 规则定义在 Logic」：依赖关系是业务规则，声明在 Logic，不写在事件处理里。
 
 ```typescript
 // ✅ 依赖关系是业务规则，声明在 Logic，而非写在事件处理里
@@ -373,7 +374,7 @@ for (const dependent of resolveDependentFields(field)) {
 4. **隐藏字段的残留值不得进入提交载荷**
 
 **示例**
-来源：`frontend/test/vue/src/logic/ticketValidation.logic.ts`（见 frontend/examples/golden/form-validation.md 第 4 节）
+来源：`frontend/examples/golden/form-validation.md`「4. 动态可见性与隐藏字段」：可见性判定在 Logic，页面与提交共用同一份判据。
 
 ```typescript
 // ✅ 可见性判定在 Logic，页面与提交共用同一份判据
@@ -426,7 +427,7 @@ export function toSubmitPayload(values: TicketFormValues): Omit<TicketFormValues
 - 集合级约束（数量上限、整体不可为空）与单项约束分开报，且**集合级优先**
 
 **示例**
-来源：`frontend/test/vue/src/logic/attachment.logic.ts`（见 frontend/examples/golden/form-validation.md 第 7 节）
+来源：`frontend/examples/golden/form-validation.md`「7. 附件校验」：先判集合级数量，再判单项类型与大小。
 
 ```typescript
 // ✅ 数组验证：先判集合级（数量），再判单项（类型/大小）
@@ -510,7 +511,7 @@ it('should_accept_file_exactly_at_size_limit', () => {
 - 恢复按钮可用
 - 保留用户输入
 - 显示错误信息（表单级或字段级）
-- 详见 frontend/rules/error-handling.md
+- 错误展示见 `frontend/rules/error-handling.md`「展示方式」：能归属到字段的按字段级展示并聚焦，无法归属的升为表单级。
 
 ---
 
@@ -549,8 +550,8 @@ export function resolveFirstErrorField(
 }
 ```
 
-聚焦动作属于 DOM 操作，由 UI 侧的小工具承担（`frontend/test/vue/src/hooks/focusFirstErrorField.ts`），
-Logic 只回答"聚焦哪个字段"。
+聚焦动作属于 DOM 操作，由 UI 侧的小工具承担，Logic 只回答"聚焦哪个字段"
+（见 `frontend/examples/golden/form-validation.md`「3. 聚焦顺序不依赖对象键序」：顺序表等于表单视觉顺序）。
 
 ---
 

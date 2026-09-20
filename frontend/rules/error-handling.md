@@ -1,6 +1,8 @@
 # 错误处理
 
-错误统一捕获、转换、展示。
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析，首段为 `common/`、`frontend/` 或 `backend/`。见 `<SPEC_ROOT>/README.md`「路径基准」。
+
+错误统一捕获、转换、展示。业务错误码的契约定义见 `common/rules/api-contract.md`「业务错误码」。
 
 ## 错误分类
 
@@ -49,7 +51,7 @@ interface StandardError {
 ```
 
 **示例**
-来源：`frontend/test/vue/src/services/`（完整版见 frontend/examples/golden/service-layer.md 第 1、4 节）
+来源：`frontend/examples/golden/service-layer.md`「统一请求出口」与「错误归一」：try-catch 只收敛在唯一请求出口，业务 Service 方法不重复包裹。
 
 ```typescript
 // ✅ Service 统一错误处理：try-catch 只在这一处
@@ -102,7 +104,7 @@ export async function fetchUserList(params: UserListParams) {
 - 不直接操作 UI（通过返回值通知）
 
 **示例**
-来源：`frontend/test/vue/src/hooks/useTicketList.ts`、`useTicketForm.ts`
+来源：`frontend/examples/golden/list-page.md`「页面组装」：按错误码决定策略，取消静默、字段级错误落到字段。
 
 ```typescript
 // ✅ 按错误码决定策略：取消不算故障，字段级错误落到字段
@@ -139,7 +141,7 @@ if (!result.success) {
 - **静默错误**（非关键操作）：控制台日志 + 埋点上报
 
 **示例**
-来源：`frontend/test/vue/src/components/feedback/DataLoader.vue` + `pages/TicketListPage.vue`
+来源：`frontend/examples/golden/list-page.md`「页面组装」：容器组件按状态分派，页面不写 v-if 链。
 
 ```vue
 <!-- ✅ 页面级错误：由容器组件按状态分派，页面不写 v-if 链 -->

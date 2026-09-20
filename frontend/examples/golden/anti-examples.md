@@ -1,16 +1,15 @@
 # 负向示例集
 
-来源：`frontend/test/react/`（React 18 + TS，**未按本规范落地**，且缺 `package.json`/`main.tsx`，无法构建）
+来源：本文件内联反例（已删工程，代码即载体；原 React 18 + TS 未按本规范落地的片段已内联至本文件各节）。
 用途：这些是真实产出的违规代码，用于识别常见偏离。每条给出违反条目与正确做法。
 
-说明：该项目是本规范早期未覆盖时的产物。保留它比删除更有价值——
-它记录了「不加约束时 AI 会怎么写」，是校验规范有效性的对照组。
+说明：本文件内联记录了「不加约束时 AI 会怎么写」，是校验规范有效性的对照组。
 
 ---
 
 ## 1. 页面直接调用 Service
 
-违反：core-principles P3、frontend/rules/architecture.md（依赖只能向下，页面不越层）
+违反：`frontend/rules/core-principles.md`「P3 逻辑完全解耦原则」、 `frontend/rules/architecture.md`「依赖只能向下：Page/Component→Hook→Logic→Service；禁止反向依赖。」
 
 来源：`pages/UserListPage.tsx:16, 155-190`
 
@@ -35,19 +34,19 @@ const handleDelete = useCallback(async (userId: string) => {
 问题：删除的编排（确认→请求→反馈→刷新→页码修正）落在页面里，
 换一个入口（详情页删除）就要复制一遍；且 `window.confirm`/`alert` 不可测试。
 
-**正确做法**：编排进 Hook，页面只调用。参见 `frontend/examples/golden/list-page.md` 第 6 节。
+**正确做法**：编排进 Hook，页面只调用。参见 `frontend/examples/golden/list-page.md`「6. 页面只做组装」（原文："页面内仅 1 个函数、状态全部来自 Hook。"）。
 
 ```typescript
-// ✅ 页面
+// ✅ 页面（React 写法）
 const rowOps = useTicketRowOperations({ rows, query, total, reload, goToPage });
-// <TicketTable @remove="rowOps.remove" />
+// <TicketTable rows={rows} onRemove={rowOps.remove} />
 ```
 
 ---
 
 ## 2. 展示型组件自己加载数据
 
-违反：core-principles P2（组件完全解耦：组件不自取数据）
+违反：`frontend/rules/core-principles.md`「P2 组件完全解耦原则」「禁止组件内发起业务数据请求（列表/详情/提交/删除）」
 
 来源：`components/UserFormModal.tsx:44-67`
 
@@ -74,7 +73,7 @@ const loadUserDetail = async (userId: string) => {
 
 ## 3. 竞态保护形似而无实效
 
-违反：frontend/rules/async-operations.md（竞态处理）
+违反：`frontend/rules/async-operations.md`「竞态条件处理」「signal 必须真正传给请求，否则 abort 不会中断任何东西」
 
 来源：`hooks/useUserList.ts:28-45`
 
@@ -95,13 +94,13 @@ if (currentParamsRef.current !== params) return;
 - 用对象引用做新旧判定，语义不稳定（同值不同引用 / 同引用重复调用）。
 
 **正确做法**：Service 统一接受 `{ signal }`，Hook 用单调序号判定。
-参见 `frontend/examples/golden/list-page.md` 第 4 节 `useRequestGuard`。
+参见 `frontend/examples/golden/list-page.md`「4. 竞态双保险」（原文："仅靠 AbortController 无法覆盖"；"期间又发起了新请求，本次结果作废"）。
 
 ---
 
 ## 4. 每个接口重复 try-catch
 
-违反：frontend/rules/async-operations.md（收敛到统一请求出口）
+违反：`frontend/rules/async-operations.md`「捕获必须收敛到唯一的请求出口（统一封装的 httpClient / request），」
 
 来源：`services/user.service.ts` —— 10 个函数各写一遍：
 
@@ -121,13 +120,13 @@ export async function fetchUserList(params: UserListParams) {
 漏写 try-catch 就会抛到调用方；错误归一规则随时间漂移。
 
 **正确做法**：单一 `httpClient` 承担 try-catch/超时/重试，业务方法只描述接口语义。
-参见 `service-layer.md` 第 1 节。
+参见 `frontend/examples/golden/service-layer.md`「1. 统一请求出口承担 try-catch」（原文："业务方法只描述接口语义，不再包裹 try-catch"）。
 
 ---
 
 ## 5. retryable 计算了但没人用
 
-违反：frontend/rules/error-handling.md（错误字段须被消费）、frontend/anti-patterns/hidden-side-effect.md
+违反：`frontend/rules/error-handling.md`「是否可重试；须被重试逻辑真实消费，不可只标不用」、 `frontend/anti-patterns/hidden-side-effect.md`「调用方无感知即被改全局、发请求、写状态，就是隐藏副作用。」
 
 来源：`services/user.service.ts:30,40,56,68,…`
 
@@ -138,16 +137,16 @@ return { code: 'TIMEOUT', message: '请求超时', type: 'network', retryable: t
 
 问题：字段成为装饰。规范要求的不是"有这个字段"，而是"重试策略由它驱动"。
 
-这是「无消费者产物」的典型形态，判据见 `common/protocol/task-boundary.md`：加东西前先指出消费者。
+这是「无消费者产物」的典型形态，判据见 `common/protocol/task-boundary.md`「消费者判据（四问）」（原文："判定方式：指名消费者。指不出即为装饰性代码，删除。"）。
 
 **正确做法**：`retryable` 作为重试循环的判据，并与幂等性共同决定是否重试。
-参见 `service-layer.md` 第 3 节。
+参见 `frontend/examples/golden/service-layer.md`「3. 幂等性决定是否重试」（原文："对 POST 重试会重复创建资源（重复工单/订单）"）。
 
 ---
 
 ## 6. 受控组件自持一份状态
 
-违反：core-principles P4（单向数据流）、frontend/rules/store.md（状态单一来源）
+违反：`frontend/rules/core-principles.md`「P4 单向数据流原则」「依赖只能向下：Page/Component → Hook → Logic → Service」、 `frontend/rules/store.md`「需刷新保持的状态一律以 URL 为唯一来源，不得以 Store 作为替代。」
 
 来源：`components/UserFilter.tsx:43-45`
 
@@ -165,13 +164,13 @@ export const UserFilter: React.FC<UserFilterProps> = ({
 浏览器前进/后退、外部重置筛选时，URL 变了而组件内部不变。
 
 **正确做法**：筛选条件以 URL 为唯一来源，组件全受控（`value` + `onChange`）。
-仅"输入中的草稿值"可短暂本地持有，防抖后立即上报。参见 `frontend/examples/golden/list-page.md` 第 1 节。
+仅"输入中的草稿值"可短暂本地持有，防抖后立即上报。参见 `frontend/examples/golden/list-page.md`「1. 筛选条件以 URL 为唯一来源」（原文："以 URL 为唯一来源后，该类 bug 从结构上消失。"）。
 
 ---
 
 ## 7. 校验层放弃类型
 
-违反：frontend/rules/typescript.md（禁止 any）
+违反：`frontend/rules/typescript.md`「禁止无理由 any，确实需要时用 unknown 或明确窄化。」
 
 来源：`logic/userValidation.logic.ts:14`
 
@@ -198,7 +197,7 @@ export interface ValidationRule<V> {
 
 ## 8. 注释复述代码
 
-违反：AGENTS.md B 类行为准则、common/rules/comment.md（注释写"为什么"）
+违反：`AGENTS.md`「行为规则（B = Behavior）」、 `common/rules/comment.md`「注释写"为什么这么做"，不写"这行做了什么"。」
 
 来源：`logic/userValidation.logic.ts`、`pages/UserListPage.tsx` 多处
 
@@ -211,7 +210,7 @@ if (rule.required && isEmpty(value)) return rule.message;
 const handleFilterChange = useCallback(/* … */);
 ```
 
-对照一条有价值的注释（来自 frontend/test/vue）：
+对照一条有价值的注释（本文件内联，原文："非必填字段留空时跳过后续规则，否则空值会撞上格式校验"）：
 
 ```typescript
 // ✅ 解释了不这样写会出什么问题
@@ -223,7 +222,7 @@ if (isEmptyValue(value)) return null;
 
 ## 9. useEffect 依赖注释掩盖问题
 
-违反：frontend/rules/async-operations.md
+违反：`frontend/rules/async-operations.md`「竞态条件处理」「上述两种方案**须同时使用**：AbortController 负责中断在途请求，」
 
 来源：`pages/UserListPage.tsx:44-46`
 
@@ -244,7 +243,7 @@ useEffect(() => {
 
 ## 10. 页面承担 13 个函数
 
-违反：core-principles P1（薄页面：≤3 个函数、≤5 个状态变量）
+违反：`frontend/rules/core-principles.md`「P1 页面薄层原则」「页面内直接定义的函数不超过 3 个」
 
 来源：`pages/UserListPage.tsx` —— `updateURLParams`、`handleFilterChange`、
 `handleResetFilter`、`handleSort`、`handlePageChange`、`handlePageSizeChange`、
@@ -253,30 +252,30 @@ useEffect(() => {
 
 **正确做法**：按关注点分组抽 Hook（查询编排 / 行操作 / 弹窗），
 每个 Hook 须有独立关注点，不是把函数搬个位置。
-判据见 frontend/protocol/decision-trees.md「Hook 拆分决策」。
+判据见 `frontend/protocol/decision-trees.md`「二之二、Hook 拆分决策」（原文："问：是否只是把页面函数原样搬了进来？"）。
 
 ---
 
 ## 11. Logic 层空转
 
-违反：frontend/rules/architecture.md（Logic 是业务规则的落点）、common/rules/business-rule.md
+违反：`frontend/rules/architecture.md`「Logic：业务规则、状态流转、副作用编排，可复用、可测试。」、 `common/rules/business-rule.md`「业务规则进入Logic。」
 
 现象：4 个 Hook 全部直接调 Service，Logic 只做 URL 解析与参数拼装，
 业务规则（谁能删、什么状态能改优先级、删除末页最后一条后去哪页）散落在页面与组件里。
 
 **正确做法**：可判定的业务规则一律下沉 Logic 并可单测。
-参见 `frontend/examples/golden/list-page.md` 第 2 节 `resolvePageAfterRemoval`、
-`frontend/examples/golden/form-validation.md` 第 4 节 `resolveVisibleFields`。
+参见 `frontend/examples/golden/list-page.md`「2. 改筛选必回第一页」（原文："删除末页最后一条后退回上一页，避免停在空页。"）、
+`frontend/examples/golden/form-validation.md`「4. 动态可见性与隐藏字段」（原文："提交载荷剔除隐藏字段残留，避免把上次填的回访时间带给后端。"）。
 
 ---
 
 ## 12. 缺少可运行的最小闭环
 
-违反：common/protocol/final-gate.md（验证要求）
+违反：`common/protocol/final-gate.md`「无法验证时的处理」（原文："明确声明哪些验证项**未执行**（构建 / 类型检查 / 测试 / 运行）。"）
 
 现象：22 个 `.tsx/.ts` 源文件齐备，但没有 `package.json`、`tsconfig.json`、`main.tsx`，
 `axios` 从未声明为依赖——项目从一开始就不可能通过构建。
 
 **正确做法**：工程骨架先于业务代码；无法执行构建时，须按
-common/protocol/final-gate.md 的「无法验证时的处理」显式声明未验证项，
+`common/protocol/final-gate.md`「无法验证时的处理」（原文："明确声明哪些验证项**未执行**（构建 / 类型检查 / 测试 / 运行）。"）显式声明未验证项，
 不得以"代码已写完"当作完成。

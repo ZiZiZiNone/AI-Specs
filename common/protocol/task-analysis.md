@@ -1,5 +1,7 @@
 # 任务分析
 
+> 路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
+
 先识别任务类型。
 
 ## 判定
@@ -12,7 +14,7 @@
 ## 流程
 - 第一步判定任务类型（见上），按对应任务规范走流程
   （前端：`frontend/tasks/`；后端：`backend/tasks/`，待建）。
-- 第二步确定授权面（只读 / 定向写 / 开放写），见 `common/protocol/task-boundary.md`；拿不准按只读档。
+- 第二步确定授权面（只读 / 定向写 / 开放写），见 `common/protocol/task-boundary.md`「授权面三档」："拿不准就是只读档，不是开放写档"；拿不准按只读档。
 - 分析需求来源、目标、范围、边界与验收标准。
-- 信息不足时按 `common/protocol/requirement-completeness.md` 分级处理：
+- 信息不足时按 `common/protocol/requirement-completeness.md`「检查项」："阻塞项（影响开工与验收的，如目标、验收标准、接口字段）列出并先确认"分级处理：
   阻塞项先确认，非阻塞项标注"待确认"继续，禁止用猜测补齐。

@@ -35,8 +35,8 @@ export function resolveTicketRowAbility(user: SessionUser | null, row: Ticket) {
 }
 ```
 
-来源：`frontend/test/vue/src/logic/ticketPermission.logic.ts` 的 `resolveTicketRowAbility`，
-在 `TicketTable.vue` 与页面两处消费同一份结果。
+来源：frontend/examples/golden/list-page.md「6. 页面只做组装」同一份判据形态的 `resolveTicketRowAbility`，
+在表格与页面两处消费同一份结果。
 
 ## 可见 vs 禁用
 
@@ -54,10 +54,8 @@ export function resolveTicketRowAbility(user: SessionUser | null, row: Ticket) {
 - 菜单 / 入口渲染：登记决定是否显示的渲染位置。
 - 页面 / 组件内控件：登记决定按钮可见或禁用的控件位置。
 
-正例调用点见 frontend/test/vue/src/router/index.ts（守卫侧）与
-frontend/test/vue/src/store/session.store.ts（权限来源侧）；
-判定实现侧见 frontend/test/vue/src/logic/ticketPermission.logic.ts。
+正例调用点见 frontend/examples/golden/list-page.md「6. 页面只做组装」守卫侧与权限来源侧形态；
+判定实现侧见 frontend/examples/golden/list-page.md「6. 页面只做组装」同一份判据形态。
 
 ## 框架实现
-路由守卫写法等框架细则见 frontend/frameworks/<框架>/router.md，
-具体为 frontend/frameworks/vue3/router.md 与 frontend/frameworks/miniprogram/router.md。
+路由守卫写法等框架细则 Vue 3 见 frontend/frameworks/vue3/router.md、小程序见 frontend/frameworks/miniprogram/router.md。
