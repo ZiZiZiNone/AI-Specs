@@ -3,12 +3,14 @@
 ## 路径基准（先读这一节）
 
 本文件所在目录即**规范库根**，下文记作 `<SPEC_ROOT>`。
-本库所有文档中形如 `rules/xxx.md`、`protocol/xxx.md` 的裸路径，**一律相对 `<SPEC_ROOT>` 解析，
-不是业务项目根**。在业务项目里工作时，读取规范必须拼成 `<SPEC_ROOT>/rules/xxx.md`。
+本库采用三分结构：`common/`（前后端通用）、`frontend/`（前端专属）、`backend/`（后端专属）。
+文档中的裸路径**一律相对 `<SPEC_ROOT>` 解析，不是业务项目根**，首段必为三者之一；
+例如 `common/rules/naming.md` 指 `<SPEC_ROOT>/common/rules/naming.md`。
+在业务项目里工作时，读取规范必须拼成绝对路径 `<SPEC_ROOT>/...`。
 
 **开工前置动作**（不是建议，是必做）：按序读必读四件：`<SPEC_ROOT>/README.md`（全局入口与加载策略）、
-`<SPEC_ROOT>/rules/constitution.md`（宪法）、`<SPEC_ROOT>/rules/core-principles.md`（四大原则）、
-`<SPEC_ROOT>/protocol/task-boundary.md`（任务边界与授权面）。
+`<SPEC_ROOT>/common/rules/constitution.md`（宪法）、`<SPEC_ROOT>/common/principles.md`（四条通用原则 + 极致解耦）、
+`<SPEC_ROOT>/common/protocol/task-boundary.md`（任务边界与授权面）。
 本文件只是行为规则索引，规范正文不在此。
 
 遵守规范、禁止猜测、先分析后实现。
@@ -18,24 +20,25 @@
 （例外：文件自身把编号写进小节标题的，见 C5 细则「编号小节例外」）。
 
 开工先定授权面（C6）：Review / 答疑 / 诊断默认**只读**，只报告不改代码；
-用户没点名的产物必须指得出消费者才写。判据见 `<SPEC_ROOT>/protocol/task-boundary.md`。
+用户没点名的产物必须指得出消费者才写。判据见 `<SPEC_ROOT>/common/protocol/task-boundary.md`。
 
 ## 强制自检点
 
 **每次提交前必须执行**：
 1. 检查是否遵守 B0-B5 所有行为规则
-2. 使用 checklists/detailed-check.md 进行全面自检（先做「适用性判定」，不适用项须写明原因）
-3. 实际执行构建、类型检查、测试；执行不了则按 protocol/final-gate.md 声明未验证项
+2. 使用对应子树的自检清单进行全面自检（前端 `frontend/checklists/detailed-check.md`；后端清单待建），
+   先做「适用性判定」，不适用项须写明原因
+3. 实际执行构建、类型检查、测试；执行不了则按 common/protocol/final-gate.md 声明未验证项
 4. 交付文本里每处规范引用均已核对原文；每处"规范未覆盖"的结论均附检索命令与结果（C5）
 5. 本次未越授权面：只读档全程无写动作；每处用户未点名的动作都指出了消费者；
-   无装饰性产物与重复取证（C6，判据见 protocol/task-boundary.md）
+   无装饰性产物与重复取证（C6，判据见 common/protocol/task-boundary.md）
 
 **违反后果**：
 - 违反规范的代码必须立即重做
 - 不允许"下次注意"，必须当次修正
 
-**拿不准写法时**：查 examples/golden/ 的正向示例；
-不确定某种写法是否算违规，查 examples/golden/anti-examples.md 的负向对照。
+**拿不准写法时**：查 frontend/examples/golden/ 的正向示例；
+不确定某种写法是否算违规，查 frontend/examples/golden/anti-examples.md 的负向对照。
 
 # 行为规则（B = Behavior）
 

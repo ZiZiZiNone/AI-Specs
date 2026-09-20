@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-"""导入路径校验脚本（rules/import-path.md 的可执行形态）。
+"""导入路径校验脚本（frontend/rules/import-path.md 的可执行形态）。
 
-规则（逐条对应 rules/import-path.md）：
+规则（逐条对应 frontend/rules/import-path.md）：
 - 禁用相对：`from './…'`、`from '../…'` 一律 FAIL，含同目录；
   覆盖静态 import / export … from / 动态 import() / require()。
 - `@/` 须带文件后缀或以 `/index` 结尾，否则 FAIL；
   第三方裸包与 `@scope/pkg` 形态放行；CSS `@import` / `url()` 不扫。
 - 别名唯一性不在本脚本判定（新增别名走配置评审）。
 
-扫描范围：显式传入的业务源码目录（默认 <SPEC_ROOT>/test/vue/src，
+扫描范围：显式传入的业务源码目录（默认 <SPEC_ROOT>/frontend/test/vue/src，
 仅用于本库自证；业务项目传入自家 src/ 或 miniprogram/）。
 跳过：.git、node_modules、dist、build、miniprogram_npm。
 
@@ -21,7 +21,7 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TARGET = os.path.abspath(sys.argv[1]) if len(sys.argv) > 1 and not sys.argv[1].startswith("-") else \
-    os.path.join(ROOT, "test", "vue", "src")
+    os.path.join(ROOT, "frontend", "test", "vue", "src")
 
 SKIP_DIRS = {".git", "node_modules", "dist", "build", "miniprogram_npm"}
 SCAN_EXT = (".ts", ".tsx", ".js", ".jsx", ".mts", ".cts", ".vue")

@@ -1,20 +1,22 @@
 #!/usr/bin/env python3
-"""引用校验脚本（C5 引用可验伪的可执行形态）。
+r"""引用校验脚本（C5 引用可验伪的可执行形态）。
 
-判定依据逐条来自 rules/constitution.md「C5 细则」：
+判定依据逐条来自 common/rules/constitution.md「C5 细则」：
 - 条款级 ID 只存在于两处：constitution.md 的 C1-C6、AGENTS.md 的 B0-B5；
   其它地方出现未定义的 Cx/Bx 即编造 → FAIL。
 - 位置式引用（第 N 节/条/段/章、倒数第）只允许两类：指向上述两处 ID 文件，
-  或指向编号小节例外文件（examples/golden 下四文件 `## N.`，以及
-  rules/core-principles.md `## P1`–`## P4`，被引编号必须真实存在）→ 其它一律 FAIL。
+  或指向"编号小节例外"文件——判定式为
+  `grep -nE "^#{2,4} *(P[1-4]|[0-9]+\.)" <目标文件>`，
+  被引编号须在该文件的命中结果中（**不维护文件清单，避免清单漂移**）→ 其它一律 FAIL。
 - `>` 引文逐行校验：每行必须归属到一个 .md 文件，且是该文件的逐字子行
   （即 `grep -F` 可命中；markdown 加粗/行内代码/列表序号属排版差异，不计；
   摘录跳行不算改写，合并多行才算）→ 失配 WARN，加 --strict 时升级为 FAIL。
-- P1-P4：`rules/core-principles.md` 的 `## P1`–`## P4` 已纳入 C5 编号小节例外，
+- P1-P4：`frontend/rules/core-principles.md` 的 `## P1`–`## P4` 已纳入 C5 编号小节例外，
   写 P1–P4（不写成"第 N 节"），按 PASS 处理。
 
 扫描范围：规范库根下全部 *.md，排除 .git/、node_modules/、
-test/*/src/**（fixture 源码无散文引用）、.internal-docs/（过程记录非规范正文）、
+frontend/test/*/src/**（fixture 源码无散文引用）、.internal-docs/（过程记录非规范正文）、
+.workbuddy-ai/（项目数据非规范正文）、
 SPEC-GAPS.md（时点快照，已声明失效，不追溯改写；引用其结论前须复验当前文件）。
 
 用法：python scripts/check-citations.py [<SPEC_ROOT>] [--strict] [--verbose]
@@ -24,18 +26,13 @@ import os
 import re
 import sys
 
-ROOT = os.path.abspath(sys.argv[1]) if len(sys.argv) > 1 else \
+_ARGS = [a for a in sys.argv[1:] if not a.startswith("-")]
+ROOT = os.path.abspath(_ARGS[0]) if _ARGS else \
     os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-SKIP_DIRS = {".git", "node_modules", ".internal-docs"}
+SKIP_DIRS = {".git", "node_modules", ".internal-docs", ".workbuddy-ai", "vendor"}
 SKIP_FILES = {"SPEC-GAPS.md"}
-ID_FILES = {"rules/constitution.md", "AGENTS.md"}
-GOLDEN = {
-    "examples/golden/list-page.md",
-    "examples/golden/form-validation.md",
-    "examples/golden/service-layer.md",
-    "examples/golden/anti-examples.md",
-}
+ID_FILES = {"common/rules/constitution.md", "AGENTS.md"}
 
 RE_C = re.compile(r"\bC\d+\b")
 RE_B = re.compile(r"\bB\d+\b")
@@ -64,7 +61,8 @@ def md_files():
     for dirpath, dirnames, filenames in os.walk(ROOT):
         dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS]
         rel_dir = os.path.relpath(dirpath, ROOT)
-        if rel_dir.startswith("test" + os.sep) and "src" in rel_dir.split(os.sep):
+        if rel_dir.startswith(os.path.join("frontend", "test") + os.sep) \
+                and "src" in rel_dir.split(os.sep):
             continue
         for fn in sorted(filenames):
             if fn in SKIP_FILES:
@@ -119,11 +117,11 @@ def main():
         rel = os.path.relpath(p, ROOT).replace(os.sep, "/")
         by_base.setdefault(os.path.basename(p), []).append(rel)
 
-    const_text = read(os.path.join(ROOT, "rules/constitution.md"))
+    const_text = read(os.path.join(ROOT, "common", "rules", "constitution.md"))
     agents_text = read(os.path.join(ROOT, "AGENTS.md"))
     valid_c = set(RE_C.findall(const_text))
     valid_b = set(RE_B.findall(agents_text))
-    core_text = read(os.path.join(ROOT, "rules/core-principles.md"))
+    core_text = read(os.path.join(ROOT, "frontend", "rules", "core-principles.md"))
     valid_p = set(RE_P_HEAD.findall(core_text))
 
     strict = "--strict" in sys.argv
@@ -167,13 +165,16 @@ def main():
                 if target in ID_FILES:
                     continue
                 nums = RE_POS_N.findall(line)
-                if target in GOLDEN and nums:
-                    heads = set(re.findall(r"^## (\d+)\.",
-                                            read(os.path.join(ROOT, target)), re.M))
+                # C5「编号小节例外」：以判定式实际结果为准，不维护文件清单
+                if nums:
+                    heads = {a or b for a, b in re.findall(
+                        r"^#{2,4} *(?:P([1-4])|([0-9]+)\.)",
+                        read(os.path.join(ROOT, target)), re.M)}
                     if all(n in heads for n, _ in nums):
                         continue
                 emit(fails, rel, i,
-                     f"FAIL 位置式引用「{m.group(0)}」指向 {target}（非 ID 文件且无 ## N. 编号标题）")
+                     f"FAIL 位置式引用「{m.group(0)}」指向 {target}"
+                     f"（非 ID 文件，且该文件无此编号的小节标题）")
 
         # C. `>` 引文块：须归属文件，且每行逐字命中（去标记比对）
         i = 0
