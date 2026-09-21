@@ -2,7 +2,7 @@
 
 > 路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
 
-命名表达意图；禁止无信息量命名。**具体大小写形态按语言**，见对应子树的 `backend/go/naming.md` 与 `backend/php/naming.md`。
+命名表达意图；禁止无信息量命名。**具体大小写形态按语言**，语言子树待建期间见 `backend/README.md`「计划中的子目录」，落地后见对应子树的 `backend/go/naming.md` 与 `backend/php/naming.md`。
 
 ## 跨语言规则
 
@@ -16,6 +16,6 @@
 
 - **前端**（TS / Vue / 小程序）：组件 PascalCase；变量与函数 camelCase；
   常量 UPPER_SNAKE（MAX_PAGE_SIZE）；事件回调 handleXxx / onXxx。
-- **后端**：按语言约定，见对应子树的 `backend/go/naming.md` 与 `backend/php/naming.md`。
+- **后端**：按语言约定，语言子树待建期间见 `backend/README.md`「计划中的子目录」，落地后见对应子树的 `backend/go/naming.md` 与 `backend/php/naming.md`。
   - Go：标识符用 MixedCaps，**首字母大小写决定导出性**，不额外加 Get/Set 式前缀；包名小写单词。
   - PHP：遵循 PSR-1 / PSR-12；类 PascalCase、方法与变量 camelCase、常量 UPPER_SNAKE。

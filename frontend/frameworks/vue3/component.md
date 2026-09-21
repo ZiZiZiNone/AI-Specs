@@ -3,7 +3,7 @@
 路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
 
 组件通信、props/emit 与受控约定。
-组件职责边界见 `frontend/rules/ui-rule.md` 与 `frontend/rules/core-principles.md`「P2 组件完全解耦原则」。
+组件职责边界见 `frontend/rules/ui-rule.md` 与 FE-102 `frontend/rules/core-principles.md`「FE-102 组件完全解耦原则」。
 
 ## props
 
@@ -106,7 +106,7 @@ const keyword = ref(props.initialKeyword);
 
 ## 组件通信禁止项
 
-- ❌ 组件内 import Store（P2）
+- ❌ 组件内 import Store（FE-102）
 - ❌ 组件内加载页面业务数据（列表/详情/提交/删除）
 - ❌ 组件访问路由参数（页面组件除外）
 - ❌ 通过 `$parent` / `provide` 隐式回写父级状态

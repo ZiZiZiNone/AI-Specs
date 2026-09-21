@@ -93,7 +93,7 @@ export const useSessionStore = defineStore('session', () => {
 ## 组件消费 store 的边界
 
 - **页面**可直接 `useXxxStore()`。
-- **展示组件禁止 import store**（见 `frontend/rules/core-principles.md`「P2 组件完全解耦原则」：禁止组件内直接 import Store）：
+- **展示组件禁止 import store**（见 FE-102 `frontend/rules/core-principles.md`「FE-102 组件完全解耦原则」：禁止组件内直接 import Store）：
   所需数据由 props 传入，否则组件与全局状态耦合，无法独立渲染与测试。
 
 ```vue

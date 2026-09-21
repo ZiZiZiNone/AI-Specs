@@ -2,7 +2,7 @@
 
 问题、风险、建议、依据。
 
-## 授权面：只读（C6）
+## 授权面：只读（COM-012）
 
 Review 全程不修改代码，包括发现的明显笔误、失效代码与低风险改动——
 它们写进「问题」表格，由用户决定是否修。
@@ -36,15 +36,15 @@ Review 全程不修改代码，包括发现的明显笔误、失效代码与低�
 ## 规则
 - 结论有据可查，不做无依据评价。
 - 区分"确定问题"与"建议改进"。
-- 引用规范条款前打开原文核对（C5）：见 `common/rules/constitution.md`「文件路径 + 原文逐字摘录」。
-- 报"规范未覆盖"须附检索命令与空结果（C5）：见 `common/rules/constitution.md`「附检索命令与空结果」。
+- 引用规范条款前打开原文核对（COM-011）：见 `common/rules/constitution.md`「编号 + 文件路径 + 原文逐字摘录」。
+- 报"规范未覆盖"须附检索命令与空结果（COM-011）：见 `common/rules/constitution.md`「附检索命令与空结果」。
 - 同一事实取证一次即止，不重复检索与重跑（见 `common/protocol/task-boundary.md`「重复取证」）。
 
 ## 输出模板
 ### 问题
 | 编号 | 严重度 | 问题 | 位置 | 证据摘录 | 规范依据路径+摘录 | 建议 |
 | ---- | ------ | ---- | ---- | -------- | ------------------ | ---- |
-| R1 | 严重/主要/次要/建议 | <一句话> | <文件:行> | <代码/输出原文摘录> | <如 `common/rules/constitution.md`「文件路径 + 原文逐字摘录」> | <可执行改法> |
+| R1 | 严重/主要/次要/建议 | <一句话> | <文件:行> | <代码/输出原文摘录> | <如 COM-011 `common/rules/constitution.md`「编号 + 文件路径 + 原文逐字摘录」> | <可执行改法> |
 | R2 | 主要 | 页面直连 Service | `src/pages/TicketListPage.vue:80` | `await userService.deleteUser(userId)` | `frontend/rules/architecture.md`「<原文摘录>」 | 改由 Hook 取数，判定下沉 Logic |
 
 ### 只读验证执行（白名单命令，结果摘录粘贴；未执行按 `common/protocol/final-gate.md`「声明模板」填）

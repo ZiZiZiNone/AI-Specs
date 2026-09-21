@@ -3,7 +3,7 @@
 路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
 
 组件通信、properties/observers/lifetimes 与受控约定。
-组件职责边界见 `frontend/rules/ui-rule.md` 与 `frontend/rules/core-principles.md`「P2 组件完全解耦原则」。
+组件职责边界见 `frontend/rules/ui-rule.md` 与 FE-102 `frontend/rules/core-principles.md`「FE-102 组件完全解耦原则」。
 
 ## properties
 
@@ -105,14 +105,14 @@ Component({
 
 ## 组件通信禁止项
 
-- ❌ 组件内读 `globalData` 做业务判定（P2；展示组件连读都不读）
+- ❌ 组件内读 `globalData` 做业务判定（FE-102；展示组件连读都不读）
 - ❌ 组件内加载页面业务数据（列表/详情/提交/删除）
 - ❌ 组件内调 `wx.request`（接口入口唯一归 Service）
 - ❌ 组件读页面路由参数（页面组件除外）
 - ❌ 用 `selectComponent` 命令式调用子组件业务方法
   （UI 焦点控制等纯交互可例外，需注释说明）
 
-允许调用 Service 的例外见 frontend/rules/core-principles.md P2「组件调用 Service 的边界」：
+允许调用 Service 的例外见 FE-102 `frontend/rules/core-principles.md`「组件调用 Service 的边界」：
 仅限组件自身交互功能（上传、异步搜索、唯一性校验）。
 
 ---

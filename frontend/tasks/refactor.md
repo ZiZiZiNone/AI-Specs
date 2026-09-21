@@ -2,13 +2,13 @@
 
 结构调整、不改行为的优化（任务类型判定见 `common/protocol/task-analysis.md`）。
 
-## 授权面：定向写，行为不变（C6）
+## 授权面：定向写，行为不变（COM-012）
 
 只写已列明的文件，加上真实调用链上被迫改的文件（见 `common/protocol/task-boundary.md`「只写已列明的文件，加上真实调用链上被迫改的文件」）。
 重构目标之外的文件不动；整体重构需用户明确授权升档（见 `common/protocol/task-boundary.md`「升档必须由用户明确表示，不能由 AI 自行推断」）。
 
 不夹带功能改动（见 `common/protocol/task-boundary.md`「不夹带功能改动」）。
-加东西前先过消费者四问（C6）：
+加东西前先过消费者四问（COM-012）：
 「用户要求了吗？」「不做它，当前需求能否成立？」
 「哪一段可达的代码、数据、接口、验收条件会消费它？」「省掉它，当前验收会失败吗？」
 判据见 `common/protocol/task-boundary.md`「四问全否 → 不实现，可作为建议报告」。
@@ -26,10 +26,10 @@
 
 - 不夹带功能改动；每步可回滚。
 - 四类越界（范围外扩 / 无消费者产物 / 意图越界 / 重复取证）的判据见 `common/protocol/task-boundary.md`。
-- 引用规范条款前打开原文核对（C5）：见 `common/rules/constitution.md`「文件路径 + 原文逐字摘录」。
-- 报"规范未覆盖"须附检索命令与空结果（C5）：见 `common/rules/constitution.md`「附检索命令与空结果」。
-- 同一事实取证一次即止，不重复检索与重跑（C6）：见 `common/protocol/task-boundary.md`「同一事实已有足够证据，仍反复检索、重读、重跑、重审」。
-- 首次写出的代码必须符合项目风格，写对一次（B3）：见业务项目根 `AGENTS.md`「禁止每写完一个文件就执行 prettier、eslint --fix 等格式化命令」。
+- 引用规范条款前打开原文核对（COM-011）：见 `common/rules/constitution.md`「编号 + 文件路径 + 原文逐字摘录」。
+- 报"规范未覆盖"须附检索命令与空结果（COM-011）：见 `common/rules/constitution.md`「附检索命令与空结果」。
+- 同一事实取证一次即止，不重复检索与重跑（COM-012）：见 `common/protocol/task-boundary.md`「同一事实已有足够证据，仍反复检索、重读、重跑、重审」。
+- 首次写出的代码必须符合项目风格，写对一次（FE-003）：见业务项目根 `AGENTS.md`「禁止每写完一个文件就执行 prettier、eslint --fix 等格式化命令」。
 - 验证类条目不可跳过：见 `frontend/checklists/detailed-check.md`「验证类条目不可用"不适用"跳过」；执行不了按 `common/protocol/final-gate.md`「无法验证时的处理」声明。
 
 ## 输出模板

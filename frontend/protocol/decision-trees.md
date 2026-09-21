@@ -1,5 +1,7 @@
 # 决策流程图
 
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
+
 将复杂判断转化为明确的决策流程。
 
 ## 一、状态归属决策
@@ -389,7 +391,7 @@ interface Options {
     ↓
 问：调用位置在哪一层？
   ├─ Component → 仅限组件自身交互（上传/异步搜索/唯一性校验），
-  │              业务数据加载禁止（判据见 core-principles P2）
+  │              业务数据加载禁止（判据见 `frontend/rules/core-principles.md`「FE-102 组件完全解耦原则」）
   ├─ Page → 禁止直连 Service，交给 Hook
   ├─ Hook → 允许直接调用 Service 加载数据
   ├─ Logic → 允许调用 Service
@@ -420,7 +422,7 @@ export function loadTicketList(query: TicketListQuery) {
 ### 强制规则
 - ❌ Page/Component 不能直接调用 axios/fetch
 - ❌ Page 不直连 Service（交给 Hook）
-- ❌ Component 不加载页面业务数据（自身交互类调用见 core-principles P2 例外清单）
+- ❌ Component 不加载页面业务数据（自身交互类调用见 `frontend/rules/core-principles.md`「组件调用 Service 的边界」）
 - ✅ Hook 可直接调用 Service 取数，但不写业务判断
 - ✅ Logic 可调用 Service
 - ✅ Service 是唯一的接口访问入口（唯一写请求代码的地方）

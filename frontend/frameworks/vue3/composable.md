@@ -3,7 +3,7 @@
 路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
 
 composable（useXxx）的入参、返回值、清理与竞态约定。
-职责边界见 `frontend/rules/architecture.md`「分层职责」：Hook 为 UI 侧的状态与副作用复用单元；量化标准见 `frontend/rules/core-principles.md`「P1 页面薄层原则」；
+职责边界见 `frontend/rules/architecture.md`「分层职责」：Hook 为 UI 侧的状态与副作用复用单元；量化标准见 FE-101 `frontend/rules/core-principles.md`「FE-101 页面薄层原则」；
 拆分判据见 `frontend/protocol/decision-trees.md`「Hook 拆分决策」。
 
 ## 命名与位置

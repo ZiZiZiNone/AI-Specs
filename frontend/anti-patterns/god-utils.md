@@ -1,6 +1,6 @@
 # 万能工具库
 
-对齐关系：见 `frontend/rules/core-principles.md` P3 逻辑完全解耦原则，本文件讲复用抽象时机，不为未来预造抽象。
+对齐关系见 `frontend/rules/core-principles.md`「FE-103 逻辑完全解耦原则」，本文件讲复用抽象时机，不为未来预造抽象。
 
 ## 定义
 

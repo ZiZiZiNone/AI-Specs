@@ -2,7 +2,7 @@
 
 路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析，首段为 `common/`、`frontend/` 或 `backend/`。见 `<SPEC_ROOT>/README.md`「路径基准」。本示例自包含，代码即规范结论的完整载体，不依赖外部工程。
 
-示范：`frontend/patterns/list-page.md`「筛选/分页/排序以 URL 为唯一来源」、 `frontend/rules/store.md`「需刷新保持的状态一律以 URL 为唯一来源，不得以 Store 作为替代。」、 `frontend/rules/ui-states.md`「整体态保持 `success`，错误只经 `errorMessage` / Toast 呈现。」、 `frontend/rules/core-principles.md`「P1 页面薄层原则」「页面内直接定义的函数不超过 3 个」。
+示范：`frontend/patterns/list-page.md`「筛选/分页/排序以 URL 为唯一来源」、 `frontend/rules/store.md`「需刷新保持的状态一律以 URL 为唯一来源，不得以 Store 作为替代。」、 `frontend/rules/ui-states.md`「整体态保持 `success`，错误只经 `errorMessage` / Toast 呈现。」、 FE-101 `frontend/rules/core-principles.md`「FE-101 页面薄层原则」「页面内直接定义的函数不超过 3 个」。
 
 ## 1. 筛选条件以 URL 为唯一来源
 

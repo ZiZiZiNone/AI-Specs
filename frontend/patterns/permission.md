@@ -1,5 +1,7 @@
 # 权限
 
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
+
 权限来自Store，经Logic消费。
 
 ## 规则

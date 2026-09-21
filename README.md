@@ -35,7 +35,7 @@
 | `backend/` | **部分可用** | 导航入口与共用分层原则已建立（`backend/README.md`）；语言子树、`backend/tasks/` 与 `backend/checklists/` 待建 |
 
 `backend/` 的语言子树尚未建立时，后端任务按 `common/` 通用规范与 `backend/README.md`
-的共用分层原则执行；遇到框架专属决策点应提问而非自行发挥（C1）。
+的共用分层原则执行；遇到框架专属决策点应提问而非自行发挥（COM-007）。
 
 ## 目录结构
 
@@ -49,7 +49,7 @@
 │   ├── rules/           宪法、接口契约、命名、注释、测试、重构、复用、性能、业务规则、项目 README
 │   └── protocol/        任务边界、任务类型判定、需求完整性、最终闸门
 ├── frontend/            前端专属规范（见 frontend/README.md）
-│   ├── rules/           P1–P4 前端落地、架构分层、状态、接口、错误、异步、UI、表单、样式、TS、导入路径
+│   ├── rules/           FE-101 至 FE-104 前端落地、架构分层、状态、接口、错误、异步、UI、表单、样式、TS、导入路径
 │   ├── protocol/        实现顺序、决策树
 │   ├── patterns/        列表 / 表单 / 详情 / 权限 / 表格 / 上传标准模式
 │   ├── anti-patterns/   胖页面 / 全局化 / 万能工具库 / 隐藏副作用 / 巨型组件
@@ -125,7 +125,7 @@
 本库**无运行时**，不启动任何服务。可执行的只有校验脚本：
 
 ```bash
-# 引用可验伪校验（C5）：条款级 ID、位置式引用、引文逐行比对
+# 引用可验伪校验（COM-011）：条款级编号、位置式引用、引文逐行比对
 python scripts/check-citations.py            # 退出码 0 通过，1 有 FAIL
 python scripts/check-citations.py --strict   # WARN 也计为 FAIL
 
@@ -173,7 +173,7 @@ python scripts/check-import-path.py <业务源码目录>   # 业务项目传入�
 | 项 | 影响面 | 状态 |
 |---|---|---|
 | 本机目录与库名改为 `AI-Operating-System-v4.0`（远程仓库名不改） | 需同步 `INTEGRATION.md` 与全局 `AGENTS.md` | 待做（阶段④） |
-| 条款级 ID 方案：若引入新 ID，须同步 C5 细则 | 当前决策为**不引入** | 待决策 |
+| 条款级编号方案：若引入新编号，须同步 COM-011 细则 | 当前为 COM-007 至 COM-012 与 FE-000 至 FE-005、FE-101 至 FE-104 | 已定 |
 
 ## 演化
 

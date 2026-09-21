@@ -12,26 +12,12 @@
 
 ## 子目录
 
-- `frontend/rules/`：前端专属核心规则
-  - `core-principles.md`：P1–P4 四条原则的前端落地与量化标准
-  - `architecture.md`：架构分层（Page / Component / Hook / Logic / Service）
-  - `store.md`：状态管理（状态归属决策树）
-  - `api.md`：接口访问规范（Service 唯一入口）
-  - `error-handling.md`：错误处理规范
-  - `async-operations.md`：异步操作规范（竞态、取消、重试）
-  - `ui-rule.md`：UI 组件规范
-  - `ui-states.md`：UI 状态管理（loading / error / empty / success）
-  - `form-validation.md`：表单验证规范
-  - `style.md`：样式规范（设计 token 单一来源）
-  - `typescript.md`：TypeScript 规范
-  - `import-path.md`：导入路径规范
-- `frontend/protocol/`
-  - `implementation-order.md`：实现顺序（Pattern→State→Logic→Service→UI）
-  - `decision-trees.md`：决策流程图（状态归属 / Hook vs Logic / 组件拆分等）
-- `frontend/patterns/`：页面与组件标准模式（列表 / 表单 / 详情 / 权限 / 表格 / 上传）
-- `frontend/anti-patterns/`：反模式与对策（胖页面 / 全局化 / 万能工具库 / 隐藏副作用 / 巨型组件）
-- `frontend/tasks/`：任务流程与输出模板（Feature / Bugfix / Refactor / Review，Review 含评分标准）
-- `frontend/checklists/`：交付自检（`self-check.md` 简化版、`detailed-check.md` 详细版 16 章）
+- `frontend/rules/`：前端专属核心规则（目录入口见 `frontend/rules/architecture.md`「规则」；各文件为 architecture、store、api、error-handling、async-operations、ui-rule、ui-states、form-validation、style、typescript、import-path，另有 `core-principles.md` 为 FE-101 至 FE-104 落地）
+- `frontend/protocol/`：实现顺序、决策树（目录入口见 `frontend/protocol/implementation-order.md`「实现顺序」与 `frontend/protocol/decision-trees.md`「状态归属决策」）
+- `frontend/patterns/`：页面与组件标准模式（列表 / 表单 / 详情 / 权限 / 表格 / 上传；目录入口见 `frontend/patterns/list-page.md`「规则」）
+- `frontend/anti-patterns/`：反模式与对策（胖页面 / 全局化 / 万能工具库 / 隐藏副作用 / 巨型组件；目录入口见 `frontend/anti-patterns/fat-page.md`「对策（拆到哪层，四选一写明）」）
+- `frontend/tasks/`：任务流程与输出模板（Feature / Bugfix / Refactor / Review；目录入口见 `frontend/tasks/feature.md`「输出模板」）
+- `frontend/checklists/`：交付自检（`self-check.md` 简化版、`detailed-check.md` 详细版；目录入口见 `frontend/checklists/detailed-check.md`「适用性判定」）
 - `frontend/frameworks/`：框架专属规范
   - `vue3/`：README（读取顺序）、reactivity、state、composable、component、router、testing、`ui/arco/`
   - `miniprogram/`：README（读取顺序）、state、logic、component、router、service、testing、

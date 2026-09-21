@@ -1,7 +1,9 @@
 # 表单页
 
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
+
 定位：新增 / 编辑 / 弹窗表单等"收集输入—校验—提交"场景的落点规范。
-只定分层与时机，不定字段细节；字段规则归属见 frontend/rules/form-validation.md。
+只定分层与时机，不定字段细节；字段规则归属见 `frontend/rules/form-validation.md`。
 
 ## 结构落点
 

@@ -1,6 +1,6 @@
 # 胖页面
 
-对齐关系：见 `frontend/rules/core-principles.md` P1 页面薄层原则，本文件阈值数字全部引用该文件原文，不自立阈值。
+对齐关系见 `frontend/rules/core-principles.md`「FE-101 页面薄层原则」，本文件阈值数字全部引用该文件原文，不自立阈值。
 
 ## 定义
 
@@ -40,7 +40,7 @@
 
 - 接口访问 → Service：页面不直连 Service，一律经 Hook 调用，统一请求出口收敛。
 
-- 候选并列（交用户定）：A. 先抽 Hook 再补 Logic；B. 先下沉 Logic 再薄 Hook。两者都满足 P1，选用由用户定。
+- 候选并列（交用户定）：A. 先抽 Hook 再补 Logic；B. 先下沉 Logic 再薄 Hook。两者都满足 FE-101，选用由用户定。
 
 ## 正例指针
 
@@ -56,7 +56,7 @@
 
 ## 自检指针（`frontend/checklists/detailed-check.md`，用小节名）
 
-- “P1 页面薄层原则”：8 项全过，重点查“达标方式不是把函数原样搬进 Hook”。
+- 「FE-101 页面薄层原则」：8 项全过，重点查“达标方式不是把函数原样搬进 Hook”。
 
 - “胖页面”：页面行数、状态堆叠、拆分落点三项。
 

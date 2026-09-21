@@ -1,6 +1,6 @@
 # 巨型组件
 
-对齐关系：见 `frontend/rules/core-principles.md` P2 组件完全解耦原则，本文件阈值数字全部引用该文件及配套决策原文，不自立阈值。
+对齐关系见 `frontend/rules/core-principles.md`「FE-102 组件完全解耦原则」，本文件阈值数字全部引用该文件及配套决策原文，不自立阈值。
 
 ## 定义
 
@@ -56,11 +56,11 @@
 
 ## 自检指针（`frontend/checklists/detailed-check.md`，用小节名）
 
-- “P2 组件完全解耦原则”：8 项全过，重点查无 import Store、无业务数据请求。
+- 「FE-102 组件完全解耦原则」：8 项全过，重点查无 import Store、无业务数据请求。
 
 - “巨型组件”：职责单一、props 上限、按职责拆分三项。
 
-- “P4 单向数据流原则”：数据经 props 下、事件经回调上，无反向依赖。
+- 「FE-104 单向数据流原则」：数据经 props 下、事件经回调上，无反向依赖。
 
 - “状态来源”：受控组件无 `initialXxx` 式双写入点。
 

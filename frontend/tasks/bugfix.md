@@ -2,14 +2,14 @@
 
 现有行为出错时的根因修复（任务类型判定见 `common/protocol/task-analysis.md`）。
 
-## 授权面：定向写，限改动点与真实调用链（C6）
+## 授权面：定向写，限改动点与真实调用链（COM-012）
 
 只写已列明的文件，加上真实调用链上被迫改的文件（见 `common/protocol/task-boundary.md`「只写已列明的文件，加上真实调用链上被迫改的文件」）。
 
 修共享函数查所有调用方：一并改真实受影响的调用方、fixture 与测试（见 `common/protocol/task-boundary.md`「修共享函数时必须一并改真实受影响的调用方、fixture 与测试」）。
 这不是范围外扩，是完成需求的必要后果（见 `common/protocol/task-boundary.md`「不改它，当前需求就不成立」）。
 
-加东西前先过消费者四问（C6）：
+加东西前先过消费者四问（COM-012）：
 「用户要求了吗？」「不做它，当前需求能否成立？」
 「哪一段可达的代码、数据、接口、验收条件会消费它？」「省掉它，当前验收会失败吗？」
 判据见 `common/protocol/task-boundary.md`「四问全否 → 不实现，可作为建议报告」。
@@ -29,10 +29,10 @@
 - 修复根因不是症状；若为权宜方案需注明。
 - 不顺手改无关代码（见 `common/protocol/task-boundary.md`「不顺手改无关代码」）。
 - 四类越界（范围外扩 / 无消费者产物 / 意图越界 / 重复取证）的判据见 `common/protocol/task-boundary.md`。
-- 引用规范条款前打开原文核对（C5）：见 `common/rules/constitution.md`「文件路径 + 原文逐字摘录」。
-- 报"规范未覆盖"须附检索命令与空结果（C5）：见 `common/rules/constitution.md`「附检索命令与空结果」。
-- 同一事实取证一次即止（C6）：见 `common/protocol/final-gate.md`「要求是至少执行一次，不是执行多次」，另见 `common/protocol/task-boundary.md`「同一事实已有足够证据，仍反复检索、重读、重跑、重审」。
-- 首次写出的代码必须符合项目风格，写对一次（B3）：见业务项目根 `AGENTS.md`「禁止每写完一个文件就执行 prettier、eslint --fix 等格式化命令」。
+- 引用规范条款前打开原文核对（COM-011）：见 `common/rules/constitution.md`「编号 + 文件路径 + 原文逐字摘录」。
+- 报"规范未覆盖"须附检索命令与空结果（COM-011）：见 `common/rules/constitution.md`「附检索命令与空结果」。
+- 同一事实取证一次即止（COM-012）：见 `common/protocol/final-gate.md`「要求是至少执行一次，不是执行多次」，另见 `common/protocol/task-boundary.md`「同一事实已有足够证据，仍反复检索、重读、重跑、重审」。
+- 首次写出的代码必须符合项目风格，写对一次（FE-003）：见业务项目根 `AGENTS.md`「禁止每写完一个文件就执行 prettier、eslint --fix 等格式化命令」。
 - 验证类条目不可跳过：见 `frontend/checklists/detailed-check.md`「验证类条目不可用"不适用"跳过」；执行不了按 `common/protocol/final-gate.md`「无法验证时的处理」声明。
 
 ## 输出模板

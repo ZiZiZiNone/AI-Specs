@@ -1,6 +1,6 @@
 # 全局化
 
-对齐关系：见 `frontend/rules/core-principles.md` P4 单向数据流原则，本文件讲状态归属最小化，范围能小不放大。
+对齐关系见 `frontend/rules/core-principles.md`「FE-104 单向数据流原则」，本文件讲状态归属最小化，范围能小不放大。
 
 ## 定义
 

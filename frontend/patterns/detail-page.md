@@ -1,5 +1,7 @@
 # 详情页
 
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
+
 定位：只管"由路由 id/参数定位单条记录并分区块展示"的详情页，链路为 Page→Hook→Logic→Service，区块组件只展示。
 
 ## 结构落点
@@ -77,7 +79,7 @@
 
 ## 自检指针
 
-- frontend/checklists/detailed-check.md「一、核心原则检查」：P1 页面薄层、P2 组件解耦、P4 单向数据流。
+- `frontend/checklists/detailed-check.md`「一、核心原则检查」：FE-101 页面薄层、FE-102 组件解耦、FE-104 单向数据流。
 - frontend/checklists/detailed-check.md「二、架构层次检查」：Page/Hook/Logic/Service 各层条目。
 - frontend/checklists/detailed-check.md「三、状态管理检查」：状态归属、单一来源、无 props 副本。
 - frontend/checklists/detailed-check.md「十一、测试检查」：Logic 单测、边界与错误路径覆盖。

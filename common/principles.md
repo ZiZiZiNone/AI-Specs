@@ -5,18 +5,18 @@
 
 四条通用原则，前端与后端**同等适用**。抽象层只有这四条，具体形态按语言/框架落地：
 
-- 前端落地与量化标准：`frontend/rules/core-principles.md`（P1–P4）
+- 前端落地与量化标准：`frontend/rules/core-principles.md`（FE-101 至 FE-104）
 - 后端落地：语言子树待建期间见 `backend/README.md`「分层原则（PHP / Go 共用）」，落地后见各子树 `structure.md`
 
-本文不设条款级 ID（C5 规定条款级 ID 只存在于 `common/rules/constitution.md` 的 C1–C6
-与 `AGENTS.md` 的 B0–B5）。引用本文时写「文件路径 + 原文逐字摘录」，或直接用小节标题。
+本文不设条款级编号（COM-011 规定条款级编号只存在于 `common/rules/constitution.md` 的 COM-007 至 COM-012
+与 `AGENTS.md` 的 FE-000 至 FE-005）。引用本文时写「编号 + 文件路径 + 原文逐字摘录」，或直接用小节标题。
 
 ---
 
 ## 极致解耦（总纲）
 
 > 不管外部如何实现，只需要接受固定结构数据（或不需要）就能完成功能。
-> —— 见 `frontend/rules/core-principles.md`「P2 组件完全解耦原则」
+> —— 见 `frontend/rules/core-principles.md`「FE-102 组件完全解耦原则」
 
 这是四条原则的共同目标，也是对前端与后端**同等强度**的要求，不是"分层清晰"的同义词。
 
@@ -70,7 +70,7 @@
 
 | 端 | 依赖方向（概念层） | 唯一来源（改动以该文件为准） |
 |---|---|---|
-| 前端 | `Page/Component → Hook → Logic → Service` | `frontend/rules/core-principles.md`（P4 单向数据流原则） |
+| 前端 | `Page/Component → Hook → Logic → Service` | `frontend/rules/core-principles.md`（FE-104 单向数据流原则） |
 | 后端 | `入口 → 业务（Logic / Service）→ 数据（DAO / Repository）` | `backend/README.md`「分层原则（PHP / Go 共用）」 |
 
 后端的具体落地形态因框架而异，见 `backend/README.md`「分层原则（PHP / Go 共用）」与各子树 `structure.md`（待建），不可套用同一条线性链条。

@@ -1,8 +1,10 @@
 # 表格
 
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
+
 定位：只管"纯展示型数据表格"这一种组件：收数据与列配置做渲染，排序/分页/选择/行操作一律回调上报。
 
-本文件是 frontend/patterns/list-page.md 与 frontend/patterns/detail-page.md 中 Table 职责的唯一定义处，两页不再重复定义。
+本文件是 `frontend/patterns/list-page.md` 与 `frontend/patterns/detail-page.md` 中 Table 职责的唯一定义处，两页不再重复定义。
 
 ## 结构落点
 
@@ -73,7 +75,7 @@ props 规模按 frontend/protocol/decision-trees.md 组件拆分决策执行："
 
 ## 自检指针
 
-- frontend/checklists/detailed-check.md「一、核心原则检查」：P2 组件解耦、P4 单向数据流。
+- `frontend/checklists/detailed-check.md`「一、核心原则检查」：FE-102 组件解耦、FE-104 单向数据流。
 - frontend/checklists/detailed-check.md「二、架构层次检查」：Component 层（职责单一、props 上限、行数上限、不直访接口）。
 - frontend/checklists/detailed-check.md「三、状态管理检查」：受控组件无 props 副本、单一来源。
 - frontend/checklists/detailed-check.md「十一、测试检查」：关键组件交互测试、命名描述行为。

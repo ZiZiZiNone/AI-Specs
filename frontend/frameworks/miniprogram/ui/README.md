@@ -1,4 +1,4 @@
-# Vue 3 UI 组件库
+# 小程序 UI 组件库
 
 路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
 
@@ -10,4 +10,5 @@
   2. 表格/分页等组件内部状态 vs「状态集中在 Logic」
   3. 命令式 API（Message/Modal）的允许调用位置
 - 现有目录：
-  - arco/：Arco Design Vue（校验取舍、Table 状态外置、命令式 API 位置）
+  - tdesign-miniprogram/：TDesign 小程序端与本规范的冲突取舍
+  - vant-weapp/：Vant 小程序端与本规范的冲突取舍

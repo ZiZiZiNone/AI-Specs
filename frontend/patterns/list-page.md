@@ -1,5 +1,7 @@
 # 列表页
 
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
+
 定位：只管"带筛选 + 分页/排序的查询列表页"这一种页面，链路固定为 Search→Logic→Service→Table。
 
 ## 结构落点
@@ -46,7 +48,7 @@
 
 - 筛选/分页/排序以 URL 为唯一来源，组件内不另存副本，避免双写入点。
 - 改筛选或改 pageSize 必回第一页；删除末页最后一条后按规则回退页码。
-- 页面只做组装，直接定义的函数不超过 3 个（frontend/rules/core-principles.md P1）；编排下沉到各 Hook。
+- 页面只做组装，直接定义的函数不超过 3 个（见 `frontend/rules/core-principles.md`「FE-101 页面薄层原则」：页面内直接定义的函数不超过 3 个）；编排下沉到各 Hook。
 - 取数 Hook 内不写业务判断；页码修正、行操作许可等一律下沉 Logic。
 - Table 不请求数据、不做权限判断、不持有五态（见 frontend/patterns/table.md）。
 - 刷新失败保留旧数据；**`success` 与非空 `errorMessage` 并存是合法状态**。
@@ -75,7 +77,7 @@
 
 ## 自检指针
 
-- frontend/checklists/detailed-check.md「一、核心原则检查」：P1 页面薄层、P2 组件解耦、P4 单向数据流。
+- `frontend/checklists/detailed-check.md`「一、核心原则检查」：FE-101 页面薄层、FE-102 组件解耦、FE-104 单向数据流。
 - frontend/checklists/detailed-check.md「二、架构层次检查」：Page/Hook/Logic/Service 各层条目。
 - frontend/checklists/detailed-check.md「三、状态管理检查」：状态归属、单一来源、无 props 副本。
 - frontend/checklists/detailed-check.md「十一、测试检查」：Logic 单测、互逆断言、边界与错误路径。

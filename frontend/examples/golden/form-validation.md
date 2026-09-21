@@ -1,7 +1,7 @@
 # 示例：表单校验
 
 来源：本示例自包含，不依赖外部工程；代码即规范结论的完整载体。
-示范：`frontend/rules/form-validation.md`「验证规则定义在 Logic 文件中」「非必填字段留空时必须跳过后续规则」「用户停止输入 500ms 后才发起请求」「格式尚未合法时不发起请求」、 `frontend/patterns/form-page.md`「校验规则定义在 Logic，UI 只做触发与展示错误。」、 `frontend/rules/core-principles.md`「P3 逻辑完全解耦原则」「完全解耦合的函数/工厂/方法/逻辑，在独立的逻辑文件（全局或局部），只需要接受固定结构数据（或不需要）就能完成功能。」
+示范：`frontend/rules/form-validation.md`「验证规则定义在 Logic 文件中」「非必填字段留空时必须跳过后续规则」「用户停止输入 500ms 后才发起请求」「格式尚未合法时不发起请求」、 `frontend/patterns/form-page.md`「校验规则定义在 Logic，UI 只做触发与展示错误。」、 FE-103 `frontend/rules/core-principles.md`「FE-103 逻辑完全解耦原则」「完全解耦合的函数/工厂/方法/逻辑，在独立的逻辑文件（全局或局部），只需要接受固定结构数据（或不需要）就能完成功能。」
 
 ## 1. 规则定义在 Logic
 

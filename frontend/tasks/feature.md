@@ -2,11 +2,11 @@
 
 新功能、新页面、新模块的增量交付（任务类型判定见 `common/protocol/task-analysis.md`）。
 
-## 授权面：开放写，限需求范围（C6）
+## 授权面：开放写，限需求范围（COM-012）
 
 默认开放写：在需求描述的范围内新建与修改（见 `common/protocol/task-boundary.md`「在需求描述的范围内新建与修改」）。
 
-需求没提的字段、抽象、开关、兼容分支，先过消费者四问（C6）：
+需求没提的字段、抽象、开关、兼容分支，先过消费者四问（COM-012）：
 「用户要求了吗？」「不做它，当前需求能否成立？」
 「哪一段可达的代码、数据、接口、验收条件会消费它？」「省掉它，当前验收会失败吗？」
 
@@ -19,7 +19,7 @@
 
 ## 流程：需求→设计→实现→检查
 
-1. 需求：读取并确认需求，补齐缺失项；信息不足先确认，不带猜测实现（C1）。
+1. 需求：读取并确认需求，补齐缺失项；信息不足先确认，不带猜测实现（COM-007）。
 2. 设计：判断 pattern，确定 State/Logic/Service 结构。
 3. 实现：按 Pattern→State→Logic→Service→UI 落地。
 4. 检查：先做 `frontend/checklists/detailed-check.md`「适用性判定」，再过自检清单并实际验证。
@@ -28,10 +28,10 @@
 
 - 不做需求外的功能（YAGNI）。判定用四问，不用感觉。
 - 四类越界（范围外扩 / 无消费者产物 / 意图越界 / 重复取证）的判据见 `common/protocol/task-boundary.md`。
-- 引用规范条款前打开原文核对（C5）：见 `common/rules/constitution.md`「文件路径 + 原文逐字摘录」。
-- 报"规范未覆盖"须附检索命令与空结果（C5）：见 `common/rules/constitution.md`「附检索命令与空结果」。
-- 同一事实取证一次即止，不重复检索与重跑（C6）：见 `common/protocol/task-boundary.md`「同一事实已有足够证据，仍反复检索、重读、重跑、重审」。
-- 首次写出的代码必须符合项目风格，写对一次（B3）：见业务项目根 `AGENTS.md`「禁止每写完一个文件就执行 prettier、eslint --fix 等格式化命令」。
+- 引用规范条款前打开原文核对（COM-011）：见 `common/rules/constitution.md`「编号 + 文件路径 + 原文逐字摘录」。
+- 报"规范未覆盖"须附检索命令与空结果（COM-011）：见 `common/rules/constitution.md`「附检索命令与空结果」。
+- 同一事实取证一次即止，不重复检索与重跑（COM-012）：见 `common/protocol/task-boundary.md`「同一事实已有足够证据，仍反复检索、重读、重跑、重审」。
+- 首次写出的代码必须符合项目风格，写对一次（FE-003）：见业务项目根 `AGENTS.md`「禁止每写完一个文件就执行 prettier、eslint --fix 等格式化命令」。
 - 任务边界类条目无"不适用"情形：见 `frontend/checklists/detailed-check.md`「任务边界类条目同样不可跳过」。
 
 ## 输出模板

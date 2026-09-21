@@ -9,7 +9,7 @@
 
 ## 1. 页面直接调用 Service
 
-违反：`frontend/rules/core-principles.md`「P3 逻辑完全解耦原则」、 `frontend/rules/architecture.md`「依赖只能向下：Page/Component→Hook→Logic→Service；禁止反向依赖。」
+违反：FE-103 `frontend/rules/core-principles.md`「FE-103 逻辑完全解耦原则」、 `frontend/rules/architecture.md`「依赖只能向下：Page/Component→Hook→Logic→Service；禁止反向依赖。」
 
 来源：`pages/UserListPage.tsx:16, 155-190`
 
@@ -46,7 +46,7 @@ const rowOps = useTicketRowOperations({ rows, query, total, reload, goToPage });
 
 ## 2. 展示型组件自己加载数据
 
-违反：`frontend/rules/core-principles.md`「P2 组件完全解耦原则」「禁止组件内发起业务数据请求（列表/详情/提交/删除）」
+违反：FE-102 `frontend/rules/core-principles.md`「FE-102 组件完全解耦原则」「禁止组件内发起业务数据请求（列表/详情/提交/删除）」
 
 来源：`components/UserFormModal.tsx:44-67`
 
@@ -146,7 +146,7 @@ return { code: 'TIMEOUT', message: '请求超时', type: 'network', retryable: t
 
 ## 6. 受控组件自持一份状态
 
-违反：`frontend/rules/core-principles.md`「P4 单向数据流原则」「依赖只能向下：Page/Component → Hook → Logic → Service」、 `frontend/rules/store.md`「需刷新保持的状态一律以 URL 为唯一来源，不得以 Store 作为替代。」
+违反：FE-104 `frontend/rules/core-principles.md`「FE-104 单向数据流原则」「依赖只能向下：Page/Component → Hook → Logic → Service」、 `frontend/rules/store.md`「需刷新保持的状态一律以 URL 为唯一来源，不得以 Store 作为替代。」
 
 来源：`components/UserFilter.tsx:43-45`
 
@@ -243,7 +243,7 @@ useEffect(() => {
 
 ## 10. 页面承担 13 个函数
 
-违反：`frontend/rules/core-principles.md`「P1 页面薄层原则」「页面内直接定义的函数不超过 3 个」
+违反：FE-101 `frontend/rules/core-principles.md`「FE-101 页面薄层原则」「页面内直接定义的函数不超过 3 个」
 
 来源：`pages/UserListPage.tsx` —— `updateURLParams`、`handleFilterChange`、
 `handleResetFilter`、`handleSort`、`handlePageChange`、`handlePageSizeChange`、

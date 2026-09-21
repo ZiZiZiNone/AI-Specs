@@ -1,6 +1,6 @@
 # 隐藏副作用
 
-对齐关系：见 `frontend/rules/core-principles.md` P3 逻辑完全解耦原则与 P4 单向数据流原则，本文件讲副作用显式声明。
+对齐关系见 `frontend/rules/core-principles.md`「FE-103 逻辑完全解耦原则」与「FE-104 单向数据流原则」，本文件讲副作用显式声明。
 
 ## 定义
 
