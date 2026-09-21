@@ -7,3 +7,4 @@
 - Prefers Chinese-language discussion and responses. Confidence: 0.8
 - Requires explicit user confirmation before final submission/landing; pauses for approval rather than auto-proceeding. Confidence: 0.9
 - Requires safety checkpoint via local git commit before starting risky or large-scale changes to prevent loss of work progress. Confidence: 0.85
+- Requires regression re-audit after every fix round: re-run strict subagent review after repairs to catch fix-introduced issues and prevent recurring per-round defects. Confidence: 0.85
