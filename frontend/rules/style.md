@@ -65,7 +65,7 @@ export default {
 
 ## 原子类抽取时机
 
-参照 `common/rules/reusability.md`「任何情况下不为"未来可能"预造抽象」：同一串原子类组合第二次出现且语义相同时才抽取。
+参照 `common/rules/reusability.md`「抽象决策」：同一串原子类组合第二次出现且语义相同时才抽取。
 
 ```
 问：同一串原子类组合出现第几次？
@@ -82,7 +82,7 @@ export default {
 **约定**：
 - 优先提取组件，而非 `@apply`。组件能带类型与行为，`@apply` 只搬样式。
 - 单元素原子类超过约 12 个且难以阅读时，考虑抽取。
-- 禁止建立无主题杂物文件堆放杂类（见 `frontend/anti-patterns/god-utils.md`「无主题公共桶不断堆函数、职责混杂相互依赖即为万能工具库」）。
+- 禁止建立无主题杂物文件堆放杂类（见 `frontend/anti-patterns/god-utils.md`「定义」）。
 
 ---
 

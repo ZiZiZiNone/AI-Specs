@@ -6,12 +6,11 @@
 
 默认开放写：在需求描述的范围内新建与修改（见 `common/protocol/task-boundary.md`「在需求描述的范围内新建与修改」）。
 
-需求没提的字段、抽象、开关、兼容分支，先过消费者四问（COM-012）：
+需求没提的字段、抽象、开关、兼容分支，先过消费者四问（COM-012，见 `common/protocol/task-boundary.md`「消费者判据（四问）」）：
 「用户要求了吗？」「不做它，当前需求能否成立？」
 「哪一段可达的代码、数据、接口、验收条件会消费它？」「省掉它，当前验收会失败吗？」
 
-判据见 `common/protocol/task-boundary.md`「四问全否 → 不实现，可作为建议报告」：
-「只能说出「以后可能有用」「更健壮」→ 视同全否」时不写，改为在交付里报告。
+判据见 `common/protocol/task-boundary.md`「四问全否 → 不实现，可作为建议报告」。
 
 升档见 `common/protocol/task-boundary.md`「升档必须由用户明确表示，不能由 AI 自行推断」。
 降档见 `common/protocol/task-boundary.md`「降档不需要授权」：把待写动作改成「报告并等待」。
@@ -19,7 +18,7 @@
 
 ## 流程：需求→设计→实现→检查
 
-1. 需求：读取并确认需求，补齐缺失项；信息不足先确认，不带猜测实现（COM-007）。
+1. 需求：读取并确认需求，补齐缺失项；信息不足先确认，不带猜测实现（COM-007 禁止猜测，见 `common/rules/constitution.md`）。
 2. 设计：判断 pattern，确定 State/Logic/Service 结构。
 3. 实现：按 Pattern→State→Logic→Service→UI 落地。
 4. 检查：先做 `frontend/checklists/detailed-check.md`「适用性判定」，再过自检清单并实际验证。

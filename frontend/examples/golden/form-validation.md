@@ -87,7 +87,8 @@ async function submit(): Promise<SubmitOutcome> {
   if (focusField) {
     return { isSuccess: false, focusField, message: '请修正表单中的错误后再提交' };
   }
-  // …提交
+  const result = await submitTicket(values);
+  return result;
 }
 ```
 
@@ -147,7 +148,8 @@ export function toSubmitPayload(values: TicketFormValues): Omit<TicketFormValues
   return {
     code: values.code.trim(),
     title: values.title.trim(),
-    // …
+    priority: values.priority,
+    assigneeId: values.assigneeId,
     needsFollowUp: values.needsFollowUp,
     followUpAt: values.needsFollowUp ? values.followUpAt : null,
   };

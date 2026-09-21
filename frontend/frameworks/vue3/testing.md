@@ -38,13 +38,13 @@ it('should_step_back_a_page_when_last_row_of_last_page_is_removed', () => {
   expect(resolvePageAfterRemoval({ ...query, page: 3, pageSize: 10 }, 21)).toBe(2);
 });
 
-// ✅ 可逆操作断言互逆（common/rules/test.md）
+// ✅ 可逆操作断言互逆（见 `common/rules/test.md`「规则」：可逆操作须有互逆断言）
 it('should_round_trip_query_through_url_serialization', () => {
   expect(parseQueryFromParams(serializeQueryToParams(original))).toEqual(original);
 });
 ```
 
-来源：`frontend/examples/golden/list-page.md`「2. 改筛选必回第一页」：纯函数进出，无挂载、无 mock；可逆操作断言互逆。
+来源：`frontend/examples/golden/list-page.md`「2. 改筛选必回第一页」同类形态：纯函数进出，无挂载、无 mock；可逆操作断言互逆同类形态。
 
 **若 Logic 测试需要挂载组件或 mock 路由，说明该 Logic 不纯**——
 这是分层出问题的信号，应先修 Logic 而不是给测试加设施。
@@ -96,12 +96,13 @@ it('should_abort_inflight_request_when_scope_disposed', async () => {
 
 ## 组件测试
 
-组件测试为规范示范形态：`data-test` 选择器、emit 载荷断言。新增组件测试时照此形态；交互元素须带 `data-test` 属性。
+组件测试为规范示范形态：`data-test` 选择器、emit 载荷断言。新增组件测试时照此形态手写；交互元素须带 `data-test` 属性。
 
 只测「给定 props 渲染出什么」与「交互是否上报正确事件」：
 
 ```typescript
 // @vitest-environment jsdom
+// 规范示范形态，交互元素须带 data-test 属性
 it('should_emit_remove_with_row_when_delete_clicked', async () => {
   const wrapper = mount(TicketTable, { props: { rows: [row], user: adminUser, /* … */ } });
   await wrapper.find('[data-test="remove"]').trigger('click');

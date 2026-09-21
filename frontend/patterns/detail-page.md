@@ -58,17 +58,16 @@
 
 ## 正例指针
 
-- 注：详情页暂无专用金例，以下正例以 frontend/examples/golden/ 通用自包含示例为准。
+- 注：详情页暂无专用金例，以下正例以 `frontend/examples/golden/` 通用自包含示例为准，同类形态复用，不虚构专用符号。
 
-- frontend/examples/golden/list-page.md「6. 页面只做组装」：页面只做组装，id 取自路由。
-- frontend/examples/golden/list-page.md「3. 刷新失败保留旧数据」：详情加载与五态管理，含不存在判定与 reload。
-- frontend/examples/golden/list-page.md「3. 刷新失败保留旧数据」同类形态：resolveDetailState 判定 success/empty。
-- frontend/examples/golden/list-page.md「6. 页面只做组装」正向形态：信息区块只展示与回调。
-- frontend/examples/golden/list-page.md「6. 页面只做组装」页面组装形态：记录时间线展示组件。
-- frontend/examples/golden/list-page.md「6. 页面只做组装」独立关注点形态：详情关联记录的独立加载关注点。
-- frontend/examples/golden/list-page.md「6. 页面只做组装」容器形态：五态统一容器。
-- frontend/examples/golden/list-page.md「6. 页面只做组装」错误占位形态：页面级错误占位，含重试与返回。
-- frontend/examples/golden/list-page.md「6. 页面只做组装」同一份判据形态：行级操作许可判定，供详情操作区消费。
+- `frontend/examples/golden/list-page.md`「6. 页面只做组装」：页面只做组装，id 取自路由。
+- `frontend/examples/golden/list-page.md`「3. 刷新失败保留旧数据」：详情加载与五态管理同类形态，含不存在判定与 reload。
+- `frontend/examples/golden/list-page.md`「6. 页面只做组装」：信息区块只展示与回调同类形态。
+- `frontend/examples/golden/list-page.md`「6. 页面只做组装」：记录时间线展示同类形态。
+- `frontend/examples/golden/list-page.md`「6. 页面只做组装」：详情关联记录的独立加载关注点同类形态。
+- `frontend/examples/golden/list-page.md`「6. 页面只做组装」：五态统一容器同类形态。
+- `frontend/examples/golden/list-page.md`「6. 页面只做组装」：页面级错误占位同类形态，含重试与返回。
+- `frontend/patterns/permission.md`「同一判据须覆盖三处」：行级操作许可判定同类形态，供详情操作区消费。
 
 ## 反例指针
 

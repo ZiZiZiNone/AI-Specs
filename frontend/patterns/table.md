@@ -57,14 +57,12 @@ props 规模按 frontend/protocol/decision-trees.md 组件拆分决策执行："
 
 ## 正例指针
 
-- frontend/examples/golden/list-page.md「6. 页面只做组装」表格只收 rows 渲染：只渲染与回调，行能力由同一份判据结果驱动。
-- frontend/examples/golden/list-page.md「6. 页面只做组装」同一份判据形态：resolveTicketRowAbility 一份判定，多处消费。
-- frontend/examples/golden/list-page.md「6. 页面只做组装」容器形态：表格经 DataLoader 容器承载五态，页面不写 v-if 链。
-- frontend/examples/golden/list-page.md「6. 页面只做组装」独立关注点形态：行操作编排的独立关注点。
-- frontend/examples/golden/list-page.md「6. 页面只做组装」容器形态：五态统一容器。
-- frontend/examples/golden/list-page.md「6. 页面只做组装」空态形态：空态说明加引导动作。
-- frontend/examples/golden/list-page.md「6. 页面只做组装」交互测试形态：表格交互测试。
-- frontend/examples/golden/list-page.md：DataLoader 容器承载五态、表格只收 rows 渲染（见页面组装部分）。
+- `frontend/examples/golden/list-page.md`「6. 页面只做组装」表格只收 rows 渲染同类形态：只渲染与回调，行能力由同一份判据结果驱动。
+- `frontend/patterns/permission.md`「同一判据须覆盖三处」：一份判定多处消费同类形态。
+- `frontend/examples/golden/list-page.md`「6. 页面只做组装」容器形态：表格经 DataLoader 容器承载五态，页面不写 v-if 链。
+- `frontend/examples/golden/list-page.md`「6. 页面只做组装」行操作编排同类形态：独立关注点。
+- `frontend/examples/golden/list-page.md`「6. 页面只做组装」空态形态：空态说明加引导动作。
+- `frontend/frameworks/vue3/testing.md`「组件测试」：表格交互测试同类形态。
 
 ## 反例指针
 

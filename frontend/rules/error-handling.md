@@ -51,7 +51,7 @@ interface StandardError {
 ```
 
 **示例**
-来源：`frontend/examples/golden/service-layer.md`「统一请求出口」与「错误归一」：try-catch 只收敛在唯一请求出口，业务 Service 方法不重复包裹。
+来源：`frontend/examples/golden/service-layer.md`「1. 统一请求出口承担 try-catch」与「4. 错误归一为 StandardError」：try-catch 只收敛在唯一请求出口，业务 Service 方法不重复包裹。
 
 ```typescript
 // ✅ Service 统一错误处理：try-catch 只在这一处
@@ -104,7 +104,7 @@ export async function fetchUserList(params: UserListParams) {
 - 不直接操作 UI（通过返回值通知）
 
 **示例**
-来源：`frontend/examples/golden/list-page.md`「页面组装」：按错误码决定策略，取消静默、字段级错误落到字段。
+来源：`frontend/examples/golden/list-page.md`「6. 页面只做组装」：按错误码决定策略，取消静默、字段级错误落到字段。
 
 ```typescript
 // ✅ 按错误码决定策略：取消不算故障，字段级错误落到字段
@@ -133,7 +133,9 @@ if (!result.success) {
 - 提供用户操作入口（重试/取消/返回）
 - 不自行判断错误类型和处理策略
 
-**展示方式**：
+### 展示方式
+
+全局错误走 Modal 对话框、页面级错误走错误占位组件、表单错误走表单顶部错误提示、操作错误走 Toast 提示、静默错误走控制台日志加埋点上报：
 - **全局错误**（网络断开、登录过期）：Modal 对话框
 - **页面级错误**（数据加载失败）：错误占位组件
 - **表单错误**（提交失败）：表单顶部错误提示 + 字段级错误
@@ -141,7 +143,7 @@ if (!result.success) {
 - **静默错误**（非关键操作）：控制台日志 + 埋点上报
 
 **示例**
-来源：`frontend/examples/golden/list-page.md`「页面组装」：容器组件按状态分派，页面不写 v-if 链。
+来源：`frontend/examples/golden/list-page.md`「6. 页面只做组装」：容器组件按状态分派，页面不写 v-if 链。
 
 ```vue
 <!-- ✅ 页面级错误：由容器组件按状态分派，页面不写 v-if 链 -->

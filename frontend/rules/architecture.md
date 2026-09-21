@@ -25,7 +25,7 @@
 - 禁止 Service 依赖 Logic、Logic 依赖 UI 组件与 Hook、Component 直接调接口。
 - Hook 可调用 Logic 与 Service；但业务判断一律下沉 Logic，Hook 只负责调用顺序、UI 状态与错误分流。
 - Logic 保持框架无关（不 import Hook/UI），保证可单测。
-- Store 的 action 可调用 Service 加载自身拥有的状态，不加载页面业务数据（见 `frontend/rules/store.md`「禁止在 Store 里加载页面业务数据（列表/详情/表单），那属于 Hook 的职责」）。
+- Store 的 action 可调用 Service 加载自身拥有的状态，不加载页面业务数据（见 `frontend/rules/store.md`「规则」）。
 - 跨层复用走 Logic/Service，不通过 props 层层透传业务逻辑。
 - 高内聚低耦合：同一职责不分散到多处；模块间只通过明确接口（props / Service / Store）通信，不依赖内部实现。
 

@@ -13,7 +13,7 @@
 - 子资源用嵌套复数：`GET /orders/{id}/items`、`POST /orders/{id}/items`。
 - 查询、过滤、排序走查询参数：`GET /orders?status=paid&sort=-createdAt`，不另建路径。
 - 方法语义固定：查询用 `GET`，新建用 `POST`，全量替换用 `PUT`，部分更新用 `PATCH`，删除用 `DELETE`。
-- 新增字段先过消费者判据，见 `common/protocol/task-boundary.md`「哪一段可达的代码、数据、接口、验收条件会消费它」：指不出消费点的不加。
+- 新增字段先过消费者判据，见 `common/protocol/task-boundary.md`「消费者判据（四问）」：第 3 问指不出消费点的不加。
 
 ## 响应信封
 
@@ -48,12 +48,12 @@ HTTP 状态码表达传输层结果，业务码表达领域结果，两者不互
 
 ## 幂等与重试
 
-- `GET`、`PUT`、`DELETE` 默认可重试，超时或网络抖动可按退避重试。
+- `GET` 默认可重试，超时或网络抖动可按退避重试。`PUT`、`DELETE` 是否默认重试按业务项目声明，本文件只定 `POST` 禁自动重试。
 - 非幂等请求默认不重试。`POST` 禁自动重试，临时故障也只允许人工确认后重发。
 - 需防重放的 `POST` 使用幂等键：调用方生成 `Idempotency-Key`，服务端按键去重，去重窗口由业务项目声明。
 - 同一幂等键重复提交返回首次结果，不执行第二次副作用。
 - 重试必须带退避与上限，取消信号到达时立即中断。
-- 前端落点见 `frontend/rules/async-operations.md`「幂等性前置判断」：重试的前提是重复执行不产生额外后果。
+- 前端落点见 `frontend/rules/async-operations.md`「幂等性前置判断（先判这条，再谈重试）」。
 
 ## 版本化
 

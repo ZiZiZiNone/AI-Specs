@@ -273,7 +273,7 @@ Page ← Component（回调上报）
 
 ### 强制要求
 - 依赖只能向下：Page/Component → Hook → Logic → Service
-- 允许跨层直连：Page/Component 可直接调 Logic
+- 允许跨层直连：仅允许 Page/Component 直接调 Logic 与 Hook 直接调 Service；Page/Component 直接调 Service 一律禁止（见 `frontend/rules/architecture.md`「规则」）
 - 禁止向上/反向/循环依赖
 - 组件不能调用父组件方法（通过回调上报事件）
 - Logic 不能调用 Hook/UI

@@ -37,8 +37,7 @@ export function resolveTicketRowAbility(user: SessionUser | null, row: Ticket) {
 }
 ```
 
-来源：frontend/examples/golden/list-page.md「6. 页面只做组装」同一份判据形态的 `resolveTicketRowAbility`，
-在表格与页面两处消费同一份结果。
+来源：`frontend/examples/golden/list-page.md`「6. 页面只做组装」同类形态，在表格与页面两处消费同一份结果。
 
 ## 可见 vs 禁用
 
@@ -56,8 +55,8 @@ export function resolveTicketRowAbility(user: SessionUser | null, row: Ticket) {
 - 菜单 / 入口渲染：登记决定是否显示的渲染位置。
 - 页面 / 组件内控件：登记决定按钮可见或禁用的控件位置。
 
-正例调用点见 frontend/examples/golden/list-page.md「6. 页面只做组装」守卫侧与权限来源侧形态；
-判定实现侧见 frontend/examples/golden/list-page.md「6. 页面只做组装」同一份判据形态。
+正例调用点见 `frontend/examples/golden/list-page.md`「6. 页面只做组装」同类形态；
+判定实现侧见本文件「同一判据须覆盖三处」。
 
 ## 框架实现
 路由守卫写法等框架细则 Vue 3 见 frontend/frameworks/vue3/router.md、小程序见 frontend/frameworks/miniprogram/router.md。

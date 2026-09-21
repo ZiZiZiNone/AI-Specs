@@ -493,7 +493,7 @@ async function fetchWithRetry(fetcher: () => Promise<any>, maxRetries = 3) {
 - 显示重试次数（可选）
 
 **示例**
-来源：`frontend/examples/golden/list-page.md`「页面组装」：重试入口调用原本的加载函数，不另写重试版逻辑。
+来源：`frontend/examples/golden/list-page.md`「6. 页面只做组装」：重试入口调用原本的加载函数，不另写重试版逻辑。
 
 ```typescript
 // ✅ 手动重试：复用同一个 load，参数从当前查询条件重新取，不缓存旧参数副本

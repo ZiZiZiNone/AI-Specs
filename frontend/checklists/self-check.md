@@ -15,7 +15,7 @@
 - [ ] 页面够薄，逻辑在 Logic；且非"把函数搬进 Hook"式达标。
 - [ ] 组件职责单一，只做展示与交互，不自取业务数据。
 - [ ] Service 唯一接口入口，UI 未直连接口。
-- [ ] 依赖只能向下（Page/Component→Hook→Logic→Service，允许跨层直连），无反向/循环依赖。
+- [ ] 依赖只能向下（Page/Component→Hook→Logic→Service；仅允许两类跨层直连，见 `frontend/rules/architecture.md`「规则」），无反向/循环依赖。
 - [ ] Logic 层非空转：可判定的业务规则确实落在此层。
 - [ ] 单个 Hook ≤150 行、暴露成员 ≤10 个、关注点单一。
 

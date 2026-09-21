@@ -38,13 +38,14 @@ export function useTicketQuery() {
 序列化与解析成对实现于 Logic，且必须互逆（`logic/ticketQuery.logic.ts`）：
 
 ```typescript
-/** 只输出与默认值不同的项，保持 URL 简短可读。 */
+/** 只输出与默认值不同的项，保持 URL 简短可读。规范示范形态，其余字段同理。 */
 export function serializeQueryToParams(query: TicketListQuery): Record<string, string> {
   const defaults = createDefaultQuery();
   const params: Record<string, string> = {};
   if (query.page !== defaults.page) params.page = String(query.page);
   if (query.keyword) params.keyword = query.keyword;
-  // …其余同理
+  if (query.status !== defaults.status) params.status = query.status;
+  if (query.pageSize !== defaults.pageSize) params.pageSize = String(query.pageSize);
   return params;
 }
 ```
@@ -231,7 +232,7 @@ async function handleSubmit(): Promise<void> {
 </script>
 ```
 
-六态由容器组件统一承担，页面不写 v-if 链。以下为 Vue 3 形态，小程序侧映射见 `frontend/frameworks/miniprogram/component.md`「业务组件一律受控」（原文："值由 properties 传入，变更经事件上报，组件自身不持有业务状态。"）与 `frontend/frameworks/miniprogram/logic.md`「入参/返回值约定」（原文："logic 函数入参只收普通值：查询参数对象加前状态快照。"）。
+六态由容器组件统一承担，页面不写 v-if 链。以下为 Vue 3 形态，小程序侧映射见 `frontend/frameworks/miniprogram/component.md`「业务组件一律受控」与 `frontend/frameworks/miniprogram/logic.md`「入参/返回值约定」。
 
 ```vue
 <DataLoader

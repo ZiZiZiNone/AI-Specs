@@ -1,6 +1,8 @@
 # 负向示例集
 
-来源：本文件内联反例（已删工程，代码即载体；原 React 18 + TS 未按本规范落地的片段已内联至本文件各节）。
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
+
+来源：本文件内联反例，代码即载体。各节语言标签以节内代码块为准，反例为 React 18 + TS，正例为 Vue 3 + TS，不混标。
 用途：这些是真实产出的违规代码，用于识别常见偏离。每条给出违反条目与正确做法。
 
 说明：本文件内联记录了「不加约束时 AI 会怎么写」，是校验规范有效性的对照组。
@@ -37,7 +39,7 @@ const handleDelete = useCallback(async (userId: string) => {
 **正确做法**：编排进 Hook，页面只调用。参见 `frontend/examples/golden/list-page.md`「6. 页面只做组装」（原文："页面内仅 1 个函数、状态全部来自 Hook。"）。
 
 ```typescript
-// ✅ 页面（React 写法）
+// ✅ 页面（React 写法，反例同语言正例）
 const rowOps = useTicketRowOperations({ rows, query, total, reload, goToPage });
 // <TicketTable rows={rows} onRemove={rowOps.remove} />
 ```
@@ -51,7 +53,7 @@ const rowOps = useTicketRowOperations({ rows, query, total, reload, goToPage });
 来源：`components/UserFormModal.tsx:44-67`
 
 ```typescript
-// ❌ 弹窗组件内部发请求取详情
+// ❌ 弹窗组件内部发请求取详情（React 写法）
 const loadUserDetail = async (userId: string) => {
   setIsLoadingDetail(true);
   const result = await userService.fetchUserDetail(userId);
@@ -78,7 +80,7 @@ const loadUserDetail = async (userId: string) => {
 来源：`hooks/useUserList.ts:28-45`
 
 ```typescript
-// ❌ 建了 AbortController 但 signal 从未传给请求
+// ❌ 建了 AbortController 但 signal 从未传给请求（React 写法）
 abortControllerRef.current = new AbortController();
 currentParamsRef.current = params;
 
@@ -175,7 +177,7 @@ export const UserFilter: React.FC<UserFilterProps> = ({
 来源：`logic/userValidation.logic.ts:14`
 
 ```typescript
-// ❌ validator 参数为 any，规则写错字段名不会被发现
+// ❌ validator 参数为 any，规则写错字段名不会被发现（React 写法）
 export interface ValidationRule {
   validator?: (value: any, formData?: Partial<UserFormData>) => boolean;
   message: string;

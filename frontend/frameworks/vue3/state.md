@@ -86,7 +86,7 @@ export const useSessionStore = defineStore('session', () => {
 理由：把页面数据放进 store 会让状态生命周期与页面脱钩——
 离开页面数据仍在，再进入时可能读到上一次的残留。
 
-来源：`frontend/examples/golden/list-page.md`「6. 页面只做组装」：仅 session 进 store，列表/详情/表单全部由 Hook 承载。
+归属示例见 `frontend/examples/golden/list-page.md`「6. 页面只做组装」同类形态：仅 session 进 store，列表/详情/表单全部由 Hook 承载。
 
 ---
 
