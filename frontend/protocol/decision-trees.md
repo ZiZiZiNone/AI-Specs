@@ -398,7 +398,7 @@ interface Options {
   └─ Service → 请求与数据转换的落点
 ```
 
-**Hook 直连 Service 是允许的**（frontend/rules/architecture.md：「允许跨层直连」）。
+**Hook 直连 Service 是允许的**（见 `frontend/rules/architecture.md`「规则」：仅允许两类跨层直连：Page/Component 直接调 Logic，Hook 直接调 Service）。
 Hook 的职责是"取数 + 管 UI 状态"，Logic 的职责是"判定业务规则"；
 强制让 Logic 转发一层不产生任何判定，只增加一层无意义包装。
 

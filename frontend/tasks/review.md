@@ -11,8 +11,9 @@ Review 全程不修改代码，包括发现的明显笔误、失效代码与低�
 只读白名单（仅允许以下只读形式，按项目实际取用）：
 - 类型检查：`vue-tsc --noEmit`
 - Lint：`eslint . --no-fix`（或 `eslint <范围> --no-fix`，结果摘录粘贴）
-- 测试：`vitest run <范围> --coverage=false`（结果摘录粘贴；构建如需验证用只读构建命令，不加写参数）
-禁止的动作：写文件（含把报告落盘成文件）、`--fix` 类改写参数、格式化、删除、提交、安装依赖。
+- 测试：`vitest run <范围> --coverage=false`（结果摘录粘贴）
+构建不在 Review 白名单；确需验证构建另起定向写或开放写任务并声明授权面。
+禁止的动作：写文件（含把报告落盘成文件）、`--fix` 类改写参数、格式化、删除、提交、安装依赖、执行构建写入。未列举但产生文件、依赖或远端变更的命令一律禁止。
 报告需落盘时，另起任务并重新声明授权面。
 
 用户在看到报告后要求修改时，任务类型按 `common/protocol/task-analysis.md` 重新判定
@@ -38,20 +39,26 @@ Review 全程不修改代码，包括发现的明显笔误、失效代码与低�
 - 区分"确定问题"与"建议改进"。
 - 引用规范条款前打开原文核对（COM-011）：见 `common/rules/constitution.md`「编号 + 文件路径 + 原文逐字摘录」。
 - 报"规范未覆盖"须附检索命令与空结果（COM-011）：见 `common/rules/constitution.md`「附检索命令与空结果」。
-- 同一事实取证一次即止，不重复检索与重跑（见 `common/protocol/task-boundary.md`「重复取证」）。
+- 同一事实取证一次即止，不重复检索与重跑（COM-012，见 `common/protocol/task-boundary.md`「重复取证」）。
 
 ## 输出模板
 ### 问题
 | 编号 | 严重度 | 问题 | 位置 | 证据摘录 | 规范依据路径+摘录 | 建议 |
 | ---- | ------ | ---- | ---- | -------- | ------------------ | ---- |
 | R1 | 严重/主要/次要/建议 | <一句话> | <文件:行> | <代码/输出原文摘录> | <如 COM-011 `common/rules/constitution.md`「编号 + 文件路径 + 原文逐字摘录」> | <可执行改法> |
-| R2 | 主要 | 页面直连 Service | `src/pages/TicketListPage.vue:80` | `await userService.deleteUser(userId)` | `frontend/rules/architecture.md`「<原文摘录>」 | 改由 Hook 取数，判定下沉 Logic |
+| R2 | 主要 | 页面直连 Service | `src/pages/TicketListPage.vue:80` | `await userService.deleteUser(userId)` | `frontend/rules/architecture.md`「Page/Component 直接调 Service 一律禁止」 | 改由 Hook 取数，判定下沉 Logic |
 
 ### 只读验证执行（白名单命令，结果摘录粘贴；未执行按 `common/protocol/final-gate.md`「声明模板」填）
 - 类型检查：`vue-tsc --noEmit` → <通过/未执行>。
 - Lint：`eslint <范围> --no-fix` → <通过/未执行>。
 - 测试：`vitest run <范围> --coverage=false` → <通过数/未执行>。
-- 禁止 `--fix`、落盘报告、安装依赖；报告落盘另起任务。
+- 禁止 `--fix`、落盘报告、安装依赖、执行构建写入；报告落盘另起任务。
+
+#### 填写示例
+- [x] 类型检查：`vue-tsc --noEmit` → 通过（无输出）。
+- [x] Lint：`eslint src/logic --no-fix` → 通过（无输出，摘录粘贴）。
+- [x] 测试：`vitest run src/logic --coverage=false` → 通过（`9 passed`，摘录粘贴）。
+- 未执行示例按 `common/protocol/final-gate.md`「声明模板」填。
 
 ### 风险
 -
@@ -65,4 +72,4 @@ Review 全程不修改代码，包括发现的明显笔误、失效代码与低�
 ### 评分（可选，保留 1 位小数；每条失分必链到上表编号）
 - 架构：_/5　一致性：_/5　可维护性：_/5　状态：_/5　总分 = 均值（保留 1 位小数）
 - 失分原因：<如架构扣分链 R1，<规范依据路径+摘录>；无失分写"无">
-- 填写示例：架构 4.5/5（R2 扣 0.5，见 `frontend/rules/architecture.md`「<摘录>」）。
+- 填写示例：架构 4.5/5（R2 扣 0.5，见 `frontend/rules/architecture.md`「Page/Component 直接调 Service 一律禁止」）。

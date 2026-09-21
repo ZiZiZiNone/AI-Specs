@@ -5,9 +5,9 @@
 输出前必须通过检查。
 
 ## 检查
-- 对照**对应子树**的自检清单逐项自检（前端：`frontend/checklists/self-check.md`「自检」："边界/架构/状态/异步/命名/模式/测试/类型/反模式检查"），
+- 对照**对应子树**的自检清单逐项自检（前端：`frontend/checklists/self-check.md`「自检」；后端语言子树待建期间逐项对照 `backend/README.md`「分层原则（PHP / Go 共用）」与 `common/principles.md`「检查清单」，缺失验证按「无法验证时的处理」声明），
   覆盖边界 / 架构 / 状态 / 异步 / 命名 / 模式 / 测试 / 类型 / 反模式）。
-- 完整交付前另过对应子树的详细清单（前端：`frontend/checklists/detailed-check.md`「适用性判定」："每条只有三种结论——通过 / 不适用（附原因）/ 未通过"），
+- 完整交付前另过对应子树的详细清单（前端：`frontend/checklists/detailed-check.md`「适用性判定」；后端 `backend/checklists/` 待建，待建期间先做适用性判定再逐项给结论，缺失项按「无法验证时的处理」声明），
   先做「适用性判定」再逐项给结论。
 - 关键数据与数字有来源或可复现；来自 mock 的数字须标注（见 `common/rules/test.md`「Mock 与假数据」："交付文档中若引用了 mock 产生的数字，必须标注来源为 mock"）。
 - 约束未越界、需求已覆盖、产物可运行/可打开。越界的判定标准见 `common/protocol/task-boundary.md`「四类越界」："需求是一个点，动作扩成一片"等四类形态（授权面三档与四类越界：范围外扩 / 无消费者产物 / 意图越界 / 重复取证）。

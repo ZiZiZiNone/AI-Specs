@@ -3,7 +3,7 @@ r"""引用校验脚本（COM-011 引用可验伪的可执行形态）。
 
 判定依据逐条来自 common/rules/constitution.md「COM-011 细则」：
 - 条款级编号只存在于两处：constitution.md 的 COM-007 至 COM-012、AGENTS.md 的 FE-000 至 FE-005；
-  其它地方出现未定义的 COM-xxx/FE-xxx 即编造 → FAIL。
+  其它地方出现未定义的 COM-xxx/FE-xxx 即编造 → FAIL。白名单硬编码为 COM-007 至 COM-012，不从正文反推，避免范例行污染。
 - 位置式引用（第 N 节/条/段/章、倒数第）只允许两类：指向上述两处编号文件，
   或指向"编号小节例外"文件——判定式为
   `grep -nE "^#{2,4} *(FE-[0-9]+|[0-9]+\.)" <目标文件>`，
@@ -16,7 +16,7 @@ r"""引用校验脚本（COM-011 引用可验伪的可执行形态）。
 
 扫描范围：规范库根下全部 *.md，排除 .git/、node_modules/、
 .internal-docs/（过程记录非规范正文）、
-.workbuddy-ai/（项目数据非规范正文）。
+.workbuddy-ai/（项目数据非规范正文）、vendor/（第三方依赖）。
 
 用法：python scripts/check-citations.py [<SPEC_ROOT>] [--strict] [--verbose]
 退出码：0 通过；1 有 FAIL（--strict 下 WARN 也算）。
@@ -31,6 +31,7 @@ ROOT = os.path.abspath(_ARGS[0]) if _ARGS else \
 
 SKIP_DIRS = {".git", "node_modules", ".internal-docs", ".workbuddy-ai", "vendor"}
 ID_FILES = {"common/rules/constitution.md", "AGENTS.md"}
+VALID_COM = {f"COM-{i:03d}" for i in range(7, 13)}
 
 RE_COM = re.compile(r"\bCOM-\d+\b")
 RE_FE = re.compile(r"\bFE-\d+\b")
@@ -108,9 +109,8 @@ def main():
         rel = os.path.relpath(p, ROOT).replace(os.sep, "/")
         by_base.setdefault(os.path.basename(p), []).append(rel)
 
-    const_text = read(os.path.join(ROOT, "common", "rules", "constitution.md"))
     agents_text = read(os.path.join(ROOT, "AGENTS.md"))
-    valid_com = set(RE_COM.findall(const_text))
+    valid_com = set(VALID_COM)
     valid_fe_def = set(RE_FE.findall(agents_text))
     core_text = read(os.path.join(ROOT, "frontend", "rules", "core-principles.md"))
     valid_fe_core = set(RE_FE_HEAD.findall(core_text))

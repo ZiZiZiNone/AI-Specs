@@ -1,5 +1,7 @@
 # TypeScript
 
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析，首段为 `common/`、`frontend/` 或 `backend/`。见 `<SPEC_ROOT>/README.md`「路径基准」。
+
 避免any；类型即文档。
 
 ## 规则
@@ -33,7 +35,7 @@ interface TicketDetail {
 
 **例外**：框架机制要求以 `undefined` 作为"未提供"信号的位置（如组件 props
 的默认值填充），须用 `?:`。这类例外由框架规范显式说明并给出理由，
-见 frontend/frameworks/vue3/component.md。
+见 `frontend/frameworks/vue3/component.md`「可空性约定」。
 
 ## 规则表与映射的类型化
 
@@ -51,7 +53,7 @@ export type FieldRules = { [fieldName: string]: { validator?: (v: any) => boolea
 
 纯 TS 模块（`logic` / `service` / `types` / `hooks`）按此序：
 文件头注释 → imports → 类型（`interface` / `type`）→ 常量与映射表 → 私有函数 → 公开导出函数。
-`async` 不提前，失败经返回值表达（见 frontend/frameworks/miniprogram/logic.md 入参/返回值约定）。
+`async` 不提前，失败经返回值表达（见 `frontend/frameworks/miniprogram/logic.md`「入参/返回值约定」）。
 
 ## 检查清单
 - [ ] 无无理由的 any（需要时用 unknown 并窄化）

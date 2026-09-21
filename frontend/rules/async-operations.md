@@ -295,7 +295,7 @@ if (currentParamsRef.current !== params) return;   // 引用比较，语义不�
 - 推荐延迟：搜索 300ms，自动保存 1000ms
 
 **示例**
-来源：`frontend/examples/golden/form-validation.md`「异步校验时机」：新输入同时废弃上一次的定时器与在途请求。
+来源：`frontend/examples/golden/form-validation.md`「5. 异步唯一性校验」：新输入同时废弃上一次的定时器与在途请求。
 
 ```typescript
 // ✅ 搜索防抖：新输入同时废弃上一次的定时器与在途请求

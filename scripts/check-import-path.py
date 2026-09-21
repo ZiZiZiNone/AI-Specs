@@ -23,6 +23,9 @@ if TARGET_ARG is None:
     print("用法：python scripts/check-import-path.py <业务源码目录> [--verbose]")
     sys.exit(2)
 TARGET = os.path.abspath(TARGET_ARG)
+if not os.path.isdir(TARGET):
+    print(f"目标不是目录：{TARGET}")
+    sys.exit(2)
 
 SKIP_DIRS = {".git", "node_modules", "dist", "build", "miniprogram_npm"}
 SCAN_EXT = (".ts", ".tsx", ".js", ".jsx", ".mts", ".cts", ".vue")

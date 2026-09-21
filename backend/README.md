@@ -4,7 +4,7 @@
 
 后端专属规范。与 `common/`、`frontend/` 平级。
 
-**状态**：导航入口与共用分层原则已建立（本文）；语言子树、`backend/tasks/` 与 `backend/checklists/` 待建，见 `<SPEC_ROOT>/README.md`「TODO」。
+**状态**：导航入口与共用分层原则已建立（本文）；语言子树、`backend/tasks/` 与 `backend/checklists/` 待建，见 `<SPEC_ROOT>/README.md`「TODO」与「覆盖范围」。
 
 ## 用法
 

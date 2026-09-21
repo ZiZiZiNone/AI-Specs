@@ -45,7 +45,7 @@ COM-012 授权面
 引用 FE-101 至 FE-104 时写编号，不写成"第 N 节"。
 
 **引用无编号条款的唯一合法形式**：编号 + 文件路径 + 原文逐字摘录（可被 `grep -F` 命中）。
-- ✅ COM-020 `common/protocol/final-gate.md`：「不以"读代码没问题"替代执行」
+- ✅ COM-011 `common/rules/constitution.md`：「陈述"规范规定了什么"或"规范没规定什么"时，该陈述必须能被一条命令验伪」
 - ❌ `common/protocol/final-gate.md` 第 2 节第 3 条要求实际执行构建
 - ❌ 规范里有一条大意是要管上下文预算的
 

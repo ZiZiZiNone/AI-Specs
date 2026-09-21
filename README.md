@@ -172,7 +172,7 @@ python scripts/check-import-path.py <业务源码目录>   # 业务项目传入�
 
 | 项 | 影响面 | 状态 |
 |---|---|---|
-| 本机目录与库名改为 `AI-Operating-System-v4.0`（远程仓库名不改） | 需同步 `INTEGRATION.md` 与全局 `AGENTS.md` | 待做（阶段④） |
+| 后建 `backend/go/`、`backend/php/` 语言子树（含 structure 落地）、`backend/tasks/`、`backend/checklists/` | 后端任务待建期间仅按 `common/` 通用规范与 `backend/README.md` 共用分层原则执行，框架专属决策点提问而非自行发挥 | 待做 |
 | 条款级编号方案：若引入新编号，须同步 COM-011 细则 | 当前为 COM-007 至 COM-012 与 FE-000 至 FE-005、FE-101 至 FE-104 | 已定 |
 
 ## 演化

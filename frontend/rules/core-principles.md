@@ -1,6 +1,6 @@
 # 核心原则
 
-路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析，首段为 `common/`、`frontend/` 或 `backend/`。见 `<SPEC_ROOT>/README.md`「路径基准」。示例均引自 `frontend/examples/golden/` 自包含示例。
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析，首段为 `common/`、`frontend/` 或 `backend/`。见 `<SPEC_ROOT>/README.md`「路径基准」。示例均引自 `frontend/examples/golden/` 自包含示例。本文 `src/*` 指业务项目根下源码，与规范库路径含义不同。
 
 四大核心原则，所有代码必须遵守。
 

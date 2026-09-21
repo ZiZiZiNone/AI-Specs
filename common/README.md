@@ -1,5 +1,7 @@
 # common
 
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析，首段为 `common/`、`frontend/` 或 `backend/`。见 `<SPEC_ROOT>/README.md`「路径基准」。
+
 前后端通用规范。与 `frontend/`、`backend/` 平级，三棵树各司其职。
 
 ## 用法
