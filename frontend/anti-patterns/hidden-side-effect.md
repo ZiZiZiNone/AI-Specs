@@ -44,19 +44,19 @@
 
 ## 正例指针
 
-- `frontend/test/vue/src/hooks/useRequestGuard.ts`：signal 下传请求 + 单调序号双保险，取消不进 error 态。
+- `frontend/examples/golden/list-page.md`「4. 竞态双保险」：signal 下传请求加单调序号双保险，取消不进 error 态。
 
-- `frontend/test/vue/src/hooks/useTicketList.ts`：加载与错误分流在 Hook，判定下沉 Logic。
+- `frontend/examples/golden/list-page.md`「3. 刷新失败保留旧数据」：加载与错误分流在 Hook，判定下沉 Logic。
 
-- `frontend/test/vue/src/logic/ticketQuery.logic.ts`：纯函数可单测，无框架依赖无 UI 状态。
+- `frontend/examples/golden/list-page.md`「2. 改筛选必回第一页」：纯函数可单测，无框架依赖无 UI 状态。
 
 ## 反例指针（`frontend/examples/golden/anti-examples.md`，标题原文引用，不编新条号）
 
-- “3. 竞态保护形似而无实效”：来源 `frontend/test/react/src/hooks/useUserList.ts:28-45`，signal 未下传且用引用比新旧。
+- 「3. 竞态保护形似而无实效」：signal 未下传且用引用比新旧。
 
-- “5. retryable 计算了但没人用”：来源 `frontend/test/react/src/services/user.service.ts`，字段装饰化无消费者。
+- 「5. retryable 计算了但没人用」：字段装饰化无消费者。
 
-- “9. useEffect 依赖注释掩盖问题”：来源 `frontend/test/react/src/pages/UserListPage.tsx:44-46`，注释绕开漏依赖。
+- 「9. useEffect 依赖注释掩盖问题」：注释绕开漏依赖。
 
 ## 自检指针（`frontend/checklists/detailed-check.md`，用小节名）
 

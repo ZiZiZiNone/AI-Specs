@@ -1,7 +1,9 @@
 # 小程序 Logic
 
-B 方案正文：纯函数入参/返回值约定、setData 回写接口、清理与竞态。
-本文件即 Hook 层在小程序的承担者（见 README「Hook 层映射」）。
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
+
+纯函数入参/返回值约定、setData 回写接口、清理与竞态。
+本文件即 Hook 层在小程序的承担者（见 `frontend/frameworks/miniprogram/README.md`「Hook 层映射」）。
 
 ## 职责与禁区
 

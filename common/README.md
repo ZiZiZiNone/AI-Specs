@@ -14,7 +14,8 @@
 
 - `common/principles.md`：四条通用原则（薄入口 / 模块解耦 / 逻辑解耦 / 单向依赖）+ 极致解耦总纲
 - `common/rules/`
-  - `constitution.md`：宪法 C1–C6（禁止猜测、用户决策权、规范优先、已覆盖直接执行、引用可验伪、授权面）
+  - `constitution.md`：宪法（禁止猜测、用户决策权、规范优先、已覆盖直接执行、引用可验伪、授权面）
+  - `api-contract.md`：接口契约（复数名词、无动词路径、响应信封、业务错误码、分页、幂等、版本化）
   - `naming.md`：命名抽象原则（大小写形态按端，见对应子树）
   - `comment.md`：注释规范
   - `test.md`：测试规范（含 mock / 假数据约定）
@@ -45,7 +46,7 @@
 | 端 | 子树 | 通用原则的落地文件 |
 |---|---|---|
 | 前端 | `frontend/` | `frontend/rules/core-principles.md`（P1–P4） |
-| 后端（PHP） | `backend/php/` | 该子树的 `structure.md` 已建 |
-| 后端（Go） | `backend/go/` | 该子树的 `structure.md` 已建 |
+| 后端（PHP） | `backend/php/`（待建） | 该子树的 `structure.md`（待建） |
+| 后端（Go） | `backend/go/`（待建） | 该子树的 `structure.md`（待建） |
 
 后端分层的共用约定见 `backend/README.md`。

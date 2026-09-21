@@ -1,8 +1,10 @@
 # 核心原则
 
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析，首段为 `common/`、`frontend/` 或 `backend/`。见 `<SPEC_ROOT>/README.md`「路径基准」。示例均引自 `frontend/examples/golden/` 自包含示例。
+
 四大核心原则，所有代码必须遵守。
 
-## P1 页面薄层原则
+## FE-101 页面薄层原则
 页面只负责布局和简单逻辑，核心代码模块放到组件。
 
 ### 定义
@@ -48,7 +50,7 @@
 4. 必须在代码注释中说明保留原因
 
 ### 正确示例
-来源：`frontend/test/vue/src/pages/TicketListPage.vue`（完整版见 frontend/examples/golden/list-page.md 第 6 节）
+来源：`frontend/examples/golden/list-page.md`「6. 页面只做组装」：页面只做组装和传递，状态全部来自 Hook，仅 1 个函数。
 
 ```vue
 <script setup lang="ts">
@@ -68,7 +70,7 @@ async function handleSubmit(): Promise<void> {
 ```
 
 ### 错误示例
-来源：`frontend/test/react/src/pages/UserListPage.tsx:155-190`（完整版见 frontend/examples/golden/anti-examples.md 第 1、10 节）
+来源：`frontend/examples/golden/anti-examples.md`「1. 页面直接调用 Service」与「10. 页面承担 13 个函数」：确认→请求→反馈→刷新全在页面，共 13 个函数。
 
 ```typescript
 // ❌ 页面内写业务逻辑：确认→请求→反馈→刷新全在页面，共 13 个函数
@@ -88,7 +90,7 @@ const handleDelete = useCallback(async (userId: string) => {
 
 ---
 
-## P2 组件完全解耦原则
+## FE-102 组件完全解耦原则
 组件完全解耦合，不管外部如何实现，只需要接受固定结构数据（或不需要）就能完成功能。
 
 ### 定义
@@ -143,7 +145,7 @@ const handleDelete = useCallback(async (userId: string) => {
 **禁止**业务组件、复合组件、涉及数据请求的组件自持状态。
 
 ### 正确示例
-来源：`frontend/test/vue/src/components/ticket/TicketTable.vue`
+来源：`frontend/examples/golden/list-page.md`「6. 页面只做组装」：组件只接收数据和回调，给什么渲染什么，权限由传入的 user 判定，判定调用 Logic，模板里不写条件表达式。
 
 ```vue
 <script setup lang="ts">
@@ -171,7 +173,7 @@ function abilityOf(row: Ticket) {
 ```
 
 ### 错误示例
-来源：`frontend/test/react/src/components/UserFormModal.tsx:44-67`（见 frontend/examples/golden/anti-examples.md 第 2 节）
+来源：`frontend/examples/golden/anti-examples.md`「2. 展示型组件自己加载数据」：弹窗自己取详情，与接口绑定，无法脱离后端渲染。
 
 ```typescript
 // ❌ 组件内调用接口：弹窗自己取详情，与接口绑定，无法脱离后端渲染
@@ -188,11 +190,11 @@ const loadUserDetail = async (userId: string) => {
 
 ---
 
-## P3 逻辑完全解耦原则
+## FE-103 逻辑完全解耦原则
 完全解耦合的函数/工厂/方法/逻辑，在独立的逻辑文件（全局或局部），只需要接受固定结构数据（或不需要）就能完成功能。
 
 ### 定义
-- **Logic 文件**：src/logic/ 下的纯业务逻辑文件
+- **Logic 文件**：业务项目 `src/logic/` 下的纯业务逻辑文件
 - **完全解耦**：不依赖框架、不依赖 UI、不依赖全局状态
 - **固定结构**：输入输出通过 TypeScript 接口严格定义
 
@@ -210,7 +212,7 @@ const loadUserDetail = async (userId: string) => {
 - 多页面共用同一 Logic，不重复实现
 
 ### 正确示例
-来源：`frontend/test/vue/src/logic/ticketQuery.logic.ts`（更多见 frontend/examples/golden/list-page.md 第 2 节）
+来源：`frontend/examples/golden/list-page.md`「2. 改筛选必回第一页」：纯逻辑框架无关，输入输出普通数据，可直接单测。
 
 ```typescript
 // ✅ 纯逻辑，框架无关：输入输出都是普通数据，可直接单测
@@ -225,7 +227,7 @@ export function resolvePageAfterRemoval(
 }
 ```
 
-配套单测无需挂载组件（`logic/ticketQuery.logic.spec.ts`）：
+配套单测无需挂载组件：
 
 ```typescript
 it('should_step_back_a_page_when_last_row_of_last_page_is_removed', () => {
@@ -234,8 +236,7 @@ it('should_step_back_a_page_when_last_row_of_last_page_is_removed', () => {
 ```
 
 ### 错误示例
-参照 `frontend/test/react/`（见 frontend/examples/golden/anti-examples.md 第 11 节）：Logic 层空转，
-业务规则散落在页面与组件里。以下是两类典型污染：
+来源：`frontend/examples/golden/anti-examples.md`「11. Logic 层空转」：业务规则散落在页面与组件里。以下是两类典型污染：
 
 ```typescript
 // ❌ Logic 依赖 UI：引入框架 Hook，无法脱离组件运行
@@ -252,7 +253,7 @@ export function validateUser(values: UserFormData): void {
 
 ---
 
-## P4 单向数据流原则
+## FE-104 单向数据流原则
 页面负责原始简单数据，传入各个组件/方法等，然后接受渲染完成/输出完成的最终成果。
 
 ### 定义
@@ -278,7 +279,7 @@ Page ← Component（回调上报）
 - Logic 不能调用 Hook/UI
 
 ### 正确示例
-来源：`frontend/test/vue/src/`（筛选条以 URL 为唯一来源，见 frontend/examples/golden/list-page.md 第 1 节）
+来源：`frontend/examples/golden/list-page.md`「1. 筛选条件以 URL 为唯一来源」：筛选条以 URL 为唯一来源，组件全受控，自己不存筛选值。
 
 ```vue
 <!-- ✅ 数据向下流动，事件向上冒泡：组件全受控，自己不存筛选值 -->
@@ -297,7 +298,7 @@ function changeFilter(patch: Partial<Omit<TicketListQuery, 'page'>>): void {
 ```
 
 ### 错误示例
-来源：`frontend/test/react/src/components/UserFilter.tsx:43-45`（见 frontend/examples/golden/anti-examples.md 第 6 节）
+来源：`frontend/examples/golden/anti-examples.md`「6. 受控组件自持一份状态」：组件自持一份与 URL 平行的状态，形成两个写入点。
 
 ```typescript
 // ❌ 组件自持一份与 URL 平行的状态，形成两个写入点

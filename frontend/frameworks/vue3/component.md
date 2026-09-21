@@ -1,7 +1,9 @@
 # Vue 3 组件
 
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
+
 组件通信、props/emit 与受控约定。
-组件职责边界见 frontend/rules/ui-rule.md 与 frontend/rules/core-principles.md P2。
+组件职责边界见 `frontend/rules/ui-rule.md` 与 `frontend/rules/core-principles.md`「P2 组件完全解耦原则」。
 
 ## props
 
@@ -15,7 +17,7 @@
 - **领域数据字段用 `| null`**（如 `assignee: TicketAssignee | null`），
   表达"业务上确实为空"，与"未传入"区分开。
 
-这是对 frontend/rules/typescript.md「可空类型用 `Type | null`」的框架侧细化：
+这是对 `frontend/rules/typescript.md`「可空的表达」：领域数据的可空字段用 `Type | null` 的框架侧细化：
 该条约束领域数据建模，不适用于组件 props 的"未传入"语义——
 Vue 的默认值机制以 `undefined` 为信号，强制 `| null` 会迫使每个调用点显式传 `null`。
 
@@ -111,7 +113,7 @@ const keyword = ref(props.initialKeyword);
 - ❌ 用 `defineExpose` 暴露内部方法供父级命令式调用业务逻辑
   （UI 焦点控制等纯交互可例外，需注释说明）
 
-允许 import Service 的例外见 frontend/rules/core-principles.md P2「组件调用 Service 的边界」：
+允许 import Service 的例外见 `frontend/rules/core-principles.md`「组件调用 Service 的边界」：
 仅限组件自身交互功能（上传、异步搜索、唯一性校验）。
 
 ---

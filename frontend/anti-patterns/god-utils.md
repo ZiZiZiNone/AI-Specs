@@ -44,19 +44,19 @@
 
 ## 正例指针
 
-- `frontend/test/vue/src/logic/ticketQuery.logic.ts`：纯逻辑框架无关，输入输出普通数据，可直接单测。
+- `frontend/examples/golden/list-page.md`「2. 改筛选必回第一页」：纯逻辑框架无关，输入输出普通数据，可直接单测。
 
-- `frontend/test/vue/src/logic/ticketValidation.logic.ts`：校验规则按字段归属 Logic，不在组件内。
+- `frontend/examples/golden/form-validation.md`「1. 规则定义在 Logic」：校验规则按字段归属 Logic，不在组件内。
 
-- `frontend/test/vue/src/logic/ticketPermission.logic.ts`：行权限判定下沉 Logic，组件只消费结果。
+- `frontend/examples/golden/list-page.md`「6. 页面只做组装」：行权限判定下沉 Logic，组件只消费结果。
 
 ## 反例指针（`frontend/examples/golden/anti-examples.md`，标题原文引用，不编新条号）
 
-- “11. Logic 层空转”：4 个 Hook 直调 Service，规则散落页面组件，Logic 只做参数拼装。
+- 「11. Logic 层空转」：规则散落页面组件，Logic 只做参数拼装。
 
-- “4. 每个接口重复 try-catch”：来源 `frontend/test/react/src/services/user.service.ts`，10 个函数各写一遍超时与捕获。
+- 「4. 每个接口重复 try-catch」：10 个函数各写一遍超时与捕获。
 
-- “7. 校验层放弃类型”：来源 `frontend/test/react/src/logic/userValidation.logic.ts:14`，validator 用 any 致字段写错不被发现。
+- 「7. 校验层放弃类型」：validator 用 any 致字段写错不被发现。
 
 ## 自检指针（`frontend/checklists/detailed-check.md`，用小节名）
 

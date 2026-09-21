@@ -249,7 +249,7 @@ async function handleSubmit(): Promise<void> {
 
 ## 小程序映射
 
-小程序侧 `frontend/test/miniprogram/` 工程已删，本节不再引用其路径；机制结论以小程序框架规范为准：
+机制结论以小程序框架规范为准：
 
-- 分页纯函数：见 `frontend/frameworks/miniprogram/logic.md`「入参/返回值约定」（原文："logic 函数入参只收普通值：查询参数对象加前状态快照。"；"失败表达走状态内 error 字段，不抛异常。"；"取消不是错误：被取消的请求须在上层被识别为预期行为，不进入 error 态。"）；删除回退见该文件「删除回退」（原文："删除末页最后一条后退回上一页，避免停在空页。"）。
-- 受控筛选条：见 `frontend/frameworks/miniprogram/component.md`「业务组件一律受控」（原文："值由 properties 传入，变更经事件上报，组件自身不持有业务状态。"）。
+- 分页纯函数：见 `frontend/frameworks/miniprogram/logic.md`「入参/返回值约定」：logic 函数入参只收普通值，失败表达走状态内 error 字段；取消语义见 `frontend/rules/async-operations.md`「取消不是错误」：被取消的请求须在上层被识别为预期行为；删除回退见 `frontend/frameworks/miniprogram/logic.md`「删除回退」：删除末页最后一条后退回上一页，避免停在空页。
+- 受控筛选条：见 `frontend/frameworks/miniprogram/component.md`「业务组件一律受控」：值由 properties 传入，变更经事件上报，组件自身不持有业务状态。

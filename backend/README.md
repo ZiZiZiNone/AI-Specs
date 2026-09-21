@@ -1,8 +1,10 @@
 # backend
 
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析，首段为 `common/`、`frontend/` 或 `backend/`。见 `<SPEC_ROOT>/README.md`「路径基准」。
+
 后端专属规范。与 `common/`、`frontend/` 平级。
 
-**状态**：导航入口、PHP 与 Go 语言子树、`backend/tasks/` 与 `backend/checklists/` 均已建立。
+**状态**：导航入口与共用分层原则已建立（本文）；语言子树、`backend/tasks/` 与 `backend/checklists/` 待建，见 `<SPEC_ROOT>/README.md`「TODO」。
 
 ## 用法
 
@@ -10,7 +12,7 @@
   **不在本目录重复**；本目录只放后端专属结论。
 - 进入业务项目先判定语言与框架（读 `composer.json` / `go.mod`），再按需读取对应语言子树；
   涉及框架时进入其二级目录。无对应目录时仅遵循 `common/` 通用规范，
-  **不套用其他技术栈的规则**；遇到框架专属决策点应提问而非自行发挥（C1）。
+  **不套用其他技术栈的规则**；遇到框架专属决策点应提问而非自行发挥。
 
 ## 分层原则（PHP / Go 共用）
 
@@ -29,7 +31,7 @@
 - 依赖经参数或构造函数显式传入，不用全局单例、静态门面（Facade）、服务定位器
 - 逻辑单元必须可脱离宿主单测（不起 HTTP 服务）
 
-## 现有子目录
+## 计划中的子目录
 
 每个语言子树采用「语言级通用 + 框架二级目录」两层，**一主题一文件**：
 
@@ -49,17 +51,17 @@
 | `security.md` | 安全 |
 | `concurrency.md` | 并发处理（**仅 Go**；PHP 传统 FPM 模型无对应物，不建该文件） |
 
-接口设计（HTTP 契约、业务错误码、分页、幂等、版本化）属前后端共用，归属 `common/`。
+接口设计（HTTP 契约、业务错误码、分页、幂等、版本化）属前后端共用，规划于 `common/`，见 `common/rules/api-contract.md`「响应信封」。
 
 框架二级目录**只写该框架真正引入差异的主题**，不为凑齐主题文件而写。
 
-## 现有技术栈
+## 计划中的技术栈
 
 | 子树 | 技术栈 | 状态 |
 |---|---|---|
-| `php/` | PHP 8.3+ 语言级通用 + Laravel 13 | 已建 |
-| `go/` | Go 语言级通用 + GoFrame v2.10 | 已建 |
+| `php/` | PHP 8.3+ 语言级通用 + Laravel 13 | 待建 |
+| `go/` | Go 语言级通用 + GoFrame v2.10 | 待建 |
 
-样例工程：Go 侧样例位于 `backend/go/test/`，须实跑 `go build` 与 `go test` 验证；
-PHP 侧因本机 Composer 不可用，未建可实跑样例，交付时按 `common/protocol/final-gate.md`
+样例工程：Go 侧计划建于 `backend/go/test/`，须实跑 `go build` 与 `go test`；
+PHP 侧因本机 Composer 不可用，暂不建样例，交付时按 `common/protocol/final-gate.md`
 「无法验证时的处理」声明未验证项。

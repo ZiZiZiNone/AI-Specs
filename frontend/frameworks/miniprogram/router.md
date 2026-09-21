@@ -1,7 +1,9 @@
 # 小程序路由与导航
 
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
+
 四类导航 API 分工、参数、统一导航入口与守卫。
-路由定义本身见 app.json，守卫判定调 logic（见 logic.md）。
+路由定义本身见 app.json，守卫判定调 logic（见 `frontend/frameworks/miniprogram/logic.md`）。
 
 ## 四类导航 API 分工
 

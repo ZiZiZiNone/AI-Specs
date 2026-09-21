@@ -21,7 +21,7 @@ const routes: RouteRecordRaw[] = [
 ];
 ```
 
-来源：`frontend/test/vue/src/router/index.ts`
+来源：`frontend/examples/golden/list-page.md`「1. 筛选条件以 URL 为唯一来源」：页面组件一律懒加载，name 用于跳转，避免硬编码路径。
 
 **规则**：
 - 页面组件用 `() => import()` 懒加载，非页面组件不需要。

@@ -37,5 +37,4 @@ Vue 3 框架专属规范。判定项目为 Vue 3 后按需读取，不必全量�
 
 ## 素材来源
 
-本目录示例取自 `frontend/test/vue/`（工单管理三视图，按本规范落地）。
-该项目的自检结论见 `frontend/test/vue/CONFORMANCE.md`。
+本目录示例均为规范示范形态，完整自包含示例见 `frontend/examples/golden/`。

@@ -1,11 +1,13 @@
 # 小程序测试
 
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
+
 各层测试方式、不测清单与标注法。
-分层策略见 common/rules/test.md，本文件只写小程序各层的测试方式映射。
+分层策略见 `common/rules/test.md`，本文件只写小程序各层的测试方式映射。
 
 ## 分层方式
 
-沿用 vue3/testing.md 的分层表结构，测试工具替换为小程序侧：
+沿用 `frontend/frameworks/vue3/testing.md` 的分层表结构，测试工具替换为小程序侧：
 
 | 层 | 方式 | 工具 |
 |---|---|---|
@@ -45,17 +47,15 @@ properties 传入后的渲染结果、`observer` 派生是否生效、`triggerEv
 - 不测样式与布局（走人工走查）
 - 不测第三方组件库内部（只测三冲突取舍点的行为，见 ui/ 下对应组件库目录）
 
-## 落地状态（`frontend/test/miniprogram/`）
+## 落地状态
 
-- logic 单测已落地：`src/logic/pagination.spec.ts`（成功累加/error 字段/取消静默/完成态/并发 guard）。
-- 组件挂载已落地：`src/components/filter-bar/filter-bar.spec.ts`（miniprogram-simulate v1.6.2
-  文件管线挂载；方法经实例调用、上报经真实 triggerEvent 捕获、条件渲染经真实 DOM 断言；
-  模板事件绑定属框架机制，不在此测）。
-- 导航入口、Service 出口、automator 端到端未建，仍按规范示范标注法补。
+- logic 单测为规范示范形态：成功累加、error 字段、取消静默、完成态、并发 guard，新增 logic 测试时照此形态手写。
+- 组件挂载为规范示范形态：miniprogram-simulate 文件管线挂载；方法经实例调用、上报经真实 triggerEvent 捕获、条件渲染经真实 DOM 断言；模板事件绑定属框架机制，不在此测。
+- 导航入口、Service 出口、automator 端到端按规范示范标注法补。
 
 ## 规范示范标注法
 
-沿用 vue3/testing.md 的标注：凡因工具链未落地而无法在本机实跑的测试约定，
+沿用 `frontend/frameworks/vue3/testing.md` 的标注：凡因工具链未落地而无法在本机实跑的测试约定，
 在用例顶部标注 `// 规范示范：miniprogram-simulate 未接入前按此形态手写用例`，
 待工具链落地后转实跑。标注的用例仍须符合"入参→断言"结构，不写空壳。
 

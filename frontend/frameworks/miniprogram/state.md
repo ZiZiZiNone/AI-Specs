@@ -1,5 +1,7 @@
 # 小程序状态
 
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
+
 data 归属到小程序实现的映射、setData 语义、页面间传参与全局状态边界。
 归属决策本身见 `frontend/rules/store.md`，本文件只写映射，不重复决策树。
 
@@ -58,8 +60,8 @@ this.setData({ [`list[${index}].status`]: 'done' })
 `frontend/rules/store.md` 的状态归属决策原文：
 
 > 只在单个组件内使用 → 组件内局部状态。
-> 父子/兄弟需要共享 → 提升到父组件，props/回调下发。
-> 需要刷新后保持 → URL 参数（持久化状态）。
+> 父子/兄弟需要共享 → 提升到父组件。
+> 需要刷新后保持 → URL 参数为唯一可分享来源。
 > 跨页面/跨模块或多处需要响应式共享 → 进入 Store。
 > 每上移一级都先确认必要性，避免提前全局化。
 
@@ -77,7 +79,7 @@ this.setData({ [`list[${index}].status`]: 'done' })
 
 > 禁止在 Store 里加载页面业务数据（列表/详情/表单），那属于 Hook 的职责。
 
-本目录中 Hook 层由 logic 承担（见 README「Hook 层映射」），故读作：
+本目录中 Hook 层由 logic 承担（见 `frontend/frameworks/miniprogram/README.md`「Hook 层映射」），故读作：
 页面业务数据归 logic，不进 `globalData`。
 
 ## 页面间传参

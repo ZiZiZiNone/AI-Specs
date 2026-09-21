@@ -9,14 +9,14 @@
 |---|---|---|
 | Logic 纯函数 | 直接调用，无需 Vue | `node` |
 | Service / 错误归一 | 直接调用 + mock transport | `node` |
-| composable | `withSetup` 包裹后调用 | `node`（不碰 DOM 时） |
+| composable | `withSetup` 包裹后调用 | `jsdom` |
 | 组件渲染与交互 | `@vue/test-utils` 挂载 | `jsdom` |
 
 **优先级**：Logic 与 Service 必测，composable 按复杂度测，组件只测关键交互。
 理由是前两者是业务正确性的落点且成本最低——纯函数进出，不需要任何框架设施。
 
 ```typescript
-// ✅ 默认环境设 node，组件测试文件单独声明 jsdom
+// ✅ 默认环境设 node，组件与 composable 测试文件单独声明 jsdom
 // vite.config.ts
 test: {
   environment: 'node',
@@ -24,8 +24,7 @@ test: {
 }
 ```
 
-来源：`frontend/test/vue/vite.config.ts`。需要 DOM 的文件在顶部加
-`// @vitest-environment jsdom`，避免为少数组件测试拖慢全量。
+需要 DOM 的文件在顶部加 `// @vitest-environment jsdom`，避免为少数组件测试拖慢全量。
 
 ---
 
@@ -45,7 +44,7 @@ it('should_round_trip_query_through_url_serialization', () => {
 });
 ```
 
-来源：`frontend/test/vue/src/logic/ticketQuery.logic.spec.ts`
+来源：`frontend/examples/golden/list-page.md`「2. 改筛选必回第一页」：纯函数进出，无挂载、无 mock；可逆操作断言互逆。
 
 **若 Logic 测试需要挂载组件或 mock 路由，说明该 Logic 不纯**——
 这是分层出问题的信号，应先修 Logic 而不是给测试加设施。
@@ -54,7 +53,7 @@ it('should_round_trip_query_through_url_serialization', () => {
 
 ## composable 测试
 
-下方为最小 setup 宿主、清理与竞态断言形态（注：`useRequestGuard` 对应测试尚未落地，新增 composable 测试时照此形态），
+下方为最小 setup 宿主、清理与竞态断言形态，新增 composable 测试时照此形态手写，
 并确认 `@vue/test-utils`、`jsdom` 仍在 devDependencies。
 
 composable 依赖组件实例作用域（`onScopeDispose`、`inject` 等），
@@ -83,8 +82,8 @@ it('should_abort_inflight_request_when_scope_disposed', async () => {
 });
 ```
 
-被测对象 `useRequestGuard`（`frontend/test/vue/src/hooks/useRequestGuard.ts`）确有
-`onScopeDispose(abortAll)`，故该断言与实现相符；但这条测试本身尚未写入项目。
+被测对象 `useRequestGuard` 见 `frontend/examples/golden/list-page.md`「4. 竞态双保险」，确有
+`onScopeDispose(abortAll)`，故该断言与实现相符；该测试为规范示范形态，新增 composable 测试时照此形态手写。
 
 **规则**：
 - 依赖路由的 composable，注入真实 router 的 memory history，不 mock `useRoute`——
@@ -97,8 +96,7 @@ it('should_abort_inflight_request_when_scope_disposed', async () => {
 
 ## 组件测试
 
-`frontend/test/vue/src/components/ticket/TicketTable.spec.ts` 已落地：`data-test` 选择器、
-emit 载荷断言。新增组件测试时照此形态；交互元素须带 `data-test` 属性。
+组件测试为规范示范形态：`data-test` 选择器、emit 载荷断言。新增组件测试时照此形态；交互元素须带 `data-test` 属性。
 
 只测「给定 props 渲染出什么」与「交互是否上报正确事件」：
 

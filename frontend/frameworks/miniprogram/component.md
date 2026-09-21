@@ -1,7 +1,9 @@
 # 小程序组件
 
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
+
 组件通信、properties/observers/lifetimes 与受控约定。
-组件职责边界见 frontend/rules/ui-rule.md 与 frontend/rules/core-principles.md P2。
+组件职责边界见 `frontend/rules/ui-rule.md` 与 `frontend/rules/core-principles.md`「P2 组件完全解耦原则」。
 
 ## properties
 

@@ -35,7 +35,7 @@
 记作 `<SPEC_ROOT>`。**写任何代码之前**，按顺序读完这四个文件，不得跳过：
 
 1. `<SPEC_ROOT>/README.md` —— 全局入口、路径基准、覆盖范围、加载策略
-2. `<SPEC_ROOT>/common/rules/constitution.md` —— 宪法 C1-C6
+2. `<SPEC_ROOT>/common/rules/constitution.md` —— 宪法
 3. `<SPEC_ROOT>/common/principles.md` —— 四条通用原则 + 极致解耦
 4. `<SPEC_ROOT>/common/protocol/task-boundary.md` —— 任务边界（授权面：只读/定向写/开放写）
 
@@ -43,7 +43,7 @@
 库内裸路径**相对 `<SPEC_ROOT>` 解析**，首段必为三者之一，读取时拼成 `<SPEC_ROOT>/common/...` 形式。
 其余文件按 README 的「加载策略」按需读取，禁止全量通读。
 
-规范与本项目现有代码风格冲突时，按 C2 先说明冲突再执行，不得自行取舍。
+规范与本项目现有代码风格冲突时，按 `common/rules/constitution.md`「用户明确要求优先于本规范」先说明冲突再执行，不得自行取舍。
 ```
 
 为什么放顶部：AGENTS.md 由工具自动注入上下文，越靠前越不易被后续内容淹没。
@@ -87,14 +87,14 @@ git commit -m "chore: add spec as submodule"
 记作 `<SPEC_ROOT>` = `.ai-spec`。**写任何代码之前**，按顺序读完这四个文件，不得跳过：
 
 1. `.ai-spec/README.md` —— 全局入口、路径基准、覆盖范围、加载策略
-2. `.ai-spec/common/rules/constitution.md` —— 宪法 C1-C6
+2. `.ai-spec/common/rules/constitution.md` —— 宪法
 3. `.ai-spec/common/principles.md` —— 四条通用原则 + 极致解耦
 4. `.ai-spec/common/protocol/task-boundary.md` —— 任务边界（授权面：只读/定向写/开放写）
 
 库内裸路径相对 `.ai-spec/` 解析，首段必为 `common/`、`frontend/` 或 `backend/`，
 读取时拼成 `.ai-spec/common/...` 形式。
 其余文件按 README 的「加载策略」按需读取，禁止全量通读。
-规范与本项目现有代码风格冲突时，按 C2 先说明冲突再执行。
+规范与本项目现有代码风格冲突时，按 `common/rules/constitution.md`「用户明确要求优先于本规范」先说明冲突再执行。
 ```
 
 克隆业务项目的人需要额外执行 `git submodule update --init` 才能拿到规范。
@@ -124,7 +124,7 @@ common/protocol/task-boundary.md，再开始。
 3. **定任务类型与授权面** —— 按 `common/protocol/task-analysis.md` 判定类型，
    按 `common/protocol/task-boundary.md` 确定授权面；Review / 答疑 / 诊断默认只读，只报告不改代码。
 4. **判定技术栈并进入对应子树** —— 读业务项目的 `package.json` / `composer.json` / `go.mod`：
-   - 前端 → `frontend/`，再读判定出的 `frontend/frameworks/<框架>/`
+   - 前端 → `frontend/`，再读判定出的语言子树（`frontend/frameworks/vue3/` 或 `frontend/frameworks/miniprogram/`）→ 其 `ui/<组件库>/` 二级目录
    - 后端 → `backend/`，再读判定出的语言子树与其框架二级目录
    - 无对应目录时仅遵循 `common/` 通用规范，**不套用其他技术栈的规则**
 5. **按需取用模式与决策** —— 遇决策点读 `frontend/protocol/decision-trees.md`，
@@ -145,7 +145,7 @@ common/protocol/task-boundary.md，再开始。
 | 写「优先读取 README.md」（裸路径） | 解析到业务项目自己的 README（讲装依赖的那个） | 写全 `<SPEC_ROOT>/README.md` |
 | 把入口指向 `AGENTS.md` 就完事 | AGENTS 只是行为规则索引，通用原则/分层/模式全在别处，AI 以为读完了 | 入口必须是 README，它才有模块导航 |
 | 让 AI「先通读规范库」 | 上下文被规范占满，真正写代码时额度不足 | 按 README 加载策略按需读 |
-| 业务项目已有冲突的风格约定，未声明 | AI 静默取舍，两套规范混用 | 按 C2 先说明冲突，由你决定优先级 |
+| 业务项目已有冲突的风格约定，未声明 | AI 静默取舍，两套规范混用 | 按 `common/rules/constitution.md`「用户明确要求优先于本规范」先说明冲突，由你决定优先级 |
 | 路径只写到 `rules/xxx.md` 形式 | 三分结构下裸路径首段必须是 `common/`/`frontend/`/`backend/`，否则不可解析 | 写全 `common/rules/xxx.md` |
 
 ---
@@ -157,13 +157,11 @@ common/protocol/task-boundary.md，再开始。
 | 部分 | 状态 | 说明 |
 |---|---|---|
 | `common/` | **可用** | 宪法、四条通用原则、`common/rules/`、`common/protocol/`；与语言、框架、端无关，任何项目均适用 |
-| `frontend/` | **可用** | `frontend/rules/`、`frontend/protocol/`、`frontend/patterns/`、`frontend/anti-patterns/`、`frontend/tasks/`、`frontend/checklists/`、`frontend/examples/`、`frontend/frameworks/vue3/`、`frontend/frameworks/miniprogram/`、`frontend/test/` |
-| `backend/` | **可用** | 导航入口、共用分层原则、`backend/tasks/` 输出模板、`backend/checklists/` 自检清单 |
-| `backend/go/` | **可用** | Go 语言级 12 主题文件 + `backend/go/goframe/` 框架差异文件 |
-| `backend/php/` | **可用** | PHP 语言级 11 主题文件（无并发章）+ `backend/php/laravel/` 框架差异文件 |
+| `frontend/` | **可用** | `frontend/rules/`、`frontend/protocol/`、`frontend/patterns/`、`frontend/anti-patterns/`、`frontend/tasks/`、`frontend/checklists/`、`frontend/examples/`、`frontend/frameworks/vue3/`、`frontend/frameworks/miniprogram/` |
+| `backend/` | **部分可用** | 导航入口与共用分层原则已建立（`backend/README.md`）；语言子树、`backend/tasks/` 与 `backend/checklists/` 待建 |
 
-`backend/` 语言子树已建，通用规范全部生效——
-按「加载流程」第 4 步处理，遇到框架专属决策点时应提问而非自行发挥（C1）。
+`backend/` 的语言子树尚未建立时，后端任务按 `common/` 通用规范与 `backend/README.md`
+的共用分层原则执行；遇到框架专属决策点应提问而非自行发挥。
 
 ---
 

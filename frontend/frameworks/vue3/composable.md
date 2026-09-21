@@ -1,8 +1,10 @@
 # Vue 3 组合式函数
 
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
+
 composable（useXxx）的入参、返回值、清理与竞态约定。
-职责边界见 frontend/rules/architecture.md 的 Hook 层；量化标准见 frontend/rules/core-principles.md；
-拆分判据见 frontend/protocol/decision-trees.md「Hook 拆分决策」。
+职责边界见 `frontend/rules/architecture.md`「分层职责」：Hook 为 UI 侧的状态与副作用复用单元；量化标准见 `frontend/rules/core-principles.md`「P1 页面薄层原则」；
+拆分判据见 `frontend/protocol/decision-trees.md`「Hook 拆分决策」。
 
 ## 命名与位置
 - 位置：`src/hooks/`，文件名与函数同名（camelCase，`useTicketList.ts`）。
@@ -32,7 +34,7 @@ export function useTicketList(query: { value: TicketListQuery }) {}
 本条属机制类结论（依据 Vue 的 `ComputedRef` 只读性），成立理由已写在规则内，
 可用一次 `vue-tsc` 复核。
 
-> 见 frontend/examples/golden/README.md「示例教什么、不教什么」。
+> 见 `frontend/examples/golden/README.md`「示例教什么、不教什么」。
 
 ### 入参不做业务判断
 入参进来后若需要判断/换算，下沉到 Logic，composable 只负责调用。

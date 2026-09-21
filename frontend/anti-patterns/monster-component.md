@@ -44,19 +44,15 @@
 
 ## 正例指针
 
-- `frontend/test/vue/src/components/ticket/TicketTable.vue`：组件只接收数据和回调，给什么渲染什么，判定调用 Logic。
-
-- `frontend/test/vue/src/components/ticket/TicketForm.vue`：表单展示与校验规则分离，规则不在组件内。
-
-- `frontend/test/vue/src/components/feedback/DataLoader.vue`：通用反馈组件只管渲染，不管取数。
+- `frontend/examples/golden/list-page.md`「6. 页面只做组装」：组件只接收数据和回调，给什么渲染什么，判定调用 Logic；表单展示与校验规则分离，规则不在组件内；通用反馈组件只管渲染，不管取数。
 
 ## 反例指针（`frontend/examples/golden/anti-examples.md`，标题原文引用，不编新条号）
 
-- “2. 展示型组件自己加载数据”：来源 `frontend/test/react/src/components/UserFormModal.tsx:44-67`，弹窗内部发请求取详情。
+- 「2. 展示型组件自己加载数据」：弹窗内部发请求取详情。
 
-- “6. 受控组件自持一份状态”：来源 `frontend/test/react/src/components/UserFilter.tsx:43-45`，props 初值外另存三份 state。
+- 「6. 受控组件自持一份状态」：props 初值外另存三份 state。
 
-- “11. Logic 层空转”：业务规则散落在组件里，Logic 未承接判定。
+- 「11. Logic 层空转」：业务规则散落在组件里，Logic 未承接判定。
 
 ## 自检指针（`frontend/checklists/detailed-check.md`，用小节名）
 

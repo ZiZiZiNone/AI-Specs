@@ -8,20 +8,21 @@
   第三方裸包与 `@scope/pkg` 形态放行；CSS `@import` / `url()` 不扫。
 - 别名唯一性不在本脚本判定（新增别名走配置评审）。
 
-扫描范围：显式传入的业务源码目录（默认 <SPEC_ROOT>/frontend/test/vue/src，
-仅用于本库自证；业务项目传入自家 src/ 或 miniprogram/）。
+扫描范围：必须显式传入业务源码目录（业务项目传入自家 src/ 或 miniprogram/）。
 跳过：.git、node_modules、dist、build、miniprogram_npm。
 
-用法：python scripts/check-import-path.py [<TARGET_DIR>] [--verbose]
-退出码：0 通过；1 有 FAIL。
+用法：python scripts/check-import-path.py <TARGET_DIR> [--verbose]
+退出码：0 通过；1 有 FAIL；未传目录时退出码 2。
 """
 import os
 import re
 import sys
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-TARGET = os.path.abspath(sys.argv[1]) if len(sys.argv) > 1 and not sys.argv[1].startswith("-") else \
-    os.path.join(ROOT, "frontend", "test", "vue", "src")
+TARGET_ARG = sys.argv[1] if len(sys.argv) > 1 and not sys.argv[1].startswith("-") else None
+if TARGET_ARG is None:
+    print("用法：python scripts/check-import-path.py <业务源码目录> [--verbose]")
+    sys.exit(2)
+TARGET = os.path.abspath(TARGET_ARG)
 
 SKIP_DIRS = {".git", "node_modules", "dist", "build", "miniprogram_npm"}
 SCAN_EXT = (".ts", ".tsx", ".js", ".jsx", ".mts", ".cts", ".vue")
@@ -33,7 +34,7 @@ RE_IMPORT = re.compile(
 RE_AT = re.compile(r"^@/(.+)$")
 VERBOSE = "--verbose" in sys.argv
 
-# 真实文件后缀（Q17=A 一律带后缀；`*.logic` 这类点分命名不是后缀）
+# 真实文件后缀（一律带后缀；`*.logic` 这类点分命名不是后缀）
 SUFFIXES = (".ts", ".tsx", ".js", ".jsx", ".mts", ".cts", ".vue", ".json",
             ".css", ".scss", ".less")
 
@@ -54,13 +55,14 @@ def at_ok(spec):
 
 def main():
     global checked
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     for dirpath, dirnames, filenames in os.walk(TARGET):
         dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS]
         for fn in sorted(filenames):
             if not fn.endswith(SCAN_EXT):
                 continue
             path = os.path.join(dirpath, fn)
-            rel = os.path.relpath(path, ROOT).replace(os.sep, "/")
+            rel = os.path.relpath(path, root).replace(os.sep, "/")
             with open(path, encoding="utf-8") as f:
                 text = f.read()
             checked += 1

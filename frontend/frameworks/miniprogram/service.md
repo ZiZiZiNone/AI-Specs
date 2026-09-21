@@ -1,7 +1,9 @@
 # 小程序 Service
 
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
+
 `wx.request` 统一封装、登录态、超时联动、错误归一与重试。
-Service 层职责见 frontend/examples/golden/service-layer.md（统一出口/超时联动/幂等重试/错误归一），
+Service 层职责见 `frontend/examples/golden/service-layer.md`（统一出口/超时联动/幂等重试/错误归一），
 本文件只写小程序映射，不重复通用结论。
 
 ## 统一出口
@@ -36,10 +38,10 @@ export function request<T>(options: RequestOptions): Promise<Result<T>> {
 
 ## signal 转接
 
-`wx.request` 无原生 signal 入口，logic 传下的 `signal`（见 logic.md）
+`wx.request` 无原生 signal 入口，logic 传下的 `signal`（见 `frontend/frameworks/miniprogram/logic.md`「入参/返回值约定」）
 由出口转接为 `RequestTask.abort()`。转接后 `fail` 回调的 `err.errMsg`
 含 `abort`，须映射为 `CANCELED`，走"取消不是错误"结论
-（见 frontend/rules/async-operations.md，不进入 error 态）。
+（见 `frontend/rules/async-operations.md`「取消不是错误」：被取消的请求须在上层被识别为预期行为）。
 
 ```typescript
 // ✅ signal 中断真正 abort 请求；abort 结果归一为 CANCELED
@@ -59,8 +61,8 @@ function bindAbort(task: WechatMiniprogram.RequestTask, signal?: AbortSignal) {
 
 ## 错误归一
 
-HTTP 状态与业务码统一转为 `StandardError`（结构见 frontend/rules/error-handling.md），
-logic 只收归一后的错误对象做转换（见 logic.md）。
+HTTP 状态与业务码统一转为 `StandardError`（结构见 `frontend/rules/error-handling.md`「标准错误对象结构」），
+logic 只收归一后的错误对象做转换（见 `frontend/frameworks/miniprogram/logic.md`「职责与禁区」）。
 
 | 场景 | 归一结果 |
 |---|---|

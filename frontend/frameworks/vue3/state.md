@@ -38,7 +38,7 @@ function push(next: TicketListQuery): void {
 }
 ```
 
-来源：`frontend/test/vue/src/hooks/useTicketQuery.ts`；完整示例见 frontend/examples/golden/list-page.md 第 1 节。
+来源：`frontend/examples/golden/list-page.md`「1. 筛选条件以 URL 为唯一来源」：由 URL 实时解析得出，解析与序列化成对放在 Logic。
 
 **约定**：
 - 用 `router.replace` 而非 `push`：筛选变化不应在浏览器历史里堆积条目。
@@ -86,15 +86,14 @@ export const useSessionStore = defineStore('session', () => {
 理由：把页面数据放进 store 会让状态生命周期与页面脱钩——
 离开页面数据仍在，再进入时可能读到上一次的残留。
 
-来源：`frontend/test/vue/src/store/session.store.ts`（仅 session 进 store，
-工单列表/详情/表单全部由 Hook 承载）。
+来源：`frontend/examples/golden/list-page.md`「6. 页面只做组装」：仅 session 进 store，列表/详情/表单全部由 Hook 承载。
 
 ---
 
 ## 组件消费 store 的边界
 
 - **页面**可直接 `useXxxStore()`。
-- **展示组件禁止 import store**（frontend/rules/core-principles.md P2）：
+- **展示组件禁止 import store**（见 `frontend/rules/core-principles.md`「P2 组件完全解耦原则」：禁止组件内直接 import Store）：
   所需数据由 props 传入，否则组件与全局状态耦合，无法独立渲染与测试。
 
 ```vue

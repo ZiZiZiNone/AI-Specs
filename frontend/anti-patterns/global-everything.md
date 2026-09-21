@@ -44,19 +44,17 @@
 
 ## 正例指针
 
-- `frontend/test/vue/src/hooks/useTicketQuery.ts`：筛选以 URL 为唯一来源，组件全受控只上报变更。
+- `frontend/examples/golden/list-page.md`「1. 筛选条件以 URL 为唯一来源」：筛选以 URL 为唯一来源，组件全受控只上报变更。
 
-- `frontend/test/vue/src/pages/TicketListPage.vue`：页面向下传原始数据，向上经回调收结果。
-
-- `frontend/test/vue/src/components/ticket/TicketTable.vue`：表格不自持业务状态，给什么渲染什么。
+- `frontend/examples/golden/list-page.md`「6. 页面只做组装」：页面向下传原始数据，向上经回调收结果；表格不自持业务状态，给什么渲染什么。
 
 ## 反例指针（`frontend/examples/golden/anti-examples.md`，标题原文引用，不编新条号）
 
-- “6. 受控组件自持一份状态”：来源 `frontend/test/react/src/components/UserFilter.tsx:43-45`，三份 state 与 URL 双写。
+- 「6. 受控组件自持一份状态」：三份 state 与 URL 双写。
 
-- “2. 展示型组件自己加载数据”：来源 `frontend/test/react/src/components/UserFormModal.tsx:44-67`，错误态埋组件内页面无法感知。
+- 「2. 展示型组件自己加载数据」：错误态埋组件内页面无法感知。
 
-- “9. useEffect 依赖注释掩盖问题”：来源 `frontend/test/react/src/pages/UserListPage.tsx:44-46`，对象无稳定标识致只能挂错依赖。
+- 「9. useEffect 依赖注释掩盖问题」：对象无稳定标识致只能挂错依赖。
 
 ## 自检指针（`frontend/checklists/detailed-check.md`，用小节名）
 

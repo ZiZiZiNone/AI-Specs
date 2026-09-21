@@ -1,5 +1,7 @@
 # Vue 3 响应式
 
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
+
 ref / reactive / shallowRef 的选择与 watch 使用边界。
 
 ## 选择决策
@@ -70,10 +72,10 @@ const viewModel = reactive({
 「嵌套 reactive」这一条属机制类结论（依据 Vue 的代理身份语义），
 成立理由已写明，可用一个最小复现验证。
 
-> 见 frontend/examples/golden/README.md「示例教什么、不教什么」。
+> 见 `frontend/examples/golden/README.md`「示例教什么、不教什么」。
 
 ### computed
-- 派生值一律 computed，不冗余存一份（见 frontend/rules/store.md）。
+- 派生值一律 computed，不冗余存一份（见 `frontend/rules/store.md`「派生值实时计算（selector/计算属性），不冗余存一份」）。
 - computed 内禁止副作用（请求、赋值、写 Store）。
 
 ---

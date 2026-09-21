@@ -44,19 +44,15 @@
 
 ## 正例指针
 
-- `frontend/test/vue/src/pages/TicketListPage.vue`：页面只做组装和传递，状态全部来自 Hook。
-
-- `frontend/test/vue/src/hooks/useTicketQuery.ts`：筛选编排收敛于 Hook，页面不持有转换逻辑。
-
-- `frontend/test/vue/src/hooks/useTicketList.ts`：列表加载与五态由 Hook 承担，页面只消费结果。
+- `frontend/examples/golden/list-page.md`「6. 页面只做组装」：页面只做组装和传递，状态全部来自 Hook；筛选编排收敛于 Hook，页面不持有转换逻辑；列表加载与五态由 Hook 承担，页面只消费结果。
 
 ## 反例指针（`frontend/examples/golden/anti-examples.md`，标题原文引用，不编新条号）
 
-- “10. 页面承担 13 个函数”：来源 `frontend/test/react/src/pages/UserListPage.tsx`，13 个处理函数全堆页面。
+- 「10. 页面承担 13 个函数」：13 个处理函数全堆页面。
 
-- “1. 页面直接调用 Service”：来源 `frontend/test/react/src/pages/UserListPage.tsx:16, 155-190`，确认→请求→反馈→刷新落在页面。
+- 「1. 页面直接调用 Service」：确认→请求→反馈→刷新落在页面。
 
-- “11. Logic 层空转”：Hook 直调 Service、规则散落页面组件，Logic 只做参数拼装。
+- 「11. Logic 层空转」：Hook 直调 Service、规则散落页面组件，Logic 只做参数拼装。
 
 ## 自检指针（`frontend/checklists/detailed-check.md`，用小节名）
 

@@ -5,3 +5,5 @@
 - Requires final deliverables contain only mature product content with no demos, process artifacts, iteration comments, scaffolding configs, or code left behind. Confidence: 0.9
 - Prefers AI-oriented specs optimized for on-demand lookup: clear directory overview plus precise, retrievable numbering/IDs with absolute alignment to avoid misleading AI. Confidence: 0.85
 - Prefers Chinese-language discussion and responses. Confidence: 0.8
+- Requires explicit user confirmation before final submission/landing; pauses for approval rather than auto-proceeding. Confidence: 0.9
+- Requires safety checkpoint via local git commit before starting risky or large-scale changes to prevent loss of work progress. Confidence: 0.85

@@ -15,9 +15,8 @@ r"""引用校验脚本（C5 引用可验伪的可执行形态）。
   写 P1–P4（不写成"第 N 节"），按 PASS 处理。
 
 扫描范围：规范库根下全部 *.md，排除 .git/、node_modules/、
-frontend/test/*/src/**（fixture 源码无散文引用）、.internal-docs/（过程记录非规范正文）、
-.workbuddy-ai/（项目数据非规范正文）、
-SPEC-GAPS.md（时点快照，已声明失效，不追溯改写；引用其结论前须复验当前文件）。
+.internal-docs/（过程记录非规范正文）、
+.workbuddy-ai/（项目数据非规范正文）。
 
 用法：python scripts/check-citations.py [<SPEC_ROOT>] [--strict] [--verbose]
 退出码：0 通过；1 有 FAIL（--strict 下 WARN 也算）。
@@ -31,7 +30,6 @@ ROOT = os.path.abspath(_ARGS[0]) if _ARGS else \
     os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SKIP_DIRS = {".git", "node_modules", ".internal-docs", ".workbuddy-ai", "vendor"}
-SKIP_FILES = {"SPEC-GAPS.md"}
 ID_FILES = {"common/rules/constitution.md", "AGENTS.md"}
 
 RE_C = re.compile(r"\bC\d+\b")
@@ -60,13 +58,7 @@ def md_files():
     out = []
     for dirpath, dirnames, filenames in os.walk(ROOT):
         dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS]
-        rel_dir = os.path.relpath(dirpath, ROOT)
-        if rel_dir.startswith(os.path.join("frontend", "test") + os.sep) \
-                and "src" in rel_dir.split(os.sep):
-            continue
         for fn in sorted(filenames):
-            if fn in SKIP_FILES:
-                continue
             if fn.endswith(".md"):
                 out.append(os.path.join(dirpath, fn))
     return out
