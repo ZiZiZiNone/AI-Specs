@@ -15,3 +15,11 @@ class DuplicateKeyException extends \RuntimeException
 }
 
 class NotFoundException extends \RuntimeException {}
+
+class ConflictException extends \RuntimeException
+{
+    public function __construct(public readonly string $key)
+    {
+        parent::__construct('payload conflict for key: ' . $key);
+    }
+}

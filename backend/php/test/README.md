@@ -2,7 +2,7 @@
 
 路径基准：本文路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
 
-本目录为 `backend/php/` 最小可运行切片：创建订单（幂等键 + 事务边界），零依赖（无 Composer 包），`php test/run.php` 即跑。
+本目录为 `backend/php/` 最小可运行切片：创建订单（幂等键 + 事务边界），零依赖（无 Composer 包），`php test/run.php` 即跑。需 PHP 8.2+（readonly 类）；本机实测 8.4.7。
 
 ## 运行
 

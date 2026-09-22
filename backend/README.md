@@ -52,7 +52,7 @@
 | `concurrency.md` | 并发处理（**仅 Go**；PHP 传统 FPM 模型无对应物，不建该文件） |
 | `transaction.md` | 事务边界与迁移（Go 与 PHP 各一份，`backend/checklists/detailed-check.md`「事务检查」的规则源） |
 
-注：`common/rules/` 用单数 `comment.md`，后端用复数 `comments.md`，系历史命名，含义一致。
+注：`common/rules/` 用单数 `comment.md`，后端用复数 `comments.md`，系历史命名，含义一致。本表文件名为主题名，完整路径为 `backend/go/<名>` 与 `backend/php/<名>`（`concurrency.md` 仅前者）；按需取用，不全量通读。
 
 接口设计（HTTP 契约、业务错误码、分页、幂等、版本化）属前后端共用，见 `common/rules/api-contract.md`「响应信封」。
 

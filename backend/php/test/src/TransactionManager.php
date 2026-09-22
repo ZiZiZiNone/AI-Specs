@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace BackendPhpTest;
 
-// 事务管理器：闭包成功提交，失败回滚。仓储默认靠本定界执行，不收事务参数。
+// 事务管理器：闭包成功提交，失败回滚；提交失败同样走统一回滚口，不分叉计数。
+// 零依赖演示故直接依赖内存仓储，生产替换为框架绑定实现。
 class TransactionManager
 {
     public function __construct(private MemoryOrderRepository $repo) {}
@@ -19,7 +20,12 @@ class TransactionManager
             $this->repo->rollbackTx();
             throw $e;
         }
-        $this->repo->commitTx();
+        try {
+            $this->repo->commitTx();
+        } catch (\Throwable $e) {
+            $this->repo->rollbackTx();
+            throw $e;
+        }
         return $result;
     }
 }

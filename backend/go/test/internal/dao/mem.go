@@ -2,6 +2,7 @@ package dao
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sort"
 	"sync"
@@ -57,11 +58,15 @@ func (s *MemStore) FailInsertWith(err error) {
 
 // Transact 串行执行闭包：失败丢弃本事务暂存并计数回滚，成功原子落子。
 // 闭包体内的数据操作按次持有数据锁，本方法不跨闭包持锁，故无死锁。
+// 不支持嵌套事务，嵌套调用直接返回错误。
 func (s *MemStore) Transact(ctx context.Context, fn func(ctx context.Context) error) error {
 	s.txMu.Lock()
 	defer s.txMu.Unlock()
 	if err := ctx.Err(); err != nil {
 		return err
+	}
+	if getTx(ctx) != nil {
+		return errors.New("nested transaction not supported")
 	}
 	tx := &memTx{stagedKeys: make(map[string]struct{})}
 	if err := fn(withTx(ctx, tx)); err != nil {
@@ -85,8 +90,11 @@ func (s *MemStore) Transact(ctx context.Context, fn func(ctx context.Context) er
 	return nil
 }
 
-// Insert 写入订单，幂等键全局唯一；冲突返回 DuplicateKeyError。
+// Insert 写入订单，幂等键全局唯一；空键直接拒绝，不落存储；冲突返回 DuplicateKeyError。
 func (s *MemStore) Insert(ctx context.Context, in model.CreateOrderInput) (model.OrderResult, error) {
+	if in.IdempotencyKey == "" {
+		return model.OrderResult{}, model.ErrValidation
+	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	s.insertCalls++
@@ -109,6 +117,7 @@ func (s *MemStore) Insert(ctx context.Context, in model.CreateOrderInput) (model
 		IdempotencyKey: in.IdempotencyKey,
 		UserID:         in.UserID,
 		AmountCents:    in.AmountCents,
+		CouponCode:     in.CouponCode,
 	}
 	if tx := getTx(ctx); tx != nil {
 		tx.staged = append(tx.staged, row)

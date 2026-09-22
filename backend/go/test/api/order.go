@@ -28,6 +28,7 @@ type OrderResponse struct {
 	ID          string
 	UserID      string
 	AmountCents int64
+	CouponCode  string
 }
 
 // ToResponse 转为响应形态。
@@ -36,5 +37,6 @@ func ToResponse(res model.OrderResult) OrderResponse {
 		ID:          res.ID,
 		UserID:      res.UserID,
 		AmountCents: res.AmountCents,
+		CouponCode:  res.CouponCode,
 	}
 }

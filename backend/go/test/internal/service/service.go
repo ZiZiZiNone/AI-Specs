@@ -10,4 +10,5 @@ import (
 // OrderService 订单用例接口。
 type OrderService interface {
 	Create(ctx context.Context, in model.CreateOrderInput) (model.OrderResult, error)
+	List(ctx context.Context, filter model.OrderFilter) ([]model.OrderResult, int, error)
 }

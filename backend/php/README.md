@@ -13,6 +13,17 @@
 - 业务逻辑不得接收传输对象，不得使用静态门面，依赖经构造注入。
 - 所有逻辑单元必须可单测，不起服务，不连真实库。
 
+## 框架差异
+
+涉及 Laravel 时再进入 `backend/php/laravel/`，无对应文件即无差异：
+
+- `backend/php/laravel/README.md`：二级目录入口与差异证明规则
+- `backend/php/laravel/structure.md`：控制器、服务、仓储、表单请求与资源的 Laravel 落点
+- `backend/php/laravel/config.md`：配置收敛专属文件、敏感键只读环境
+- `backend/php/laravel/error-handling.md`：异常处理器集中映射、队列异常独立
+- `backend/php/laravel/logging.md`：容器注入日志接口、通道划分与队列标识
+- `backend/php/laravel/testing.md`：替身仓储单测、内存库特性测试、外部伪造
+
 ## 检查清单
 
 - [ ] 读取顺序为通用先于 PHP 先于 Laravel

@@ -9,6 +9,9 @@ var ErrValidation = errors.New("invalid order input")
 // ErrNotFound 按键查询无结果。
 var ErrNotFound = errors.New("order not found")
 
+// ErrConflict 同键载荷不一致：用户、金额等关键载荷与首次结果不符。
+var ErrConflict = errors.New("idempotency payload conflict")
+
 // CreateOrderInput 创建订单输入，字段均为业务含义，不含传输对象。
 type CreateOrderInput struct {
 	IdempotencyKey string
@@ -29,12 +32,13 @@ func (in CreateOrderInput) Validate() error {
 	return nil
 }
 
-// OrderResult 订单创建结果。
+// OrderResult 订单创建结果，含全部比对载荷。
 type OrderResult struct {
 	ID             string
 	IdempotencyKey string
 	UserID         string
 	AmountCents    int64
+	CouponCode     string
 }
 
 // OrderFilter 列表过滤结构，分页从 1 起计。

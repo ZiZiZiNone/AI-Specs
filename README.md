@@ -59,8 +59,8 @@
 │   └── examples/        示例与风格指南（golden，自包含）
 ├── backend/             后端专属规范（见 backend/README.md）
 │   ├── README.md        导航入口：共用分层原则、主题文件清单、现有技术栈
-│   ├── go/              Go 语言级主题 + goframe/ 框架差异
-│   ├── php/             PHP 语言级主题 + laravel/ 框架差异
+│   ├── go/              Go 语言级主题 + goframe/ 框架差异 + test/ 可运行样例
+│   ├── php/             PHP 语言级主题 + laravel/ 框架差异 + test/ 可运行样例
 │   ├── protocol/        决策流程图
 │   ├── patterns/        列表查询 / 创建幂等 / 多表写事务标准模式
 │   ├── anti-patterns/   胖控制器 / 全局数据访问 / 万能服务 / 仓储越界与对策

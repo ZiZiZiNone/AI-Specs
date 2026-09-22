@@ -41,14 +41,11 @@ class MemoryOrderRepository implements OrderRepositoryInterface
         $this->stagedKeys = [];
     }
 
-    // 由事务管理器调用：原子落子。
+    // 由事务管理器调用：原子落子；冲突只抛错不清场，清场走统一回滚口。
     public function commitTx(): void
     {
         foreach ($this->stagedKeys as $k => $_) {
             if (isset($this->byKey[$k])) {
-                $this->staged = null;
-                $this->stagedKeys = null;
-                $this->rollbacks++;
                 throw new DuplicateKeyException($k);
             }
         }
@@ -75,6 +72,9 @@ class MemoryOrderRepository implements OrderRepositoryInterface
 
     public function insert(OrderInput $in): OrderResult
     {
+        if ($in->idempotencyKey === '') {
+            throw new ValidationException('invalid order input');
+        }
         $this->insertCalls++;
         if ($this->failInsert !== null) {
             $e = $this->failInsert;
@@ -93,6 +93,7 @@ class MemoryOrderRepository implements OrderRepositoryInterface
             idempotencyKey: $in->idempotencyKey,
             userId: $in->userId,
             amountCents: $in->amountCents,
+            couponCode: $in->couponCode,
         );
         if ($this->staged !== null) {
             $this->staged[] = $row;

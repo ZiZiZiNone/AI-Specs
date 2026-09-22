@@ -12,5 +12,6 @@ final readonly class OrderResult
         public string $idempotencyKey,
         public string $userId,
         public int $amountCents,
+        public string $couponCode,
     ) {}
 }

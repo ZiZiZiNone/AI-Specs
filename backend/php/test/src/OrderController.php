@@ -16,7 +16,8 @@ class OrderController
             idempotencyKey: (string) ($request['idempotencyKey'] ?? ''),
             userId: (string) ($request['userId'] ?? ''),
             amountCents: (int) ($request['amountCents'] ?? 0),
+            couponCode: (string) ($request['couponCode'] ?? ''),
         ));
-        return ['id' => $result->id, 'userId' => $result->userId, 'amountCents' => $result->amountCents];
+        return ['id' => $result->id, 'userId' => $result->userId, 'amountCents' => $result->amountCents, 'couponCode' => $result->couponCode];
     }
 }
