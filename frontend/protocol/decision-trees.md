@@ -297,7 +297,6 @@ interface Options {
 - Checkbox / Radio / Switch
 - Slider / Rating
 - DatePicker / TimePicker
-- ColorPicker
 
 ### 黑名单（不允许自持状态）
 - 业务列表组件

@@ -86,7 +86,7 @@ function withTimeout(timeoutMs: number, externalSignal?: AbortSignal) {
 ## 3. 幂等性决定是否重试
 
 **解决的问题**：对 POST 重试会重复创建资源（重复工单/订单），
-属数据正确性缺陷。默认只对幂等方法开启。
+属数据正确性缺陷。默认只对 GET 开启，PUT / DELETE 按项目声明显式开启。
 
 来源：`services/httpClient.ts` + `services/ticket.service.ts`
 

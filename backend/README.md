@@ -4,7 +4,7 @@
 
 后端专属规范。与 `common/`、`frontend/` 平级。
 
-**状态**：导航入口与共用分层原则已建立（本文）；语言子树、`backend/tasks/` 与 `backend/checklists/` 待建，见 `<SPEC_ROOT>/README.md`「TODO」与「覆盖范围」。
+**状态**：导航入口、共用分层原则、语言子树（`backend/go/`、`backend/php/`）、`backend/tasks/` 与 `backend/checklists/` 均已建立。
 
 ## 用法
 
@@ -31,7 +31,7 @@
 - 依赖经参数或构造函数显式传入，不用全局单例、静态门面（Facade）、服务定位器
 - 逻辑单元必须可脱离宿主单测（不起 HTTP 服务）
 
-## 计划中的子目录
+## 现有子目录
 
 每个语言子树采用「语言级通用 + 框架二级目录」两层，**一主题一文件**：
 
@@ -50,18 +50,31 @@
 | `performance.md` | 性能 |
 | `security.md` | 安全 |
 | `concurrency.md` | 并发处理（**仅 Go**；PHP 传统 FPM 模型无对应物，不建该文件） |
+| `transaction.md` | 事务边界与迁移（Go 与 PHP 各一份，`backend/checklists/detailed-check.md`「事务检查」的规则源） |
 
-接口设计（HTTP 契约、业务错误码、分页、幂等、版本化）属前后端共用，规划于 `common/`，见 `common/rules/api-contract.md`「响应信封」。
+注：`common/rules/` 用单数 `comment.md`，后端用复数 `comments.md`，系历史命名，含义一致。
+
+接口设计（HTTP 契约、业务错误码、分页、幂等、版本化）属前后端共用，见 `common/rules/api-contract.md`「响应信封」。
 
 框架二级目录**只写该框架真正引入差异的主题**，不为凑齐主题文件而写。
 
-## 计划中的技术栈
+## 现有技术栈
 
 | 子树 | 技术栈 | 状态 |
 |---|---|---|
-| `php/` | PHP 8.3+ 语言级通用 + Laravel 13 | 待建 |
-| `go/` | Go 语言级通用 + GoFrame v2.10 | 待建 |
+| `php/` | PHP 8.3+ 语言级通用 + Laravel 13 | 已建 |
+| `go/` | Go 语言级通用 + GoFrame v2.10 | 已建 |
 
-样例工程：Go 侧计划建于 `backend/go/test/`，须实跑 `go build` 与 `go test`；
-PHP 侧因本机 Composer 不可用，暂不建样例，交付时按 `common/protocol/final-gate.md`
-「无法验证时的处理」声明未验证项。
+## 现有横向目录
+
+- `backend/protocol/`：决策流程图，遇分层、事务、重试、复用决策点时取用。
+- `backend/patterns/`：列表查询、创建幂等、多表写事务标准模式。
+- `backend/anti-patterns/`：胖控制器、全局数据访问、万能服务、仓储越界与对策。
+- `backend/examples/`：自包含示例与负向示例集，拿不准写法时取用。
+
+## 任务模板与自检清单
+
+- `backend/tasks/`：Feature、Bugfix、Refactor、Review 输出模板。
+- `backend/checklists/`：自检清单与详细清单。
+
+样例工程：Go 见 `backend/go/test/`（标准库零依赖，已实跑构建、检查与测试）；PHP 见 `backend/php/test/`（零依赖，已实跑 lint 与测试脚本）。命令见各样例 README。

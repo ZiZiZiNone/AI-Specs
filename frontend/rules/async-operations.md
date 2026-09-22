@@ -389,13 +389,13 @@ window.addEventListener('scroll', throttle(onScroll, 200));
 
 ```
 问：该请求重复执行是否会产生第二份副作用？
-  ├─ 否（GET / PUT / DELETE，天然幂等）→ 允许自动重试
+  ├─ 否（GET 天然幂等；PUT / DELETE 是否默认重试按业务项目声明）→ GET 允许自动重试，PUT / DELETE 需显式开启
   └─ 是（POST 等非幂等写操作）→ 禁止自动重试
        └─ 确需重试时，必须由后端支持幂等键（Idempotency-Key）后才可开启
 ```
 
 **强制要求**：
-- 自动重试默认只对幂等请求开启（GET/PUT/DELETE）
+- 自动重试默认只对 GET 开启；PUT / DELETE 按业务项目声明，需显式 `retryable: true`（见 `common/rules/api-contract.md`「幂等与重试」）
 - POST 等非幂等操作**禁止自动重试**，失败后交由用户手动触发
 - 请求封装必须提供显式开关（如 `retryable`），不允许对所有方法一律重试
 - 违反后果：网络抖动会造成重复创建（重复订单、重复工单），属数据正确性缺陷而非体验问题

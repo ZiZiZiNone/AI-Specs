@@ -63,7 +63,7 @@
 按 README「加载策略」按需读取其余文件，禁止全量通读。
 ```
 
-本机已按此方式配置全局 `C:\Users\HKX\AGENTS.md`。
+本机已按此方式配置全局 `C:\Users\HKX\AGENTS.md`（示例为本机路径，换机替换）。
 
 ---
 
@@ -127,9 +127,9 @@ common/protocol/task-boundary.md，再开始。
    - 前端 → `frontend/`，再读判定出的语言子树（`frontend/frameworks/vue3/` 或 `frontend/frameworks/miniprogram/`）→ 其 `ui/<组件库>/` 二级目录
    - 后端 → `backend/`，再读判定出的语言子树与其框架二级目录
    - 无对应目录时仅遵循 `common/` 通用规范，**不套用其他技术栈的规则**
-5. **按需取用模式与决策** —— 遇决策点读 `frontend/protocol/decision-trees.md`，
-   命中页面类型读 `frontend/patterns/`，拿不准写法读 `frontend/examples/golden/`。
-6. **交付前验收** —— 过对应子树的自检清单（前端：`frontend/checklists/`）与 `common/protocol/final-gate.md`，
+5. **按需取用模式与决策** —— 遇决策点读对应端 decision-trees（前端：`frontend/protocol/decision-trees.md`；后端：`backend/protocol/decision-trees.md`），
+   命中页面类型读 `frontend/patterns/`，命中后端读写类型读 `backend/patterns/`，拿不准写法读对应端 `examples/golden/`。
+6. **交付前验收** —— 过对应子树的自检清单（前端：`frontend/checklists/`；后端：`backend/checklists/`）与 `common/protocol/final-gate.md`，
    构建 / 类型检查 / 测试实际执行。
 
 **不要**在第 2 步之后就把规范库读完。README 的「加载策略」明确写着「禁止全量通读」，
@@ -158,10 +158,9 @@ common/protocol/task-boundary.md，再开始。
 |---|---|---|
 | `common/` | **可用** | 宪法、四条通用原则、`common/rules/`、`common/protocol/`；与语言、框架、端无关，任何项目均适用 |
 | `frontend/` | **可用** | `frontend/rules/`、`frontend/protocol/`、`frontend/patterns/`、`frontend/anti-patterns/`、`frontend/tasks/`、`frontend/checklists/`、`frontend/examples/`、`frontend/frameworks/vue3/`、`frontend/frameworks/miniprogram/` |
-| `backend/` | **部分可用** | 导航入口与共用分层原则已建立（`backend/README.md`）；语言子树、`backend/tasks/` 与 `backend/checklists/` 待建 |
+| `backend/` | **可用** | 导航入口、共用分层原则、语言子树（`backend/go/`、`backend/php/`）、`backend/tasks/` 输出模板、`backend/checklists/` 自检清单 |
 
-`backend/` 的语言子树尚未建立时，后端任务按 `common/` 通用规范与 `backend/README.md`
-的共用分层原则执行；遇到框架专属决策点应提问而非自行发挥。
+后端任务按 `common/` 通用规范、`backend/README.md` 的共用分层原则与对应语言子树执行；遇到框架专属决策点应提问而非自行发挥。
 
 ---
 

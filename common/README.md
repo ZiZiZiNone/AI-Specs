@@ -50,7 +50,7 @@
 | 端 | 子树 | 通用原则的落地文件 |
 |---|---|---|
 | 前端 | `frontend/` | `frontend/rules/core-principles.md`（FE-101 至 FE-104） |
-| 后端（PHP） | `backend/php/`（待建） | 该子树的 `structure.md`（待建） |
-| 后端（Go） | `backend/go/`（待建） | 该子树的 `structure.md`（待建） |
+| 后端（PHP） | `backend/php/` | 该子树的 `structure.md` |
+| 后端（Go） | `backend/go/` | 该子树的 `structure.md` |
 
 后端分层的共用约定见 `backend/README.md`。

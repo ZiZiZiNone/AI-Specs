@@ -22,7 +22,7 @@
 ## 禁用相对
 
 - `from './…'`、`from '../…'` 一律违规，含同目录兄弟文件；跨目录必须 `@/`。
-- 覆盖静态 `import` / `export … from` 与动态 `import()`（含路由懒加载）。
+- 覆盖静态 `import` / `export … from`、动态 `import()`（含路由懒加载）与 `require()`。
 - CSS `@import` / `url()` 与模板静态资源豁免。
 
 ## 后缀

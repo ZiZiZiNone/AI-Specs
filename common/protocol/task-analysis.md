@@ -13,7 +13,7 @@
 
 ## 流程
 - 第一步判定任务类型（见上），按对应任务规范走流程
-  （前端见 `frontend/tasks/` 对应文件；后端任务按 `common/protocol/task-boundary.md`「授权面三档」定档，语言子树待建期间仅遵循 `common/` 通用规范与 `backend/README.md` 共用分层原则）。
+  （前端见 `frontend/tasks/` 对应文件；后端见 `backend/tasks/` 对应文件）。
 - 第二步确定授权面（只读 / 定向写 / 开放写），见 `common/protocol/task-boundary.md`「授权面三档」："拿不准就是**只读档**，不是开放写档"；拿不准按只读档。
 - 分析需求来源、目标、范围、边界与验收标准。
 - 信息不足时按 `common/protocol/requirement-completeness.md`「检查项」："阻塞项（影响开工与验收的，如目标、验收标准、接口字段）列出并先确认"分级处理：

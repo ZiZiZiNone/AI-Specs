@@ -6,7 +6,7 @@
 四条通用原则，前端与后端**同等适用**。抽象层只有这四条，具体形态按语言/框架落地：
 
 - 前端落地与量化标准：`frontend/rules/core-principles.md`（FE-101 至 FE-104）
-- 后端落地：语言子树待建期间见 `backend/README.md`「分层原则（PHP / Go 共用）」，落地后见各子树 `structure.md`
+- 后端落地：`backend/README.md`「分层原则（PHP / Go 共用）」与各子树 `structure.md`
 
 本文不设条款级编号（COM-011 规定条款级编号只存在于 `common/rules/constitution.md` 的 COM-007 至 COM-012
 与 `AGENTS.md` 的 FE-000 至 FE-005）。引用本文时写「编号 + 文件路径 + 原文逐字摘录」，或直接用小节标题。
@@ -73,7 +73,7 @@
 | 前端 | `Page/Component → Hook → Logic → Service` | `frontend/rules/core-principles.md`（FE-104 单向数据流原则） |
 | 后端 | `入口 → 业务（Logic / Service）→ 数据（DAO / Repository）` | `backend/README.md`「分层原则（PHP / Go 共用）」 |
 
-后端的具体落地形态因框架而异，见 `backend/README.md`「分层原则（PHP / Go 共用）」与各子树 `structure.md`（待建），不可套用同一条线性链条。
+后端的具体落地形态因框架而异，见 `backend/README.md`「分层原则（PHP / Go 共用）」与各子树 `structure.md`，不可套用同一条线性链条。
 
 本表只列方向概览，**细节与改动以「唯一来源」列为准**，避免同一结论两处各写一遍而漂移。
 

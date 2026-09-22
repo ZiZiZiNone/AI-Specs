@@ -32,10 +32,9 @@
 |---|---|---|
 | `common/` | **可用** | 前后端通用：宪法、四条通用原则、接口契约、命名 / 注释 / 测试 / 重构 / 复用 / 性能 / 业务规则 / 项目 README 规范、任务边界与验收协议 |
 | `frontend/` | **可用** | Vue 3 与微信小程序；含 `frontend/rules/`、`frontend/protocol/`、`frontend/patterns/`、`frontend/anti-patterns/`、`frontend/tasks/`、`frontend/checklists/`、`frontend/examples/`、`frontend/frameworks/` |
-| `backend/` | **部分可用** | 导航入口与共用分层原则已建立（`backend/README.md`）；语言子树、`backend/tasks/` 与 `backend/checklists/` 待建 |
+| `backend/` | **可用** | 导航入口、共用分层原则、语言子树（`backend/go/`、`backend/php/`）、`backend/tasks/` 输出模板、`backend/checklists/` 自检清单、决策协议、标准模式、反模式、自包含示例 |
 
-`backend/` 的语言子树尚未建立时，后端任务按 `common/` 通用规范与 `backend/README.md`
-的共用分层原则执行；遇到框架专属决策点应提问而非自行发挥（COM-007）。
+后端任务按 `common/` 通用规范、`backend/README.md` 的共用分层原则与对应语言子树执行；遇到框架专属决策点应提问而非自行发挥（COM-007）。
 
 ## 目录结构
 
@@ -44,6 +43,7 @@
 ├── README.md            本文件：全局入口、路径基准、覆盖范围、加载策略、使用说明
 ├── AGENTS.md            行为规则（AI 行为约束，非规范正文）
 ├── INTEGRATION.md       接入外部项目的四种方式与常见接入错误
+├── INDEX.md               确定性检索入口（编号定义源 + 按需查阅）
 ├── common/              前后端通用规范（见 common/README.md）
 │   ├── principles.md    四条通用原则 + 极致解耦总纲
 │   ├── rules/           宪法、接口契约、命名、注释、测试、重构、复用、性能、业务规则、项目 README
@@ -58,11 +58,19 @@
 │   ├── frameworks/      vue3/、miniprogram/（各自含 ui/<组件库>/）
 │   └── examples/        示例与风格指南（golden，自包含）
 ├── backend/             后端专属规范（见 backend/README.md）
-│   └── README.md        导航入口：共用分层原则、主题文件清单、计划技术栈
+│   ├── README.md        导航入口：共用分层原则、主题文件清单、现有技术栈
+│   ├── go/              Go 语言级主题 + goframe/ 框架差异
+│   ├── php/             PHP 语言级主题 + laravel/ 框架差异
+│   ├── protocol/        决策流程图
+│   ├── patterns/        列表查询 / 创建幂等 / 多表写事务标准模式
+│   ├── anti-patterns/   胖控制器 / 全局数据访问 / 万能服务 / 仓储越界与对策
+│   ├── examples/        自包含示例与负向示例集（golden，自包含）
+│   ├── tasks/           后端任务输出模板
+│   └── checklists/      后端自检清单
 └── scripts/             引用校验脚本（见下「校验脚本」）
 ```
 
-`.internal-docs/` 为过程留痕，不受规范约束，检索时排除。
+目录树仅列骨架，目录内 README 为入口，不逐文件展开；如存在 `.internal-docs/`，则为过程留痕，不受规范约束，检索时排除。
 
 ## 加载策略
 
@@ -80,9 +88,13 @@
 | 前端 | `frontend/README.md` → 判定出的语言子树（`frontend/frameworks/vue3/` 或 `frontend/frameworks/miniprogram/`）→ 其 `ui/<组件库>/` 二级目录 |
 | 后端 | `backend/README.md` → 判定出的语言子树与其框架二级目录 |
 | 命中页面/接口模式 | `frontend/patterns/` |
+| 命中后端读写类型 | `backend/patterns/` |
 | 遇决策点 | `frontend/protocol/decision-trees.md` |
+| 遇后端分层/事务/重试/复用决策点 | `backend/protocol/decision-trees.md` |
 | 拿不准写法 | `frontend/examples/golden/` |
-| 实现完成后 | 对应子树的自检清单（前端：`frontend/checklists/`）、`common/protocol/final-gate.md` |
+| 拿不准后端写法 | `backend/examples/golden/` |
+| 事务/迁移 | 对应语言 `backend/go/transaction.md` 或 `backend/php/transaction.md`「规则」 |
+| 实现完成后 | 对应子树的自检清单（前端：`frontend/checklists/`；后端：`backend/checklists/`）、`common/protocol/final-gate.md` |
 
 ## 工作流
 
@@ -93,8 +105,8 @@
 4. **判定技术栈并进入对应子树** —— 读项目依赖（`package.json` / `composer.json` / `go.mod`）：
    前端 → `frontend/`；后端 → `backend/`；无对应目录时仅遵循 `common/` 通用规范，
    **不套用其他技术栈的规则**
-5. **按需取用模式与决策** —— `frontend/patterns/`、`frontend/protocol/decision-trees.md`
-6. **交付前验收** —— 过对应子树的自检清单（前端：`frontend/checklists/`）与 `common/protocol/final-gate.md`。
+5. **按需取用模式与决策** —— 对应端 patterns 与 decision-trees（前端：`frontend/patterns/`、`frontend/protocol/decision-trees.md`；后端：`backend/patterns/`、`backend/protocol/decision-trees.md`）
+6. **交付前验收** —— 过对应子树的自检清单（前端：`frontend/checklists/`；后端：`backend/checklists/`）与 `common/protocol/final-gate.md`。
    **构建 / 类型检查 / 测试必须实际执行**；执行不了则显式声明未验证项，
    不得以"代码已写完"当作完成
 
@@ -102,7 +114,7 @@
 
 本库为**纯文档库**，无依赖、无构建产物。
 
-- **前置**：仅「校验脚本」需要 Python 3.10+（本机已装 3.13）。
+- **前置**：仅「校验脚本」需要 Python 3.10+（本机实测 3.11.15）。
 - **获取**：本库不拷贝进业务项目，按 `INTEGRATION.md` 的任一方式**引用**即可，无需安装步骤。
 - 业务项目自身的前置依赖（运行时版本、系统依赖）由该项目根 `README.md` 负责记录，
   要求见 `common/rules/readme.md`。
@@ -130,7 +142,7 @@ python scripts/check-citations.py            # 退出码 0 通过，1 有 FAIL
 python scripts/check-citations.py --strict   # WARN 也计为 FAIL
 
 # 导入路径校验（frontend/rules/import-path.md 的可执行形态）
-python scripts/check-import-path.py <业务源码目录>   # 业务项目传入自家 src/ 或 miniprogram/
+python scripts/check-import-path.py <业务源码目录>   # 业务项目传入自家 src/ 或 miniprogram/，例：python scripts/check-import-path.py ./src
 ```
 
 ## 开发到生产的配置与部署变化
@@ -151,7 +163,7 @@ python scripts/check-import-path.py <业务源码目录>   # 业务项目传入�
 本库**无单元测试**（非代码库）。替代验证手段是上述两个校验脚本，
 外加「引用可达性」自查：
 
-- 判据：`check-citations.py` 输出 **FAIL 0 且 WARN 0**；`check-import-path.py` 输出 **FAIL 0**。
+- 判据：`check-citations.py --strict` 输出 **FAIL 0 且 WARN 0**；`check-import-path.py` 输出 **FAIL 0**。
 - 数字（文件数、引用数）会随新增文件变化，**不作为判据**。
 - 改动规范后至少跑一次 `check-citations.py`；阶段收尾必须跑全部两项。
 
@@ -168,12 +180,11 @@ python scripts/check-import-path.py <业务源码目录>   # 业务项目传入�
 
 更多接入错误见 `<SPEC_ROOT>/INTEGRATION.md`「常见接入错误」。
 
-## TODO
+## 决议备忘
 
 | 项 | 影响面 | 状态 |
 |---|---|---|
-| 后建 `backend/go/`、`backend/php/` 语言子树（含 structure 落地）、`backend/tasks/`、`backend/checklists/` | 后端任务待建期间仅按 `common/` 通用规范与 `backend/README.md` 共用分层原则执行，框架专属决策点提问而非自行发挥 | 待做 |
-| 条款级编号方案：若引入新编号，须同步 COM-011 细则 | 当前为 COM-007 至 COM-012 与 FE-000 至 FE-005、FE-101 至 FE-104 | 已定 |
+| 条款级编号方案：若引入新编号，须同步 COM-011 细则 | 条款级两处（COM-007 至 COM-012、FE-000 至 FE-005）加编号小节例外（FE-101 至 FE-104） | 已定 |
 
 ## 演化
 

@@ -27,7 +27,7 @@
 **每次提交前必须执行**：
 1. 检查是否遵守 FE-000 至 FE-005 所有行为规则
 2. 使用对应子树的自检清单进行全面自检（前端 `frontend/checklists/detailed-check.md`；
-   后端语言子树待建期间按 `common/protocol/final-gate.md`「无法验证时的处理」声明未验证项，
+   后端 `backend/checklists/detailed-check.md`「适用性判定」，
    结合 `backend/README.md`「分层原则（PHP / Go 共用）」执行），
    先做「适用性判定」，不适用项须写明原因
 3. 实际执行构建、类型检查、测试；执行不了则按 common/protocol/final-gate.md 声明未验证项
