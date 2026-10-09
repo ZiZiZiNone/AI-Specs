@@ -4,10 +4,10 @@
 
 `<SPEC_ROOT>` 指规范库根目录，取值随部署方式变化：
 
-| 部署方式 | `<SPEC_ROOT>` 取值 | 适用 |
-|---|---|---|
-| 本机固定路径 | `C:\Users\HKX\Desktop\AI-Operating-System-v4.0` | 单机多项目共用，改规范立即生效 |
-| git submodule | 业务项目内 `.ai-spec` | 团队共享、跨机器、版本可锁 |
+| 部署方式      | `<SPEC_ROOT>` 取值              | 适用                           |
+| ------------- | ------------------------------- | ------------------------------ |
+| 本机固定路径  | `C:\Users\HKX\Desktop\AI-Specs` | 单机多项目共用，改规范立即生效 |
+| git submodule | 业务项目内 `.ai-spec`           | 团队共享、跨机器、版本可锁     |
 
 移动规范库或换机器后，把下文所有 `<SPEC_ROOT>` 替换为新取值。
 
@@ -30,7 +30,7 @@
 
 本项目的前端与后端开发**必须**遵循外部规范库，库根绝对路径：
 
-    C:\Users\HKX\Desktop\AI-Operating-System-v4.0
+    C:\Users\HKX\Desktop\AI-Specs
 
 记作 `<SPEC_ROOT>`。**写任何代码之前**，按顺序读完这四个文件，不得跳过：
 
@@ -56,9 +56,9 @@
 
 ```markdown
 做开发（前端 Vue 3 / 小程序，后端 PHP / Go）时，必须先读取外部规范库并遵循：
-库根 = C:\Users\HKX\Desktop\AI-Operating-System-v4.0
+库根 = C:\Users\HKX\Desktop\AI-Specs
 必读入口 = 库根/README.md → 库根/common/rules/constitution.md
-        → 库根/common/principles.md → 库根/common/protocol/task-boundary.md
+→ 库根/common/principles.md → 库根/common/protocol/task-boundary.md
 库内裸路径（common/xxx.md、frontend/xxx.md、backend/xxx.md 等）相对库根解析，不是业务项目根。
 按 README「加载策略」按需读取其余文件，禁止全量通读。
 ```
@@ -69,12 +69,12 @@
 
 ## 方式三：git submodule（团队共享 / 跨机器）
 
-远程仓库：`https://git.yztiot.com/mystw/Frontend-AI-Operating-System.git`
+远程仓库：`https://github.com/ZiZiZiNone/AI-Specs.git`
 
 在业务项目根执行：
 
 ```bash
-git submodule add https://git.yztiot.com/mystw/Frontend-AI-Operating-System.git .ai-spec
+git submodule add https://github.com/ZiZiZiNone/AI-Specs.git .ai-spec
 git commit -m "chore: add spec as submodule"
 ```
 
@@ -105,7 +105,7 @@ git commit -m "chore: add spec as submodule"
 ## 方式四：对话里直接给路径（临时）
 
 ```
-本次开发遵循 C:\Users\HKX\Desktop\AI-Operating-System-v4.0 的规范。
+本次开发遵循 C:\Users\HKX\Desktop\AI-Specs 的规范。
 先读该目录 README.md 与 common/rules/constitution.md、common/principles.md、
 common/protocol/task-boundary.md，再开始。
 ```
@@ -139,14 +139,14 @@ common/protocol/task-boundary.md，再开始。
 
 ## 常见接入错误
 
-| 错误 | 后果 | 正确做法 |
-|---|---|---|
-| 只写「遵循 XX 规范」不给绝对路径 | AI 找不到库，凭训练知识编一套"规范" | 必须给 `<SPEC_ROOT>` 绝对路径 |
-| 写「优先读取 README.md」（裸路径） | 解析到业务项目自己的 README（讲装依赖的那个） | 写全 `<SPEC_ROOT>/README.md` |
-| 把入口指向 `AGENTS.md` 就完事 | AGENTS 只是行为规则索引，通用原则/分层/模式全在别处，AI 以为读完了 | 入口必须是 README，它才有模块导航 |
-| 让 AI「先通读规范库」 | 上下文被规范占满，真正写代码时额度不足 | 按 README 加载策略按需读 |
-| 业务项目已有冲突的风格约定，未声明 | AI 静默取舍，两套规范混用 | 按 `common/rules/constitution.md`「用户明确要求优先于本规范」先说明冲突，由你决定优先级 |
-| 路径只写到 `rules/xxx.md` 形式 | 三分结构下裸路径首段必须是 `common/`/`frontend/`/`backend/`，否则不可解析 | 写全 `common/rules/xxx.md` |
+| 错误                               | 后果                                                                      | 正确做法                                                                                |
+| ---------------------------------- | ------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| 只写「遵循 XX 规范」不给绝对路径   | AI 找不到库，凭训练知识编一套"规范"                                       | 必须给 `<SPEC_ROOT>` 绝对路径                                                           |
+| 写「优先读取 README.md」（裸路径） | 解析到业务项目自己的 README（讲装依赖的那个）                             | 写全 `<SPEC_ROOT>/README.md`                                                            |
+| 把入口指向 `AGENTS.md` 就完事      | AGENTS 只是行为规则索引，通用原则/分层/模式全在别处，AI 以为读完了        | 入口必须是 README，它才有模块导航                                                       |
+| 让 AI「先通读规范库」              | 上下文被规范占满，真正写代码时额度不足                                    | 按 README 加载策略按需读                                                                |
+| 业务项目已有冲突的风格约定，未声明 | AI 静默取舍，两套规范混用                                                 | 按 `common/rules/constitution.md`「用户明确要求优先于本规范」先说明冲突，由你决定优先级 |
+| 路径只写到 `rules/xxx.md` 形式     | 三分结构下裸路径首段必须是 `common/`/`frontend/`/`backend/`，否则不可解析 | 写全 `common/rules/xxx.md`                                                              |
 
 ---
 
@@ -154,11 +154,11 @@ common/protocol/task-boundary.md，再开始。
 
 本库并非各技术栈均已完备，接入时按下表预期：
 
-| 部分 | 状态 | 说明 |
-|---|---|---|
-| `common/` | **可用** | 宪法、四条通用原则、`common/rules/`、`common/protocol/`；与语言、框架、端无关，任何项目均适用 |
+| 部分        | 状态     | 说明                                                                                                                                                                                                                       |
+| ----------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `common/`   | **可用** | 宪法、四条通用原则、`common/rules/`、`common/protocol/`；与语言、框架、端无关，任何项目均适用                                                                                                                              |
 | `frontend/` | **可用** | `frontend/rules/`、`frontend/protocol/`、`frontend/patterns/`、`frontend/anti-patterns/`、`frontend/tasks/`、`frontend/checklists/`、`frontend/examples/`、`frontend/frameworks/vue3/`、`frontend/frameworks/miniprogram/` |
-| `backend/` | **可用** | 导航入口、共用分层原则、语言子树（`backend/go/`、`backend/php/`）、`backend/tasks/` 输出模板、`backend/checklists/` 自检清单 |
+| `backend/`  | **可用** | 导航入口、共用分层原则、语言子树（`backend/go/`、`backend/php/`）、`backend/tasks/` 输出模板、`backend/checklists/` 自检清单                                                                                               |
 
 后端任务按 `common/` 通用规范、`backend/README.md` 的共用分层原则与对应语言子树执行；遇到框架专属决策点应提问而非自行发挥。
 
