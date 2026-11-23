@@ -126,3 +126,11 @@ this.setData({ [`list[${index}].status`]: 'done' })
 - [ ] 页面业务数据在 logic + 页面 `data`，不在 `globalData`
 - [ ] `globalData` 只有会话/用户/配置/未读数四类，走 `app.ts` 统一入口改写
 - [ ] 刷新保持的状态走 query + storage，读写在 logic 内
+
+## v2.0 小程序 `setData` 量化红线与性能优化
+
+- **纠正“万级才路径更新”误区**：微信小程序单次 `setData` 数据量硬上限为 **1024KB**，且逻辑层到视图层需跨线程 JSON 序列化。百条图文列表整包覆写即可引发明显掉帧。
+- **强制规范**：
+  1. 分页加载采用**二维分页数组**（`listPages[pageIndex]`）或精确路径追加（`setData({ ['items[' + idx + ']']: item })`），避免整数组回写；
+  2. 仅用于逻辑控制、不参与 WXML 渲染的字段（如 `requestGuard`、定时器句柄、原始分页游标）**严禁放入 `data`**，须挂载在页面/组件实例属性或声明 `pureDataPattern`；
+  3. 同一事件循环内的多次状态更新合并为一次 `setData` 调用，避免高频滚动回调中超过 20fps 刷写。

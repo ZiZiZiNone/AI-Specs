@@ -86,3 +86,9 @@ return wx.navigateTo({ url })
 - [ ] onLoad 内无登录弹回逻辑，未登录在入口即拦截
 - [ ] tabBar 页面只用 switchTab
 - [ ] 同一页面多参数走 onLoad 重载，未配多条路由
+
+## v2.0 页面栈 10 层上限降级与冷启动直达守卫
+
+- **10 层页面栈自动降级**：微信原生页面栈上限为 10 层。统一导航入口 `navigateSafe(url)` 必须检查 `getCurrentPages().length`：当 `length >= 10` 时自动降级为 `wx.redirectTo`（而非任由 `wx.navigateTo` 抛错失败），参考实现见 `frontend/frameworks/miniprogram/test/miniprogram/utils/navigate.mjs`。
+- **扫码/分享冷启动直达深层页**：不可假设用户总从首页进入；受保护页面 `onLoad` 必须先 `await ensureAppReady()` 等待 `App.onLaunch` 静默登录与会话就绪，再校验登录/权限态并按需重定向。
+- **分包体积预算**：主包严格控制在 2MB 以内（单分包 ≤ 2MB，总包 ≤ 20MB），非首屏页面与重型组件一律下沉分包并启用分包异步化。

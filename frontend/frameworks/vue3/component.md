@@ -131,3 +131,9 @@ const keyword = ref(props.initialKeyword);
 - [ ] 未用 defineExpose 暴露业务方法
 - [ ] SFC 块顺序为 template → script → style（缺 style 不罚，自定义块殿后）
 - [ ] script 内部按类型 → props/emit 声明 → 实例 → computed/watch → 生命周期 → 函数
+
+## Vue 3.4+ / 3.5 现代特性使用边界（v2.0）
+
+- **`defineModel()`**：可用于简单受控表单组件简化 `modelValue` + `update:modelValue` 样板，但严禁把复杂领域对象直接双向透传并就地修改嵌套属性（仍须遵循单向数据流 `FE-104`）。
+- **响应式 Props 解构（Vue 3.5+）**：允许在 `<script setup>` 直接解构 `defineProps` 并赋默认值，但传给普通函数或 `watch` 源时须用 getter `() => propName` 保持响应性。
+- **`useTemplateRef()` 与 `useId()`（Vue 3.5+）**：优先使用 `useTemplateRef` 获取模板引用，使用 `useId()` 生成表单 `label`/`aria-describedby` 无障碍关联唯一 ID。

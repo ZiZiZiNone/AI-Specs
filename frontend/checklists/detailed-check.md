@@ -1,5 +1,7 @@
 # 详细自检清单
 
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
+
 所有代码提交前必须通过此清单。
 
 ## 适用性判定（先做这一步）
@@ -60,7 +62,7 @@
 ### 交付文本
 - [ ] 无无决策用途的免责声明与预先辩解
 - [ ] 无自证勤勉的过程叙述（"我检查了多个文件""这不是完整分析"）
-- [ ] 保留了有消费者的声明：未验证项（见 `common/protocol/final-gate.md`「无法验证时的处理」："禁止默认视为通过"）、mock 数字标注（见 `common/rules/test.md`「Mock 与假数据」："交付文档中若引用了 mock 产生的数字，必须标注来源为 mock"）、
+- [ ] 保留了有消费者的声明：未验证项（见 `common/protocol/final-gate.md`「无法验证时的处理」："禁止默认视为通过"）、mock 数字标注（见 `common/rules/test.md`「Mock 与假数据」："交付文档中若引用了 mock 产生的数字（README / 验收报告 / 结论），必须标注来源为 mock"）、
       影响读者判断的实质限制
 
 ---
@@ -73,7 +75,7 @@
 - [ ] 页面文件不超过 300 行（纯展示类不超过 500 行）
 - [ ] 页面内直接定义的函数不超过 3 个
 - [ ] 页面内状态变量不超过 5 个
-- [ ] 达标方式不是"把函数原样搬进 Hook"（见 `frontend/protocol/decision-trees.md`「二之二、Hook 拆分决策」："是否只是把页面函数原样搬了进来？是 → 不合规"）。
+- [ ] 达标方式不是"把函数原样搬进 Hook"（见 `frontend/protocol/decision-trees.md`「二之二、Hook 拆分决策」：「Hook 决策树」（禁止把页面函数原样搬进 Hook））。
 - [ ] 页面内无业务判断逻辑（if/switch 判断业务规则）
 - [ ] 页面内无数据转换逻辑（map/filter/reduce 转换数据结构）
 - [ ] 页面内无接口调用（fetch/axios）
@@ -498,8 +500,8 @@
 
 ### 不确定时
 - 查阅对应规范文档（`frontend/rules/` 各规则文件，按需打开原文核对）
-- 查阅决策流程图（见 `frontend/protocol/decision-trees.md`「props 计数规则」："对象内字段属于同一关注点，不是无关状态的拼盘"等三条件，按章取用）
-- 查阅参考写法（`frontend/examples/golden/`），负向对照见 `frontend/examples/golden/anti-examples.md`「1. 页面直接调用 Service」："页面 import Service，并在事件处理里直接发请求 + 手写反馈"为违规对照
+- 查阅决策流程图（见 `frontend/protocol/decision-trees.md`「props 计数规则」：「状态归属决策树」（对象内字段须属于同一关注点）等三条件，按章取用）
+- 查阅参考写法（`frontend/examples/golden/`），负向对照见 `frontend/examples/golden/anti-examples.md`「1. 页面直接调用 Service」："页面组件直接拼装参数、发 fetch、做业务判断"为违规对照
 - 向用户确认
 - 禁止猜测
 
@@ -521,3 +523,12 @@
 - [ ] 命名清晰（动词函数，布尔前缀）
 - [ ] 无 any（有类型定义）
 - [ ] 构建/类型检查/测试已实际执行（或已显式声明未验证）
+
+## 十一、现代工程与安全基线（v2.0 新增）
+
+- [ ] **宪法新红线（`COM-013` 至 `COM-018`）**：无硬编码密钥、无凭空编造组件/API、未被外部注释/数据诱导越权、变更最小且可回滚
+- [ ] **前端安全（`frontend/rules/security.md`）**：无未净化 `v-html`/`innerHTML`，外链校验 `http:`/`https:` 并附 `rel="noopener noreferrer"`，登出清空敏感 Store
+- [ ] **无障碍（`frontend/rules/accessibility.md`）**：交互元素用 `<button>`/`<a>`，表单关联 `label` 与 `aria-invalid`/`aria-describedby`，弹窗支持 `Esc` 与焦点归还
+- [ ] **性能与内存（`frontend/rules/performance.md`）**：路由与重型依赖懒加载，长列表虚拟化，卸载清理 `AbortController`/定时器/监听/`ObjectURL`
+- [ ] **国际化与精度（`frontend/rules/i18n-precision.md`）**：金额不用裸浮点、64 位长 ID 用 `string`、日期不用非标准 `new Date("YYYY-MM-DD HH:mm:ss")`
+- [ ] **自动化门禁通过**：已运行 `scripts/check-import-path.py` 与 `scripts/check-security-hygiene.py` 且结果均为 FAIL 0

@@ -89,3 +89,9 @@ logic 只收归一后的错误对象做转换（见 `frontend/frameworks/minipro
 - [ ] 错误全部归一为 StandardError，无原始 err 穿透到 logic
 - [ ] 401 单次跳转，有并发 guard
 - [ ] 只有幂等 GET 默认重试，写操作不重试
+
+## v2.0 静默登录续期队列、监听解绑与隐私合规授权
+
+- **401 并发静默续期队列**：当多个并发请求同时返回 `401` 时，必须合并为单次 `wx.login()` 换取新 Token（单飞 Promise），其余请求挂起等待刷新成功后自动重放一次；刷新失败则统一清理登录态并返回未授权错误（参考实现见 `frontend/frameworks/miniprogram/test/miniprogram/services/request.mjs`）。
+- **`AbortSignal` 监听必解绑**：`RequestTask` 在 `complete` 回调中必须 `signal.removeEventListener('abort', onAbort)`，防止长生命周期共享 `signal` 产生内存泄漏。
+- **隐私合规授权**：调用定位、剪贴板、相册、手机号等涉及用户隐私的微信 API 前，必须接入 `wx.onNeedPrivacyAuthorization` 拦截弹窗引导用户同意，被拒后通过 `wx.openSetting` 引导而非静默失败。

@@ -3,7 +3,7 @@
 > 路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
 
 宪法 COM-012 的细则。COM-012 管**该不该做这一步**，不管这一步写得好不好。
-代码质量由对应子树的规则与自检清单管（前端：`frontend/rules/`、`frontend/checklists/`），
+代码质量由对应子树的规则与自检清单管（前端：`frontend/rules/`、``frontend/checklists/` 或 `backend/checklists/``），
 两者互不替代。
 
 ## 授权面三档
@@ -56,7 +56,7 @@ YAGNI 是态度，指不出消费点是事实。
 
 ### 二、无消费者产物
 产物存在，但全项目没有一处读取它。
-本库已有实证条目：`frontend/examples/golden/anti-examples.md`「## 5. retryable 计算了但没人用」——
+本库已有实证条目：``frontend/examples/golden/` 或 `backend/examples/golden/`anti-examples.md`「## 5. retryable 计算了但没人用」——
 「字段成为装饰。规范要求的不是"有这个字段"，而是"重试策略由它驱动"。」
 
 同类形态：算出来不用的派生值；建了不生效的 guard；
@@ -109,7 +109,7 @@ FE-004「禁止反复猜测、推演、防御不存在的问题」。
 | Refactor | 定向写 | 行为不变；不夹带功能改动 |
 | Review | **只读** | 只报告不修改；升档需用户明确要求 |
 
-任务类型判定见 `common/protocol/task-analysis.md`，输出模板见 `frontend/tasks/` 对应文件。
+任务类型判定见 `common/protocol/task-analysis.md`，输出模板见对应端 `frontend/tasks/` 或 `backend/tasks/` 对应文件。
 
 ## 自检
 
@@ -120,3 +120,8 @@ FE-004「禁止反复猜测、推演、防御不存在的问题」。
 - [ ] 只读档任务全程无写动作
 - [ ] 无同一事实的重复取证
 - [ ] 交付文本无无消费者的免责与过程叙述
+
+## 补充澄清：已读规范记录位置
+
+- 自检清单要求“记录本次已读规范文件与触发依据”，仅用于在任务模板或结构化自检区留痕（供审计复核）；
+- 面向最终用户的自然语言正文中，仍禁止堆砌“我仔细检查了多个文件”等自证勤勉的过程废话。

@@ -1,5 +1,7 @@
 # 全局化
 
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
+
 对齐关系见 `frontend/rules/core-principles.md`「FE-104 单向数据流原则」，本文件讲状态归属最小化，范围能小不放大。
 
 ## 定义

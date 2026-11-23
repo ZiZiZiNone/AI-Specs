@@ -1,5 +1,7 @@
 # Refactor 任务
 
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
+
 结构调整、不改行为的优化（任务类型判定见 `common/protocol/task-analysis.md`）。
 
 ## 授权面：定向写，行为不变（COM-012）

@@ -80,3 +80,8 @@ Form → Logic → Service，收敛出口为 Service 的提交方法。
 - 「聚焦顺序来自显式顺序表，不依赖 Object.keys」
 - 「隐藏字段残留值不进入提交载荷」
 - 「校验接口自身失败时不阻塞提交」
+
+## v2.0 编辑态脏检查基准与离开拦截
+
+- 编辑页拉取详情回填完成后，将规范化后的表单快照记录为 `initialSnapshot`，`isDirty` 通过当前值与 `initialSnapshot` 深度比对得出（而非回填触发 `change` 就误标脏）。
+- 当 `isDirty && !isSubmitting` 时，通过路由守卫（`onBeforeRouteLeave`）与浏览器 `beforeunload`（小程序用 `wx.enableAlertBeforeUnload`）二次确认拦截误离开；提交并发冲突返回 `409` 时提示刷新最新数据。

@@ -81,3 +81,8 @@
 - frontend/checklists/detailed-check.md「二、架构层次检查」：Page/Hook/Logic/Service 各层条目。
 - frontend/checklists/detailed-check.md「三、状态管理检查」：状态归属、单一来源、无 props 副本。
 - frontend/checklists/detailed-check.md「十一、测试检查」：Logic 单测、互逆断言、边界与错误路径。
+
+## v2.0 排序回页与非法页码纠正
+
+- 修改筛选条件、`pageSize` 或排序字段（`sortBy`/`sortOrder`）时，统一重置 `page = 1`；
+- URL 传入非正整数或超出 `totalPages` 的越界 `page` 时，自动纠正至合法区间并 `router.replace` 同步 URL（不污染浏览器历史栈）。

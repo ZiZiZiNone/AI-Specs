@@ -1,5 +1,7 @@
 # Bugfix 任务
 
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
+
 现有行为出错时的根因修复（任务类型判定见 `common/protocol/task-analysis.md`）。
 
 ## 授权面：定向写，限改动点与真实调用链（COM-012）

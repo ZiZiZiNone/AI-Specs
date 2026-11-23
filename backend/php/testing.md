@@ -1,24 +1,22 @@
-# PHP 单元测试
+# PHP 测试规范
 
-路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析，首段为 `common/`、`frontend/` 或 `backend/`。见 `<SPEC_ROOT>/README.md`「路径基准」。
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
 
-基准见 `backend/README.md`「分层原则（PHP / Go 共用）」与 `common/principles.md`「逻辑解耦原则」。方法见 `common/rules/test.md`「规则」。
+通用原则见 `common/rules/test.md`「规则」，无法执行时按 `common/protocol/final-gate.md`「无法验证时的处理」声明。
 
-## 规则
+## 规则与正反示例
 
-- 服务测试使用内存替身仓储，不起服务不连真实库。
-- 每个业务分支至少一例，异常分支断言异常类与错误码。
-- 仓储测试用事务回滚或专用测试库，禁止污染开发库。
-- 控制器只做契约测试，断言状态码与结构，不重复服务分支。
-- 外部调用用替身隔离，禁止依赖外部可用性。
-- 测试命名为方法加场景加期望，失败信息可直接定位。
-- 覆盖率以分支为准，不为数字造无断言测试。
+1. **隔离可测与时钟注入**：通过构造函数注入 `callable(): int` 时钟与内存 Fake 仓储，实现毫秒级确定性单测；测试脚本同样禁止使用 `global` 变量（封装在 `TestRunner` 或 PHPUnit/Pest 类中）。
+2. **全量语法与静态检查**：提交前执行全目录 `php -l`、`vendor/bin/phpstan analyse`、`vendor/bin/pint --test` 及测试套件（见 `backend/php/test/`）。
+
+```php
+// ✅ 正例：注入可控时钟测试 TTL 过期
+$now = 1763884800;
+$service = new OrderService($repo, $tx, static function () use (&$now): int { return $now; });
+$now += OrderService::DEFAULT_IDEMPOTENCY_TTL + 60;
+```
 
 ## 检查清单
 
-- [ ] 服务脱离宿主可跑
-- [ ] 分支异常全覆盖
-- [ ] 数据库测试可回滚
-- [ ] 控制器无重复分支
-- [ ] 外部依赖已隔离
-- [ ] 命名可定位失败
+- [ ] 全量 `.php` 文件通过 `php -l` 与单元测试
+- [ ] 测试代码无 `global` 变量、无真实外网与系统时钟依赖

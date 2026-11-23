@@ -1,5 +1,7 @@
 # Vue 3 测试
 
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
+
 通用测试原则见 common/rules/test.md（测行为不测覆盖率、命名 `should_xxx_when_xxx`、
 边界含临界点、mock 须标注）。本文只讲 Vue 侧怎么落。
 

@@ -84,3 +84,10 @@
 
 - 架构：五分之几，契约：五分之几，可维护性：五分之几，安全与数据：五分之几，总分等于均值（保留一位小数）
 - 失分原因：无失分写无
+
+## Go / PHP 只读静态检查命令白名单（不改工作区文件）
+
+Review 处于只读授权面，允许运行以下**不产生源码修改与持久构建产物**的核验命令：
+- **Go**：`gofmt -l .`、`go vet ./...`、`golangci-lint run`、`govulncheck ./...`、`go test -race ./...`（注意：不写项目目录构建产物；如需验证编译可用 `go build -o /dev/null ./...`）
+- **PHP**：`find src tests -name '*.php' -print0 | xargs -0 -n1 php -l`、`vendor/bin/pint --test`、`vendor/bin/phpstan analyse`、`composer audit`、`php test/run.php`
+- **规范门禁**：`python3 <SPEC_ROOT>/scripts/check-security-hygiene.py <业务源码目录>`

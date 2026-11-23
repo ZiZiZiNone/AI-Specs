@@ -1,23 +1,14 @@
-# GoFrame 错误处理差异
+# GoFrame v2.10 错误与响应映射差异规范
 
-路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析，首段为 `common/`、`frontend/` 或 `backend/`。见 `<SPEC_ROOT>/README.md`「路径基准」。
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
 
-基准见 `backend/README.md`「现有子目录」。业务码见 `common/rules/api-contract.md`「业务错误码」。
+## GoFrame 专属约束
 
-## 规则
-
-- 只写框架差异：中间件统一收敛业务码，逻辑单元仍只返回领域错误，不直接构造传输响应。
-- 成功与失败同形输出，形状见 `common/rules/api-contract.md`「响应信封」，中间件负责补请求标识。
-- 同一失败原因全链路共用同一业务码，不为同一语义造第二套码，映射表集中维护。
-- 参数校验失败在入口层拦截并映射参数码，业务规则失败下沉服务层判定，不混层处理。
-- 错误说明面向调用方可执行，写清发生事项与解决动作，不输出堆栈与内部实现名。
-- 框架默认错误页与调试输出生产环境关闭，错误详情只进日志，响应只给收敛后信息。
+1. **统一错误码构造**：领域错误在边界层通过 `gerror.NewCode(gcode.New(bizCode, msg, nil), detail)` 包装，领域层内部仍优先使用标准哨兵错误（`errors.Is`），避免把 `gerror` 强耦合进纯领域函数。
+2. **统一响应中间件**：使用自定义 `ghttp.MiddlewareHandlerResponse` 替代默认文本响应，统一输出 `common/rules/api-contract.md` 信封 `{code, message, data, requestId}`，失败时 `data` 固定为 `null`，并根据业务码映射正确 HTTP 状态码（400/401/403/404/409/422/500）。
+3. **屏蔽内部栈信息**：生产环境禁止把 `gerror.Stack(err)` 写入 HTTP 响应体，仅记入结构化服务端日志并关联 `requestId`。
 
 ## 检查清单
 
-- [ ] 逻辑单元未直接构造响应
-- [ ] 响应形状统一且带标识
-- [ ] 同一语义只有同一业务码
-- [ ] 参数与业务失败分层处理
-- [ ] 错误说明可执行无内部细节
-- [ ] 生产默认错误输出已关闭
+- [ ] 已注册自定义 `MiddlewareHandlerResponse` 输出统一信封且失败 `data` 为 `null`
+- [ ] 响应体未泄露 `gerror.Stack` 或数据库底层错误原文

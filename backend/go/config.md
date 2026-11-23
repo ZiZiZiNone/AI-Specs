@@ -1,23 +1,29 @@
-# Go 配置管理
+# Go 配置管理规范
 
-路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析，首段为 `common/`、`frontend/` 或 `backend/`。见 `<SPEC_ROOT>/README.md`「路径基准」。
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
 
-基准见 `common/principles.md`「模块解耦原则」与 `backend/README.md`「分层原则（PHP / Go 共用）」。取舍依据见 `common/protocol/task-boundary.md`「消费者判据（四问）」。
+## 规则与正反示例
 
-## 规则
+1. **启动期一次性解析并校验（Fail-Fast）**：在 `cmd/server` 将环境变量/YAML 反序列化为只读强类型 `Config` 结构体并校验必填项，缺失立即报错退出，禁止在业务函数内部散落 `os.Getenv()`。
+2. **配置切片向下注入**：模块只接收自己所需的子配置结构（如 `DBConfig`），不传递整个全局 `AppConfig`。
 
-- 配置在进程启动时集中加载并校验，逻辑单元只接收解析后的配置结构体，不直调全局配置访问点。
-- 配置项先指明直接消费者，无消费者、可推导、可写死为常量的项不设为配置。
-- 敏感配置只走环境与密钥载体，不入库、不进代码库、不写日志，缺失时启动即失败。
-- 环境差异用显式配置档区分，默认配置可本地启动，生产覆盖项逐项声明来源。
-- 配置结构体字段集中定义类型、单位与取值范围，非法值在启动期拦截，不延迟到运行时。
-- 配置变更可追踪，新增、改名、废弃均给出迁移说明，废弃项到期后删除。
+```go
+// ✅ 正例：强类型配置结构体 + 启动校验
+type DBConfig struct {
+    DSN             string        `env:"DB_DSN"`
+    MaxOpenConns    int           `env:"DB_MAX_OPEN"`
+    ConnMaxLifetime time.Duration `env:"DB_CONN_MAX_LIFE"`
+}
+func (c DBConfig) Validate() error {
+    if c.DSN == "" { return errors.New("DB_DSN is required") }
+    return nil
+}
+
+// ❌ 反例：业务层隐式读环境变量，无法单测且运行时才炸
+func queryOrders() { dsn := os.Getenv("DB_DSN"); _ = dsn }
+```
 
 ## 检查清单
 
-- [ ] 配置集中加载并启动校验
-- [ ] 逻辑单元只收配置结构体
-- [ ] 新增配置均有指明消费者
-- [ ] 敏感配置未落盘未入日志
-- [ ] 非法值启动期即拦截
-- [ ] 废弃配置有迁移说明
+- [ ] 业务包内无 `os.Getenv` 或全局可变配置单例
+- [ ] 必填配置与超时参数在启动阶段完成校验

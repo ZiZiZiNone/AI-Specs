@@ -60,3 +60,9 @@ export function resolveTicketRowAbility(user: SessionUser | null, row: Ticket) {
 
 ## 框架实现
 路由守卫写法等框架细则 Vue 3 见 frontend/frameworks/vue3/router.md、小程序见 frontend/frameworks/miniprogram/router.md。
+
+## v2.0 异步鉴权、运行时降级与数据级权限
+
+- **异步会话等待**：路由守卫与首屏渲染必须等待 `session.ensureLoaded()` 单飞完成，未就绪时展示全屏骨架而非直接放行。
+- **运行时权限降级与切租户**：会话刷新或切换租户后若权限收缩，立即清空受限 Store 缓存并将当前无权页面重定向至工作台/403。
+- **数据级与字段级权限**：除页面/按钮权限外，涉及他人数据归属（ABAC）或敏感字段（如底价、手机号）时，由后端权威裁决并裁剪字段，前端仅按返回能力标记渲染。

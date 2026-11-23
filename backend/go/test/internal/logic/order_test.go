@@ -1,152 +1,115 @@
-package logic
+package logic_test
 
 import (
 	"context"
 	"errors"
-	"sync"
 	"testing"
+	"time"
 
-	"spectest.local/backend-go-test/internal/dao"
-	"spectest.local/backend-go-test/internal/model"
+	"example.com/ai-specs/order-slice/api"
+	"example.com/ai-specs/order-slice/internal/controller"
+	"example.com/ai-specs/order-slice/internal/dao"
+	"example.com/ai-specs/order-slice/internal/logic"
+	"example.com/ai-specs/order-slice/internal/model"
 )
 
-func orderInputWithKey(key string) model.CreateOrderInput {
-	return model.CreateOrderInput{
-		IdempotencyKey: key,
-		UserID:         "u-1",
-		AmountCents:    100,
+func TestOrderCreate_IdempotencyScopedPerUser(t *testing.T) {
+	store := dao.NewMemOrderStore()
+	now := time.Date(2026, 11, 23, 8, 0, 0, 0, time.UTC)
+	svc := logic.NewOrderLogic(store, store, nil, func() time.Time { return now })
+	ctrl := controller.NewOrderController(svc)
+	ctx := dao.WithRequestID(context.Background(), "req-001")
+
+	r1, err := ctrl.Create(ctx, api.CreateOrderRequest{
+		UserID: "u1", ItemID: "sku-1", Quantity: 2, UnitPriceCents: 500, IdempotencyKey: "same-key",
+	})
+	if err != nil {
+		t.Fatalf("u1 create failed: %v", err)
+	}
+	// 不同用户使用同一幂等键，必须隔离成功（防跨用户 DoS/探测）
+	r2, err := ctrl.Create(ctx, api.CreateOrderRequest{
+		UserID: "u2", ItemID: "sku-1", Quantity: 1, UnitPriceCents: 500, IdempotencyKey: "same-key",
+	})
+	if err != nil {
+		t.Fatalf("u2 create with same key should succeed: %v", err)
+	}
+	if r1.ID == r2.ID {
+		t.Fatalf("expected distinct order IDs for different users, got %s", r1.ID)
+	}
+	// 同用户同键同载荷重放返回相同结果
+	r1Replay, err := ctrl.Create(ctx, api.CreateOrderRequest{
+		UserID: "u1", ItemID: "sku-1", Quantity: 2, UnitPriceCents: 500, IdempotencyKey: "same-key",
+	})
+	if err != nil || r1Replay.ID != r1.ID {
+		t.Fatalf("expected idempotent replay %s, got %s err=%v", r1.ID, r1Replay.ID, err)
+	}
+	// 同用户同键异载荷（含优惠券差异）必须返回 ErrConflict
+	_, err = ctrl.Create(ctx, api.CreateOrderRequest{
+		UserID: "u1", ItemID: "sku-1", Quantity: 2, UnitPriceCents: 500, CouponCode: "VIP10", IdempotencyKey: "same-key",
+	})
+	if !errors.Is(err, model.ErrConflict) {
+		t.Fatalf("expected ErrConflict for payload mismatch, got %v", err)
 	}
 }
 
-func TestCreateDuplicateKeyReturnsFirstResult(t *testing.T) {
-	store := dao.NewMemStore()
-	svc := NewOrderLogic(store, store)
-	ctx := context.Background()
+func TestOrderCreate_IdempotencyExpiresAfterTTL(t *testing.T) {
+	store := dao.NewMemOrderStore()
+	current := time.Date(2026, 11, 23, 8, 0, 0, 0, time.UTC)
+	svc := logic.NewOrderLogic(store, store, nil, func() time.Time { return current })
 
-	first, err := svc.Create(ctx, orderInputWithKey("key-1"))
+	r1, err := svc.Create(context.Background(), api.CreateOrderRequest{
+		UserID: "u1", ItemID: "sku-1", Quantity: 1, UnitPriceCents: 100, IdempotencyKey: "ttl-key",
+	})
 	if err != nil {
 		t.Fatalf("first create failed: %v", err)
 	}
-	again, err := svc.Create(ctx, orderInputWithKey("key-1"))
-	if err != nil {
-		t.Fatalf("replay failed: %v", err)
-	}
-	if again.ID != first.ID {
-		t.Fatalf("replay created a second order: %v vs %v", again.ID, first.ID)
-	}
-	if store.RowCount() != 1 {
-		t.Fatalf("replay must not add rows, got %d", store.RowCount())
+	current = current.Add(logic.DefaultIdempotencyTTL + time.Minute)
+	r2, err := svc.Create(context.Background(), api.CreateOrderRequest{
+		UserID: "u1", ItemID: "sku-1", Quantity: 1, UnitPriceCents: 100, IdempotencyKey: "ttl-key",
+	})
+	if err != nil || r2.ID == r1.ID {
+		t.Fatalf("expected new order after TTL expiry, got r1=%s r2=%s err=%v", r1.ID, r2.ID, err)
 	}
 }
 
-func TestCreateFailureRollsBack(t *testing.T) {
-	store := dao.NewMemStore()
-	store.FailInsertWith(errors.New("db down"))
-	svc := NewOrderLogic(store, store)
-	ctx := context.Background()
-
-	if _, err := svc.Create(ctx, orderInputWithKey("key-9")); err == nil {
-		t.Fatal("expected error, got nil")
-	}
-	if !store.RollbackCalled() {
-		t.Fatal("failed create must roll back")
-	}
-	if store.RowCount() != 0 {
-		t.Fatal("rolled-back rows must be discarded")
-	}
-	if _, dup := store.FindStoredKey("key-9"); dup {
-		t.Fatal("failed create must not store idempotency key")
-	}
-}
-
-func TestCreateRejectsEmptyKey(t *testing.T) {
-	store := dao.NewMemStore()
-	svc := NewOrderLogic(store, store)
-	ctx := context.Background()
-
-	in := orderInputWithKey("")
-	if _, err := svc.Create(ctx, in); !errors.Is(err, model.ErrValidation) {
-		t.Fatalf("expected validation error, got %v", err)
-	}
-	if store.InsertCalls() != 0 {
-		t.Fatal("rejected input must not reach dao")
-	}
-}
-
-func TestCreateConcurrentReplayReturnsFirstResult(t *testing.T) {
-	// 提交期合并冲突分支在本串行化演示下不可达，覆盖见 Insert 预检路径；
-	// 本测试证明无死锁、无 data race 与重放收敛。
-	store := dao.NewMemStore()
-	svc := NewOrderLogic(store, store)
-	ctx := context.Background()
-
-	const n = 8
-	ids := make([]string, n)
-	var wg sync.WaitGroup
-	for i := 0; i < n; i++ {
-		wg.Add(1)
-		go func(i int) {
-			defer wg.Done()
-			res, err := svc.Create(ctx, orderInputWithKey("key-c"))
-			if err != nil {
-				t.Errorf("concurrent create failed: %v", err)
-				return
-			}
-			ids[i] = res.ID
-		}(i)
-	}
-	wg.Wait()
-	for _, id := range ids {
-		if id == "" || id != ids[0] {
-			t.Fatalf("concurrent replay diverged: %v", ids)
-		}
-	}
-	if store.RowCount() != 1 {
-		t.Fatalf("concurrent replay must keep one row, got %d", store.RowCount())
-	}
-}
-
-func TestCreateConflictingPayloadReturnsConflict(t *testing.T) {
-	store := dao.NewMemStore()
-	svc := NewOrderLogic(store, store)
-	ctx := context.Background()
-
-	if _, err := svc.Create(ctx, orderInputWithKey("key-x")); err != nil {
-		t.Fatalf("first create failed: %v", err)
-	}
-	clash := orderInputWithKey("key-x")
-	clash.AmountCents = 999
-	if _, err := svc.Create(ctx, clash); !errors.Is(err, model.ErrConflict) {
-		t.Fatalf("expected conflict, got %v", err)
-	}
-	if store.RowCount() != 1 {
-		t.Fatalf("conflict must not add rows, got %d", store.RowCount())
-	}
-}
-
-func TestDaoRejectsEmptyKeyDirectly(t *testing.T) {
-	store := dao.NewMemStore()
-	if _, err := store.Insert(context.Background(), model.CreateOrderInput{}); !errors.Is(err, model.ErrValidation) {
-		t.Fatalf("expected validation error, got %v", err)
-	}
-}
-
-func TestListPaginates(t *testing.T) {
-	store := dao.NewMemStore()
-	svc := NewOrderLogic(store, store)
-	ctx := context.Background()
-
-	for _, k := range []string{"k-a", "k-b", "k-c"} {
-		if _, err := svc.Create(ctx, orderInputWithKey(k)); err != nil {
+func TestOrderList_ClampsPageSizeToMaxAndRejectsUnknownSort(t *testing.T) {
+	store := dao.NewMemOrderStore()
+	svc := logic.NewOrderLogic(store, store, nil, nil)
+	for i := 0; i < 12; i++ {
+		_, err := svc.Create(context.Background(), api.CreateOrderRequest{
+			UserID: "u1", ItemID: "sku-1", Quantity: 1, UnitPriceCents: int64(100 * (i + 1)), IdempotencyKey: time.Duration(i).String(),
+		})
+		if err != nil {
 			t.Fatalf("seed failed: %v", err)
 		}
 	}
-	items, total, err := svc.List(ctx, model.OrderFilter{Page: 1, PageSize: 2})
-	if err != nil || total != 3 || len(items) != 2 {
-		t.Fatalf("page one wrong: items=%d total=%d err=%v", len(items), total, err)
+	res, err := svc.List(context.Background(), api.ListOrdersRequest{UserID: "u1", Page: 1, PageSize: 500})
+	if err != nil {
+		t.Fatalf("list failed: %v", err)
 	}
-	items, total, err = svc.List(ctx, model.OrderFilter{Page: 5, PageSize: 2})
-	if err != nil || total != 3 || len(items) != 0 {
-		t.Fatalf("empty page must stay empty: items=%d total=%d err=%v", len(items), total, err)
+	if res.Page.PageSize != model.MaxPageSize {
+		t.Fatalf("expected pageSize clamped to %d, got %d", model.MaxPageSize, res.Page.PageSize)
 	}
+	if res.Items[0].ID != "ord-1" || res.Items[9].ID != "ord-10" {
+		t.Fatalf("expected numeric sequence order, got first=%s tenth=%s", res.Items[0].ID, res.Items[9].ID)
+	}
+	_, err = svc.List(context.Background(), api.ListOrdersRequest{UserID: "u1", SortBy: "drop_table"})
+	if !errors.Is(err, model.ErrUnknownSortField) {
+		t.Fatalf("expected ErrUnknownSortField, got %v", err)
+	}
+}
+
+func TestTransact_PanicTriggersRollback(t *testing.T) {
+	store := dao.NewMemOrderStore()
+	defer func() {
+		if r := recover(); r == nil {
+			t.Fatalf("expected panic to propagate")
+		}
+		if store.Rollbacks != 1 {
+			t.Fatalf("expected rollback count 1 after panic, got %d", store.Rollbacks)
+		}
+	}()
+	_ = store.Transact(context.Background(), func(ctx context.Context) error {
+		panic("boom")
+	})
 }

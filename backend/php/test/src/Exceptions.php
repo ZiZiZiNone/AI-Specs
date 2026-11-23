@@ -1,25 +1,44 @@
 <?php
-
 declare(strict_types=1);
 
-namespace BackendPhpTest;
+namespace App;
 
-class ValidationException extends \RuntimeException {}
+use RuntimeException;
 
-class DuplicateKeyException extends \RuntimeException
+abstract class DomainException extends RuntimeException
 {
-    public function __construct(public readonly string $key)
-    {
-        parent::__construct('duplicate idempotency key: ' . $key);
+    /** @param array<string, mixed> $context */
+    public function __construct(
+        public readonly int $errorCode,
+        string $message,
+        public readonly array $context = [],
+    ) {
+        parent::__construct($message, $errorCode);
     }
 }
 
-class NotFoundException extends \RuntimeException {}
-
-class ConflictException extends \RuntimeException
+final class InvalidInputException extends DomainException
 {
-    public function __construct(public readonly string $key)
+    /** @param array<string, mixed> $context */
+    public function __construct(string $message, array $context = [])
     {
-        parent::__construct('payload conflict for key: ' . $key);
+        parent::__construct(40001, $message, $context);
+    }
+}
+
+final class ConflictException extends DomainException
+{
+    /** @param array<string, mixed> $context */
+    public function __construct(string $message, array $context = [])
+    {
+        parent::__construct(40901, $message, $context);
+    }
+}
+
+final class NestedTransactionException extends DomainException
+{
+    public function __construct(string $message = 'Nested transaction is not supported')
+    {
+        parent::__construct(50002, $message);
     }
 }

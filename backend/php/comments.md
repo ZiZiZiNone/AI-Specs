@@ -1,23 +1,25 @@
-# PHP 注释与文档
+# PHP 注释与 PHPDoc 规范
 
-路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析，首段为 `common/`、`frontend/` 或 `backend/`。见 `<SPEC_ROOT>/README.md`「路径基准」。
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
 
-基准见 `common/principles.md`「逻辑解耦原则」。
+通用原则见 `common/rules/comment.md`。
 
-## 规则
+## 规则与正反示例
 
-- 服务公开方法必须写文档注释，说明输入输出、返回结构与抛出异常。
-- 仓储方法注明查询条件、排序、分页语义与空结果行为。
-- 复杂逻辑必须写原因与示例，不只写做了什么。
-- 接口注释写契约，实现类补充实现特有约束，不复制粘贴。
-- 废弃方法标注替代者与移除版本，禁止静默保留。
-- 提交时同步更新相关文档，注释与代码不一致视为缺陷。
+1. **PHPDoc 补足泛型与数组形状**：PHP 8.2+ 原生类型已表达清晰时不再写废话 `@param string $id`；仅用 PHPDoc 补充 `array{...}`、`list<T>`、`@template` 供 PHPStan 静态分析。
+2. **写明不变量与异常契约**：记录抛出的领域异常与幂等/事务前置条件，禁留死代码注释。
+
+```php
+// ✅ 正例：补充数组形状供 PHPStan 校验
+/** @param array{userId: string, quantity: int, couponCode?: string} $payload */
+public function create(array $payload): OrderResult
+
+// ❌ 反例：复述原生类型的无效 PHPDoc
+/** @param OrderInput $input 输入 */
+public function create(OrderInput $input): OrderResult
+```
 
 ## 检查清单
 
-- [ ] 公共方法有契约注释
-- [ ] 查询语义已注明
-- [ ] 复杂逻辑有原因示例
-- [ ] 接口实现注释分工明确
-- [ ] 废弃有替代说明
-- [ ] 文档与代码一致
+- [ ] PHPDoc 与实际参数字段完全一致（无漏写可选键如 `couponCode`）
+- [ ] 复杂数组与集合均具备 PHPStan 泛型/形状注解

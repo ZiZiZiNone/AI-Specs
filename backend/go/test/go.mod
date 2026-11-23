@@ -1,3 +1,3 @@
-module spectest.local/backend-go-test
+module example.com/ai-specs/order-slice
 
-go 1.25
+go 1.19

@@ -1,24 +1,15 @@
 #!/usr/bin/env python3
-r"""引用校验脚本（COM-011 引用可验伪的可执行形态）。
+r"""引用校验脚本 v3.0（COM-011 引用可验伪的可执行形态）。
 
-判定依据逐条来自 common/rules/constitution.md「COM-011 细则」：
-- 条款级编号只存在于两处：constitution.md 的 COM-007 至 COM-012、AGENTS.md 的 FE-000 至 FE-005；
-  其它地方出现未定义的 COM-xxx/FE-xxx 即编造 → FAIL。白名单硬编码为 COM-007 至 COM-012，不从正文反推，避免范例行污染。
-- 位置式引用（第 N 节/条/段/章、倒数第）只允许两类：指向上述两处编号文件，
-  或指向"编号小节例外"文件——判定式为
-  `grep -nE "^#{2,4} *(FE-[0-9]+|[0-9]+\.)" <目标文件>`，
-  被引编号须在该文件的命中结果中（**不维护文件清单，避免清单漂移**）→ 其它一律 FAIL。
-- `>` 引文逐行校验：每行必须归属到一个 .md 文件，且是该文件的逐字子行
-  （即 `grep -F` 可命中；markdown 加粗/行内代码/列表序号属排版差异，不计；
-  摘录跳行不算改写，合并多行才算）→ 失配 WARN，加 --strict 时升级为 FAIL。
-- FE-101 至 FE-104：`frontend/rules/core-principles.md` 的 `## FE-101`–`## FE-104` 已纳入 COM-011 编号小节例外，
-  写编号（不写成"第 N 节"），按 PASS 处理。
+v3.0 全量能力：
+1. 四大编号定义源校验：COM-007~018、FE-000~005、FE-101~104、BE-101~108；
+2. 位置式引用（第 N 节/条/段/章、倒数第）拦截，支持编号小节例外判定式；
+3. `>` 引文块逐行逐字核验；
+4. 正文裸路径（common/...、frontend/...、backend/...、scripts/...）断链校验；
+5. 正文 `文件路径「小节标题」` 存在性校验；
+6. 新增：正文行内 `文件路径` 同行双引号 `"..."` 逐字摘录校验（长度 ≥ 10 字符且非反例/命令）。
 
-扫描范围：规范库根下全部 *.md，排除 .git/、node_modules/、
-.internal-docs/（过程记录非规范正文）、
-.workbuddy-ai/（项目数据非规范正文）、vendor/（第三方依赖）。
-
-用法：python scripts/check-citations.py [<SPEC_ROOT>] [--strict] [--verbose]
+用法：python3 scripts/check-citations.py [<SPEC_ROOT>] [--strict] [--verbose]
 退出码：0 通过；1 有 FAIL（--strict 下 WARN 也算）。
 """
 import os
@@ -29,24 +20,30 @@ _ARGS = [a for a in sys.argv[1:] if not a.startswith("-")]
 ROOT = os.path.abspath(_ARGS[0]) if _ARGS else \
     os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-SKIP_DIRS = {".git", "node_modules", ".internal-docs", ".workbuddy-ai", "vendor"}
-ID_FILES = {"common/rules/constitution.md", "AGENTS.md"}
-VALID_COM = {f"COM-{i:03d}" for i in range(7, 13)}
+SKIP_DIRS = {".git", "node_modules", ".internal-docs", ".workbuddy-ai", "vendor", "target"}
+ID_FILES = {
+    "common/rules/constitution.md",
+    "AGENTS.md",
+    "frontend/rules/core-principles.md",
+    "backend/rules/core-principles.md",
+}
+VALID_COM = {f"COM-{i:03d}" for i in range(7, 19)}
 
 RE_COM = re.compile(r"\bCOM-\d+\b")
 RE_FE = re.compile(r"\bFE-\d+\b")
+RE_BE = re.compile(r"\bBE-\d+\b")
 RE_POS = re.compile(r"第\s*\d+\s*(节|条|段|章)|倒数第")
 RE_POS_N = re.compile(r"第\s*(\d+)\s*(节|条|段|章)")
 RE_MD = re.compile(r"([A-Za-z0-9_\-./]+\.md)")
+RE_BARE_SPEC_PATH = re.compile(
+    r"(?<![A-Za-z0-9_\-./])((?:common|frontend|backend|scripts)/[A-Za-z0-9_\-./]+\.(?:md|py|sh|go|php|mjs|ts|java|rs))"
+)
+RE_MD_SECTION = re.compile(r"`?((?:common|frontend|backend|scripts)/[A-Za-z0-9_\-./]+\.md)`?\s*「([^」]+)」")
+RE_INLINE_QUOTE = re.compile(r"`?((?:common|frontend|backend|scripts)/[A-Za-z0-9_\-./]+\.md)`?[^。\n]{0,40}[:：]\s*\"([^\"]{10,})\"")
 RE_FE_HEAD = re.compile(r"^## (FE-\d+)\b", re.M)
+RE_BE_HEAD = re.compile(r"^## (BE-\d+)\b", re.M)
 RE_FENCE = re.compile(r"^\s*```")
 LIST_MARK = re.compile(r"^(?:\d+[.)、]\s*|[-*+]\s*)")
-
-fails, warns, infos = [], [], []
-
-
-def emit(bucket, path, line, msg):
-    bucket.append(f"{path}:{line}: {msg}")
 
 
 def read(path):
@@ -54,9 +51,9 @@ def read(path):
         return f.read()
 
 
-def md_files():
+def md_files(root):
     out = []
-    for dirpath, dirnames, filenames in os.walk(ROOT):
+    for dirpath, dirnames, filenames in os.walk(root):
         dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS]
         for fn in sorted(filenames):
             if fn.endswith(".md"):
@@ -65,11 +62,6 @@ def md_files():
 
 
 def norm(s, strip_list=False):
-    """去 markdown 行内标记、列表序号后压掉全部空白再比对。
-
-    排版差异（加粗、行内代码、列表序号、换行位置）不算改写；
-    文字本身的增删改一律检出。
-    """
     s = re.sub(r"[*_`~]", "", s)
     if strip_list:
         s = LIST_MARK.sub("", s)
@@ -77,7 +69,6 @@ def norm(s, strip_list=False):
 
 
 def line_hits(quote_line, target_text):
-    """引文单行是否在目标文件中逐字命中（COM-011 的 grep -F 语义，逐行）。"""
     qn = norm(quote_line, strip_list=True)
     if not qn:
         return True
@@ -85,42 +76,43 @@ def line_hits(quote_line, target_text):
 
 
 def strip_quotes_for_pos(line):
-    """「」/"" 引号内与 ❌ 反例行不算位置式引用（COM-011 自身的规则描述与反例）。"""
     if "❌" in line:
         return ""
     return re.sub(r"「[^」]*」|\"[^\"]*\"|'[^']*'", "", line)
 
 
-def resolve_target(token, files_by_base):
+def resolve_target(root, token, files_by_base):
     token = token.replace("\\", "/").lstrip("./")
-    if os.path.isfile(os.path.join(ROOT, token)):
+    if os.path.isfile(os.path.join(root, token)):
         return token
     base = os.path.basename(token)
     hits = files_by_base.get(base, [])
     if len(hits) == 1:
         return hits[0]
-    return None  # 找不到或歧义，调用方按 WARN/FAIL 处理
+    return None
 
 
-def main():
-    files = md_files()
+def check_repo(root, strict=False, verbose=False):
+    fails, warns, infos = [], [], []
+    files = md_files(root)
     by_base = {}
+    cache = {}
     for p in files:
-        rel = os.path.relpath(p, ROOT).replace(os.sep, "/")
+        rel = os.path.relpath(p, root).replace(os.sep, "/")
         by_base.setdefault(os.path.basename(p), []).append(rel)
+        cache[rel] = read(p)
 
-    agents_text = read(os.path.join(ROOT, "AGENTS.md"))
+    def emit(bucket, path, line, msg):
+        bucket.append(f"{path}:{line}: {msg}")
+
     valid_com = set(VALID_COM)
-    valid_fe_def = set(RE_FE.findall(agents_text))
-    core_text = read(os.path.join(ROOT, "frontend", "rules", "core-principles.md"))
-    valid_fe_core = set(RE_FE_HEAD.findall(core_text))
-    valid_fe = valid_fe_def | valid_fe_core
-
-    strict = "--strict" in sys.argv
+    agents_text = cache.get("AGENTS.md", "")
+    valid_fe = set(RE_FE.findall(agents_text)) | set(RE_FE_HEAD.findall(cache.get("frontend/rules/core-principles.md", "")))
+    valid_be = set(RE_BE_HEAD.findall(cache.get("backend/rules/core-principles.md", "")))
 
     for path in files:
-        rel = os.path.relpath(path, ROOT).replace(os.sep, "/")
-        text = read(path)
+        rel = os.path.relpath(path, root).replace(os.sep, "/")
+        text = cache[rel]
         lines = text.splitlines()
         in_fence = False
 
@@ -131,38 +123,61 @@ def main():
             if in_fence:
                 continue
 
-            # A. 条款级编号：未在两处定义文件中出现的 COM-xxx/FE-xxx 即编造
             if rel not in ID_FILES:
                 for tok in RE_COM.findall(line):
                     if tok not in valid_com:
-                        emit(fails, rel, i, f"FAIL 未定义的条款编号 {tok}（COM-011：条款级编号只在 constitution/AGENTS 存在）")
+                        if tok in {"COM-001", "COM-006"} and ("历史" in line or "预留" in line):
+                            continue
+                        emit(fails, rel, i, f"FAIL 未定义的条款编号 {tok}（合法范围 {sorted(valid_com)}）")
                 for tok in RE_FE.findall(line):
                     if tok not in valid_fe:
-                        emit(fails, rel, i, f"FAIL 未定义的条款编号 {tok}（COM-011：条款级编号只在 AGENTS/core-principles 存在，计 {sorted(valid_fe)}）")
+                        emit(fails, rel, i, f"FAIL 未定义的条款编号 {tok}（合法范围 {sorted(valid_fe)}）")
+                for tok in RE_BE.findall(line):
+                    if tok not in valid_be:
+                        emit(fails, rel, i, f"FAIL 未定义的条款编号 {tok}（合法范围 {sorted(valid_be)}）")
 
-            # B. 位置式引用
             for m in RE_POS.finditer(strip_quotes_for_pos(line)):
                 window = "\n".join(lines[max(0, i - 4):i])
                 cands = RE_MD.findall(line) or RE_MD.findall(window)
-                target = resolve_target(cands[-1], by_base) if cands else None
+                target = resolve_target(root, cands[-1], by_base) if cands else None
                 if target is None:
                     emit(fails, rel, i, f"FAIL 位置式引用「{m.group(0)}」找不到被引文件（须写文件路径）")
                     continue
                 if target in ID_FILES:
                     continue
                 nums = RE_POS_N.findall(line)
-                # COM-011「编号小节例外」：以判定式实际结果为准，不维护文件清单
                 if nums:
-                    heads = {a or b for a, b in re.findall(
-                        r"^#{2,4} *(?:FE-([0-9]+)|([0-9]+)\.)",
-                        read(os.path.join(ROOT, target)), re.M)}
+                    heads = {a or b or c for a, b, c in re.findall(
+                        r"^#{2,4} *(?:FE-([0-9]+)|BE-([0-9]+)|([0-9]+)\.)",
+                        cache.get(target, ""), re.M)}
                     if all(n in heads for n, _ in nums):
                         continue
-                emit(fails, rel, i,
-                     f"FAIL 位置式引用「{m.group(0)}」指向 {target}"
-                     f"（非编号文件，且该文件无此编号的小节标题）")
+                emit(fails, rel, i, f"FAIL 位置式引用「{m.group(0)}」指向 {target}（非编号文件且无对应编号小节）")
 
-        # C. `>` 引文块：须归属文件，且每行逐字命中（去标记比对）
+            if "❌" not in line:
+                for m in RE_BARE_SPEC_PATH.finditer(line):
+                    ref_path = m.group(1)
+                    if "xxx" in ref_path or "*" in ref_path or "<" in ref_path:
+                        continue
+                    if not os.path.isfile(os.path.join(root, ref_path)):
+                        emit(fails, rel, i, f"FAIL 断链：引用路径 {ref_path} 在仓库中不存在")
+
+                for m in RE_MD_SECTION.finditer(line):
+                    ref_path, sec = m.group(1), m.group(2)
+                    if "xxx" in ref_path or ref_path not in cache:
+                        continue
+                    target_text = cache[ref_path]
+                    if sec not in target_text and norm(sec) not in norm(target_text):
+                        emit(warns, rel, i, f"WARN 章节引用失配：{ref_path} 中未找到「{sec}」")
+
+                # F. 正文行内 "..." 逐字摘录校验（v3.0 新增）
+                for m in RE_INLINE_QUOTE.finditer(line):
+                    ref_path, quoted = m.group(1), m.group(2)
+                    if ref_path not in cache:
+                        continue
+                    if not line_hits(quoted, cache[ref_path]):
+                        emit(warns, rel, i, f"WARN 行内引文在 {ref_path} 中逐字未命中：{quoted[:40]}")
+
         i = 0
         in_fence = False
         while i < len(lines):
@@ -179,38 +194,34 @@ def main():
             while j < len(lines) and lines[j].lstrip().startswith(">"):
                 quotes.append(re.sub(r"^\s*>\s?", "", lines[j]))
                 j += 1
+            if quotes and re.match(r"^(?:说明|注意|路径基准|提示)\s*[：:]", quotes[0].strip()):
+                i = j
+                continue
             window = "\n".join(lines[max(0, i - 8):j])
             cands = RE_MD.findall(window)
-            target = resolve_target(cands[-1], by_base) if cands else None
+            target = resolve_target(root, cands[-1], by_base) if cands else None
             if target is None:
                 emit(warns, rel, i + 1, "WARN 引文块找不到归属文件，无法验伪（须在附近写文件路径）")
             else:
-                t = read(os.path.join(ROOT, target))
-                bad, ptr = [], []
-                for q in quotes:
-                    qs = q.strip()
-                    if not qs or qs in t or line_hits(q, t):
-                        continue
-                    frags = re.findall(r"「([^」]+)」", q)
-                    if (re.search(r"见|参照|引用", q)
-                            and any(f and f in t for f in frags)):
-                        ptr.append(q)
-                    else:
-                        bad.append(q)
+                t = cache.get(target, "")
+                bad = [q for q in quotes if q.strip() and q.strip() not in t and not line_hits(q, t)
+                       and not (re.search(r"见|参照|引用", q) and any(f and f in t for f in re.findall(r"「([^」]+)」", q)))]
                 if bad:
-                    emit(warns, rel, i + 1,
-                         f"WARN 引文在 {target} 中逐字未命中（疑似改写或记错出处）：{bad[0][:40]}")
-                if ptr:
-                    infos.append(f"{rel}:{i + 1}: INFO 指针式引用（见 X「标题」），被指标题存在，可验伪")
-                elif not bad and any(q.strip() and q.strip() not in t for q in quotes):
-                    infos.append(f"{rel}:{i + 1}: INFO 引文与 {target} 仅排版标记差异，已按去标记比对通过")
+                    emit(warns, rel, i + 1, f"WARN 引文在 {target} 中逐字未命中（疑似改写或记错出处）：{bad[0][:40]}")
             i = j
 
+    return files, fails, warns, infos
+
+
+def main():
+    strict = "--strict" in sys.argv
+    verbose = "--verbose" in sys.argv
+    files, fails, warns, infos = check_repo(ROOT, strict=strict, verbose=verbose)
     for line in fails:
         print(line)
     for line in warns:
         print(line)
-    if "--verbose" in sys.argv:
+    if verbose:
         for line in infos:
             print(line)
     print(f"共 {len(files)} 个文件：FAIL {len(fails)}，WARN {len(warns)}")

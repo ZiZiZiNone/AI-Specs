@@ -124,9 +124,9 @@ async function load(): Promise<void> {
     return;
   }
 
-  list.value = result.data.list;
-  total.value = result.data.total;
-  state.value = resolveListState(result.data.list);
+  list.value = result.data.items;
+  total.value = result.data.page.total;
+  state.value = resolveListState(result.data.items);
 }
 ```
 
@@ -141,29 +141,30 @@ async function load(): Promise<void> {
 
 ```typescript
 export function useRequestGuard() {
-  const controllers = new Set<AbortController>();
-  const latestToken = ref(0);
+  let activeController: AbortController | null = null;
+  let latestToken = 0;
 
   function start() {
+    // 发起新请求前先真正中断上一在途请求（单飞覆盖）
+    activeController?.abort();
     const controller = new AbortController();
-    controllers.add(controller);
-    latestToken.value += 1;
-    const token = latestToken.value;
+    activeController = controller;
+    const token = ++latestToken;
 
     return {
       signal: controller.signal,
-      // 期间又发起了新请求，本次结果作废
-      isStale: () => {
-        controllers.delete(controller);
-        return token !== latestToken.value;
+      // 纯查询：不提前清空 activeController，保证 abortAll() 仍可中止当前请求
+      isStale: () => token !== latestToken,
+      done: () => {
+        if (activeController === controller) activeController = null;
       },
     };
   }
 
   function abortAll(): void {
-    for (const controller of controllers) controller.abort();
-    controllers.clear();
-    latestToken.value += 1;
+    activeController?.abort();
+    activeController = null;
+    latestToken += 1;
   }
 
   onScopeDispose(abortAll);
@@ -232,7 +233,7 @@ async function handleSubmit(): Promise<void> {
 </script>
 ```
 
-六态由容器组件统一承担，页面不写 v-if 链。以下为 Vue 3 形态，小程序侧映射见 `frontend/frameworks/miniprogram/component.md`「业务组件一律受控」与 `frontend/frameworks/miniprogram/logic.md`「入参/返回值约定」。
+五态由容器组件统一承担，页面不写 v-if 链。以下为 Vue 3 形态，小程序侧映射见 `frontend/frameworks/miniprogram/component.md`「业务组件一律受控」与 `frontend/frameworks/miniprogram/logic.md`「入参/返回值约定」。
 
 ```vue
 <DataLoader
@@ -254,3 +255,10 @@ async function handleSubmit(): Promise<void> {
 
 - 分页纯函数：见 `frontend/frameworks/miniprogram/logic.md`「入参/返回值约定」：logic 函数入参只收普通值，失败表达走状态内 error 字段；取消语义见 `frontend/rules/async-operations.md`「取消不是错误」：被取消的请求须在上层被识别为预期行为；删除回退见 `frontend/frameworks/miniprogram/logic.md`「删除回退」：删除末页最后一条后退回上一页，避免停在空页。
 - 受控筛选条：见 `frontend/frameworks/miniprogram/component.md`「业务组件一律受控」：值由 properties 传入，变更经事件上报，组件自身不持有业务状态。
+
+## v2.0 关键修复说明（已同步至可运行切片 `frontend/frameworks/vue3/test/`）
+
+1. **`useRequestGuard.start()` 真正取消旧请求**：发起新请求前必须先调用 `activeController?.abort()` 中断上一在途请求，再创建新 `AbortController` 并递增单调 `token`，避免旧请求滞留与 `controllers` 泄漏。
+2. **刷新成功清空 `errorMessage`**：当刷新态重新请求成功时，必须将 `errorMessage` 重置为 `null`，避免旧错误条长期残留。
+3. **翻页为空保持 `success` 态**：仅当 `page === 1 && items.length === 0` 时进入 `empty` 态；`page > 1` 返回空数组时保持 `success` 并提示“没有更多数据”。
+4. **统一契约载荷与多值 Query 防护**：分页响应严格读取 `result.data.items` 与 `result.data.page.total`；解析 `route.query` 时兼容 `string | string[] | null`（取首值并校验合法正整数），禁止不安全强转。

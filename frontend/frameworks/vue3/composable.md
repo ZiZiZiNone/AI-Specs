@@ -104,27 +104,30 @@ composable 内的请求/定时器只能在被调用后启动，禁止写在模�
 ```typescript
 // ✅ 统一封装，避免每个 composable 各写一遍
 export function useRequestGuard() {
-  const controllers = new Set<AbortController>();
-  const latestToken = ref(0);
+  let activeController: AbortController | null = null;
+  let latestToken = 0;
 
   function start() {
+    // 发起新请求前先真正中断上一在途请求（单飞覆盖）
+    activeController?.abort();
     const controller = new AbortController();
-    controllers.add(controller);
-    latestToken.value += 1;
-    const token = latestToken.value;
+    activeController = controller;
+    const token = ++latestToken;
+
     return {
       signal: controller.signal,
-      isStale: () => {
-        controllers.delete(controller);
-        return token !== latestToken.value;
+      // 纯查询：不提前清空 activeController，保证 abortAll() 仍可中止当前请求
+      isStale: () => token !== latestToken,
+      done: () => {
+        if (activeController === controller) activeController = null;
       },
     };
   }
 
-  function abortAll() {
-    for (const c of controllers) c.abort();
-    controllers.clear();
-    latestToken.value += 1;
+  function abortAll(): void {
+    activeController?.abort();
+    activeController = null;
+    latestToken += 1;
   }
 
   onScopeDispose(abortAll);
@@ -155,10 +158,10 @@ if (!result.success) {
 
 ```typescript
 // ✅ 五态判定在 Logic，composable 只赋值
-state.value = resolveListState(result.data.list);
+state.value = resolveListState(result.data.items);
 
 // ❌ 业务判定写在 composable 里
-state.value = result.data.list.length > 0 ? 'success' : 'empty';
+state.value = result.data.items.length > 0 ? 'success' : 'empty';
 ```
 
 ---
@@ -177,3 +180,8 @@ state.value = result.data.list.length > 0 ? 'success' : 'empty';
 - [ ] 取消导致的失败未写入错误态
 - [ ] 内部无业务判断（已下沉 Logic）
 - [ ] 不返回模板/JSX，不 import UI 组件
+
+## v2.0 强制修正：KeepAlive 与真取消
+
+- `useRequestGuard.start()` 发起新请求前必须调用上一 `activeController?.abort()`，并在 `onScopeDispose` 统一 `abortAll()`。
+- **KeepAlive 陷阱**：被 `<KeepAlive>` 缓存的组件切走时不会触发 `onScopeDispose` / `onUnmounted`，轮询、定时器与订阅必须在 `onDeactivated` 中暂停/取消、在 `onActivated` 中按需恢复，且 `<KeepAlive>` 必须设置 `max` 上限防内存膨胀。

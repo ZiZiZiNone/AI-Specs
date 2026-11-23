@@ -1,5 +1,7 @@
 # 万能服务
 
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
+
 对齐关系见 `backend/php/structure.md` 与 `backend/go/structure.md`，本文件不自立阈值。
 
 对齐条目：`backend/php/structure.md`「规则」：「跨聚合协作由服务组合多个仓储，禁止仓储相互调用。」

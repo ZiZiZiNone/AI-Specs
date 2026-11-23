@@ -1,40 +1,61 @@
 <?php
-
 declare(strict_types=1);
 
-namespace BackendPhpTest;
+namespace App;
 
-// 订单服务：承载全部业务规则。依赖经构造函数注入。
-class OrderService
+final class OrderService
 {
-    public function __construct(
-        private TransactionManager $db,
-        private OrderRepositoryInterface $orders,
-    ) {}
+    public const DEFAULT_PAGE_SIZE = 20;
+    public const MAX_PAGE_SIZE = 100;
+    public const DEFAULT_IDEMPOTENCY_TTL = 86400;
 
-    // 去重记录与业务行同事务落子；唯一冲突后，在失败事务之外的新读路径
-    // 回读首次结果，不在已冲突事务内继续查询；回读比对用户与关键载荷，
-    // 同键异载荷抛冲突，不跨作用域复用结果。
-    public function create(OrderInput $in): OrderResult
+    /** @var callable(): int */
+    private $clock;
+
+    /** @param (callable(): int)|null $clock */
+    public function __construct(
+        private readonly OrderRepositoryInterface $repo,
+        private readonly TransactionManagerInterface $tx,
+        ?callable $clock = null,
+    ) {
+        $this->clock = $clock ?? static fn (): int => time();
+    }
+
+    public function create(OrderInput $input): OrderResult
     {
-        $in->validate();
-        $result = null;
-        try {
-            $this->db->transaction(function () use ($in, &$result): void {
-                $result = $this->orders->insert($in);
-            });
-        } catch (DuplicateKeyException) {
-            $first = $this->orders->findByIdempotencyKey($in->idempotencyKey);
-            if ($first->userId !== $in->userId
-                || $first->amountCents !== $in->amountCents
-                || $first->couponCode !== $in->couponCode) {
-                throw new ConflictException($in->idempotencyKey);
+        if (trim($input->userId) === '' || trim($input->itemId) === '' ||
+            trim($input->idempotencyKey) === '' || $input->quantity <= 0 || $input->unitPriceCents <= 0) {
+            throw new InvalidInputException('Invalid order parameters');
+        }
+
+        $nowTs = ($this->clock)();
+        $totalCents = $input->quantity * $input->unitPriceCents;
+
+        return $this->tx->run(function () use ($input, $totalCents, $nowTs): OrderResult {
+            $existing = $this->repo->findByIdempotencyKey($input->userId, $input->idempotencyKey, $nowTs);
+            if ($existing !== null) {
+                if ($existing->payloadHash !== $input->payloadHash()) {
+                    throw new ConflictException('Idempotency key payload mismatch', ['userId' => $input->userId]);
+                }
+                return $existing;
             }
-            return $first;
-        }
-        if (!$result instanceof OrderResult) {
-            throw new \LogicException('unreachable: committed without result');
-        }
-        return $result;
+            return $this->repo->insert($input, $totalCents, $nowTs, self::DEFAULT_IDEMPOTENCY_TTL);
+        });
+    }
+
+    /**
+     * @return array{items: list<OrderResult>, page: array{page: int, pageSize: int, total: int, totalPages: int}}
+     */
+    public function list(ListOrdersQuery $query): array
+    {
+        $safePage = max(1, $query->page);
+        $safePageSize = $query->pageSize <= 0 ? self::DEFAULT_PAGE_SIZE : min($query->pageSize, self::MAX_PAGE_SIZE);
+        return $this->repo->list(new ListOrdersQuery(
+            userId: $query->userId,
+            page: $safePage,
+            pageSize: $safePageSize,
+            sortBy: $query->sortBy,
+            sortOrder: $query->sortOrder,
+        ));
     }
 }

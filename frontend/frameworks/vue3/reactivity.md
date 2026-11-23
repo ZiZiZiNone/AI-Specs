@@ -145,3 +145,10 @@ watch(
 - [ ] flush 保持默认，改动有说明
 - [ ] watch 内的定时器/请求有清理
 - [ ] watch 内无业务判断、无状态同步、无自触发
+
+## v2.0 响应式高频陷阱补全
+
+- **`onWatcherCleanup` 版本门槛**：仅适用于 **Vue 3.5+**；低于 3.5 的项目继续使用 `watch` 回调的第三参数 `onCleanup`。
+- **`markRaw`**：第三方重量级非响应式实例（ECharts、Map、Monaco Editor、WebSocket）必须用 `markRaw()` 包裹后再存入 `ref`/`shallowRef`，避免被 Proxy 代理引发性能退化或方法异常。
+- **`watchEffect` 异步断链**：仅在第一个 `await` 之前同步读取的响应式依赖会被追踪，`await` 之后读取的依赖不会触发重新执行。
+- **`computed` 返回新对象误触发**：当 `computed` 返回新字面量对象（如从 `route.query` 派生查询对象）时，无关 query 参数变化也会生成新引用；监听时应比较序列化键或指定具体字段。

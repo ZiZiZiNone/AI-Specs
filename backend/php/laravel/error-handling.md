@@ -1,23 +1,14 @@
-# Laravel 错误映射差异
+# Laravel 13 异常处理差异规范
 
-路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析，首段为 `common/`、`frontend/` 或 `backend/`。见 `<SPEC_ROOT>/README.md`「路径基准」。
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
 
-基准见 `backend/README.md`「分层原则（PHP / Go 共用）」。
+## Laravel 专属约束
 
-## 规则
-
-- 领域异常在异常处理器集中映射状态码，服务不感知传输语义。
-- 表单请求校验失败统一错误结构，字段错误与业务错误体格式一致。
-- 模型缺失、授权失败的框架异常翻译为统一业务错误码，不直接透出。
-- 队列任务异常带重试标记记录，不与传输错误体混用。
-- 未处理异常生产只返通用码，细节进日志不进响应。
-- 错误码表集中维护，禁止各处散写魔法数字。
+1. **统一异常注册（`bootstrap/app.php`）**：Laravel 11–13 在 `bootstrap/app.php` 的 `withExceptions(function (Exceptions $exceptions) { ... })` 中集中注册领域异常到统一信封 `{code, message, data: null, requestId}` 及 HTTP 状态码（400/401/403/404/409/422/429/500）的映射。
+2. **领域异常带错误码与上下文**：自定义领域异常继承统一基类 `DomainException`，携带稳定业务码 `errorCode` 与安全上下文数组，不向客户端泄露 `ValidationException` 之外的内部 SQL/文件名。
+3. **日志降噪**：通过 `$exceptions->dontReport([...])` 或分级上报避免 4xx 业务拒绝触发 `ERROR` 告警风暴。
 
 ## 检查清单
 
-- [ ] 映射集中在处理器
-- [ ] 校验错误结构统一
-- [ ] 框架异常已翻译
-- [ ] 队列错误独立处理
-- [ ] 生产无细节泄露
-- [ ] 错误码表唯一
+- [ ] 异常映射集中在 `bootstrap/app.php` `withExceptions` 中统一输出信封
+- [ ] 4xx 领域异常不触发 `ERROR` 告警风暴，生产环境 `APP_DEBUG=false`

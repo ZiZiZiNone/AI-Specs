@@ -141,7 +141,7 @@ Component({
 })
 ```
 
-搜索防抖走 `frontend/rules/form-validation.md` 结论：用户停止输入 500ms 后才发起请求，格式未合法不发起，与 guard 双保险叠加而不替代。
+搜索防抖走 `frontend/rules/form-validation.md` 结论：用户停止输入 300ms 后才发起请求，格式未合法不发起，与 guard 双保险叠加而不替代。
 
 ## 不要制造纯转发层
 
@@ -160,5 +160,10 @@ Service 已是统一入口，再包一层不含判定的转发只是多一次跳
 - [ ] logic 内无 `setData`、无 `wx.request` 直调、无 UI 操作
 - [ ] 失败经 error 字段返回，取消静默不写 error 态
 - [ ] 快速切换场景有 guard 双保险；`onUnload` / `detached` 调 `abortAll`
-- [ ] 搜索类场景有 500ms 防抖且格式未合法不发起，与 guard 叠加
+- [ ] 搜索类场景有 300ms 防抖且格式未合法不发起，与 guard 叠加
 - [ ] 每个 logic 函数都过转发层判据：删掉它有业务规则丢失
+
+## v2.0 触底分页防重入与搜索防抖统一
+
+- **先写 `loading: true` 再发请求**：`onReachBottom` 必须先检查 `if (this.data.loadingMore || !this.data.hasMore) return;`，立即 `this.setData({ loadingMore: true })` 再发起异步请求，并由 `createRequestGuard` 防止并发重入与后发先至（参考实现见 `frontend/frameworks/miniprogram/test/miniprogram/logic/pagination.mjs`）。
+- **搜索防抖统一为 300ms**：与全库 `frontend/patterns/list-page.md`、`frontend/rules/async-operations.md` 保持一致，统一使用 `300ms`。

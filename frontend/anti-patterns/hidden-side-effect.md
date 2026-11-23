@@ -1,5 +1,7 @@
 # 隐藏副作用
 
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
+
 对齐关系见 `frontend/rules/core-principles.md`「FE-103 逻辑完全解耦原则」与「FE-104 单向数据流原则」，本文件讲副作用显式声明。
 
 ## 定义

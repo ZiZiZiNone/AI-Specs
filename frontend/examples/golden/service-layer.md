@@ -1,5 +1,7 @@
 # 示例：Service 层
 
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
+
 来源：本示例自包含，不依赖外部工程；代码即规范结论的完整载体。
 示范：`frontend/rules/api.md`「参数校验、响应数据转换、错误归一统一在 Service 内处理。」、 `frontend/rules/error-handling.md`「根据错误码/类型转换为用户友好的提示」「是否可重试；须被重试逻辑真实消费，不可只标不用」、 `frontend/rules/async-operations.md`「重试的前提是"重复执行不产生额外后果"。判断顺序：」「POST 等非幂等操作**禁止自动重试**，失败后交由用户手动触发」
 
@@ -59,6 +61,10 @@ export function fetchTicketDetail(
 ```typescript
 function withTimeout(timeoutMs: number, externalSignal?: AbortSignal) {
   const controller = new AbortController();
+  if (externalSignal?.aborted) {
+    controller.abort();
+    return { signal: controller.signal, isTimeout: () => false, dispose: () => {} };
+  }
   let timedOut = false;
 
   const timer = setTimeout(() => {
@@ -99,7 +105,8 @@ async function request<T>(method: string, path: string, options: RequestOptions 
     if (lastResult.success || !lastResult.error.retryable) break;
     if (options.signal?.aborted) return { success: false, error: CANCELED_ERROR };
 
-    await delay(RETRY_BASE_DELAY_MS * 2 ** (attempt - 1));
+    const ok = await delayWithSignal(RETRY_BASE_DELAY_MS * 2 ** (attempt - 1), options.signal);
+    if (!ok || options.signal?.aborted) return { success: false, error: CANCELED_ERROR };
     lastResult = await attemptOnce<T>(method, path, options);
   }
   return lastResult;
@@ -168,3 +175,9 @@ it('should_produce_user_readable_message_without_technical_terms', () => {
   expect(error.message).not.toContain('Error');
 });
 ```
+
+## v2.0 关键修复说明（已同步至可运行切片 `frontend/frameworks/vue3/test/`）
+
+1. **HTTP 200 业务码强制校验**：收到 HTTP 2xx 响应解析 JSON 后，必须检查 `payload.code === 0`；非零一律归入业务失败分支并返回标准化错误对象（对齐 `common/rules/api-contract.md`）。
+2. **`withTimeout` 预判已中止信号**：进入 `withTimeout` 首行先判 `if (externalSignal?.aborted)`，若外部已取消则立即返回已中止信号，不再发出网络请求。
+3. **可中断的指数退避等待**：重试循环中的 `delayWithSignal(ms, signal)` 必须监听 `signal` 的 `abort` 事件并立即 `clearTimeout` 退出；退避结束后再次检查 `signal?.aborted` 再发起下一次尝试。

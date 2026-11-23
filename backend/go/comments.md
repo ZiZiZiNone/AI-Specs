@@ -1,23 +1,26 @@
-# Go 注释与文档
+# Go 注释与 GoDoc 规范
 
-路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析，首段为 `common/`、`frontend/` 或 `backend/`。见 `<SPEC_ROOT>/README.md`「路径基准」。
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
 
-基准见 `common/principles.md`「逻辑解耦原则」。方法见 `common/rules/comment.md`「规则」。
+通用原则见 `common/rules/comment.md`。
 
-## 规则
+## 规则与正反示例
 
-- 导出类型、接口与函数必写意图注释，说明职责与适用边界，不复述签名可读出的信息。自解释的导出符号可免注释，但须在包注释中说明判定标准。
-- 逻辑单元输入输出用明确的数据结构定义，字段含义、单位与取值范围写在结构体注释中。
-- 复杂分支写意图与取舍，不写过程流水账，未确认的结论标注待确认，不编造数字。
-- 包注释说明本包职责与非职责，跨包调用入口在包注释中指明，不让读者猜测装配关系。
-- 注释与代码同改，行为变更必同步更新注释与示例，失效注释直接删除不保留。
-- 对外接口注释给出成功与失败示例，错误语义指向业务码，调用方可据注释写出正确分支。
+1. **导出符号必写 GoDoc**：所有导出的 package、type、func、const 注释以标识符名开头，说明契约、并发安全性与错误语义。
+2. **行内注释只写“为什么”**：解释业务不变量、锁顺序或协议怪癖，不复述代码字面逻辑；`TODO` 须带 `(owner/#issue)`。
+
+```go
+// ✅ 正例：以标识符开头，说清并发安全性与错误契约
+// Create 创建订单并保证同用户同幂等键可安全重放；载荷不一致时返回 model.ErrConflict。
+func (l *OrderLogic) Create(ctx context.Context, req api.CreateOrderRequest) (api.OrderResponse, error)
+
+// ❌ 反例：复述代码 + 无主 TODO
+// 创建订单
+// TODO: 以后优化
+func (l *OrderLogic) Create(ctx context.Context, req api.CreateOrderRequest) (api.OrderResponse, error)
+```
 
 ## 检查清单
 
-- [ ] 导出符号均有意图注释
-- [ ] 输入输出结构字段含义完整
-- [ ] 复杂分支有取舍说明
-- [ ] 包职责与非职责清晰
-- [ ] 注释与代码同步无失效
-- [ ] 接口示例覆盖成功与失败
+- [ ] 导出类型与函数均具备标准 GoDoc 契约注释
+- [ ] 无复述代码、无死代码注释、无无主 `TODO`

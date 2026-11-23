@@ -1,5 +1,7 @@
 # 示例：表单校验
 
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
+
 来源：本示例自包含，不依赖外部工程；代码即规范结论的完整载体。
 示范：`frontend/rules/form-validation.md`「验证规则定义在 Logic 文件中」「非必填字段留空时必须跳过后续规则」「用户停止输入 500ms 后才发起请求」「格式尚未合法时不发起请求」、 `frontend/patterns/form-page.md`「校验规则定义在 Logic，UI 只做触发与展示错误。」、 FE-103 `frontend/rules/core-principles.md`「FE-103 逻辑完全解耦原则」「完全解耦合的函数/工厂/方法/逻辑，在独立的逻辑文件（全局或局部），只需要接受固定结构数据（或不需要）就能完成功能。」
 
@@ -81,13 +83,13 @@ function handleBlur(field: keyof TicketFormValues): void {
 async function submit(): Promise<SubmitOutcome> {
   isSubmitted.value = true;
   const nextErrors = validateForm(values);
-  Object.assign(errors, nextErrors);
+  replaceErrors(errors, nextErrors) // 先清空已修复字段的旧键，再写入新错;
 
   const focusField = resolveFirstErrorField(nextErrors);
   if (focusField) {
     return { isSuccess: false, focusField, message: '请修正表单中的错误后再提交' };
   }
-  const result = await submitTicket(values);
+  const result = await submitTicket(toSubmitPayload(values));
   return result;
 }
 ```
@@ -268,3 +270,10 @@ it('should_accept_file_exactly_at_size_limit', () => {
   expect(result.isValid).toBe(true);
 });
 ```
+
+## v2.0 关键修复说明（已同步至可运行切片 `frontend/frameworks/vue3/test/`）
+
+1. **彻底消除旧错残留**：校验后必须清空不在 `nextErrors` 中的旧字段错误键，禁止仅用 `Object.assign(errors, nextErrors)` 合并。
+2. **提交前强制剔除隐藏字段并加提交锁**：`submit()` 必须维护 `isSubmitting` 防重入锁，且必须调用完整的 `toSubmitPayload(values)`（包含 `contactPhone`、`description`、`attachments` 等全部可见字段并剔除当前隐藏字段）。
+3. **失焦校验尊重首次输入时机**：`handleBlur(field)` 仅当字段已被修改（`dirty`）或表单已尝试提交过（`hasSubmitted`）时才显示错误，未输入直接失焦不报错。
+4. **异步唯一性校验资源清理与提交联动**：`useAsyncSearch` 须在 `onScopeDispose` 清理 `timer` 与 `AbortController`；校验通过时立即清除先前占用错误；同步提交前检查异步校验状态。

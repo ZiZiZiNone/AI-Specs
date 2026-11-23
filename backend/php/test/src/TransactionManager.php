@@ -1,31 +1,34 @@
 <?php
-
 declare(strict_types=1);
 
-namespace BackendPhpTest;
+namespace App;
 
-// 事务管理器：闭包成功提交，失败回滚；提交失败同样走统一回滚口，不分叉计数。
-// 零依赖演示故直接依赖内存仓储，生产替换为框架绑定实现。
-class TransactionManager
+use Throwable;
+
+final class TransactionManager implements TransactionManagerInterface
 {
-    public function __construct(private MemoryOrderRepository $repo) {}
+    private bool $inTransaction = false;
+    public int $rollbacks = 0;
 
-    /** @param callable(): mixed $fn */
-    public function transaction(callable $fn): mixed
+    public function __construct(private readonly MemoryOrderRepository $repo) {}
+
+    public function run(callable $callback): mixed
     {
+        if ($this->inTransaction) {
+            throw new NestedTransactionException();
+        }
+        $this->inTransaction = true;
         $this->repo->beginTx();
         try {
-            $result = $fn();
-        } catch (\Throwable $e) {
-            $this->repo->rollbackTx();
-            throw $e;
-        }
-        try {
+            $result = $callback();
             $this->repo->commitTx();
-        } catch (\Throwable $e) {
+            return $result;
+        } catch (Throwable $e) {
             $this->repo->rollbackTx();
+            $this->rollbacks++;
             throw $e;
+        } finally {
+            $this->inTransaction = false;
         }
-        return $result;
     }
 }

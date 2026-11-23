@@ -1,5 +1,7 @@
 # 仓储越界
 
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
+
 对齐关系见 `backend/go/structure.md`（数据层收敛）与 `backend/php/structure.md`，本文件不自立新约束。
 
 对齐条目：`backend/go/structure.md`「规则」：「dao 封装全部 SQL，logic 不直接操作数据库连接，不拼 SQL 字符串。」；`backend/php/laravel/structure.md`「规则」：「仓储封装全部查询实现，服务禁止直调模型查询构造器。」

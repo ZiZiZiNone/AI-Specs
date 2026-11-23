@@ -1,5 +1,7 @@
 # 胖控制器
 
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
+
 对齐关系见 `backend/go/structure.md` 与 `backend/php/structure.md`，本文件不自立阈值，命中症状即进入对策。
 
 对齐条目：`backend/go/structure.md`「规则」：「controller 只做参数绑定、调 service、写响应，无业务分支。」；`backend/php/structure.md`「规则」：「控制器只解析输入、调用服务、返回资源，禁止业务判断与模型直调。」

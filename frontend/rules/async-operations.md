@@ -235,28 +235,30 @@ async function search(keyword: string) {
 ```typescript
 // ✅ 完整的竞态处理：双保险 + 作用域销毁时自动清理
 export function useRequestGuard() {
-  const controllers = new Set<AbortController>();
-  const latestToken = ref(0);
+  let activeController: AbortController | null = null;
+  let latestToken = 0;
 
   function start() {
+    // 发起新请求前先真正中断上一在途请求（单飞覆盖）
+    activeController?.abort();
     const controller = new AbortController();
-    controllers.add(controller);
-    latestToken.value += 1;
-    const token = latestToken.value;
+    activeController = controller;
+    const token = ++latestToken;
 
     return {
       signal: controller.signal,
-      isStale: () => {
-        controllers.delete(controller);
-        return token !== latestToken.value;
+      // 纯查询：不提前清空 activeController，保证 abortAll() 仍可中止当前请求
+      isStale: () => token !== latestToken,
+      done: () => {
+        if (activeController === controller) activeController = null;
       },
     };
   }
 
   function abortAll(): void {
-    for (const controller of controllers) controller.abort();
-    controllers.clear();
-    latestToken.value += 1;
+    activeController?.abort();
+    activeController = null;
+    latestToken += 1;
   }
 
   onScopeDispose(abortAll);
@@ -429,7 +431,7 @@ const result = await fetchWithRetry(() => api.createTicket(values), 3);
 
 **规则**：
 - 仅对幂等请求开启（见上）
-- 最多重试 3 次（含首次共 3 次尝试）
+- 最多尝试 3 次（首次 + 最多 2 次重试，退避间隔 1s、2s；如需 3 次重试则共 4 次尝试，退避 1s、2s、4s）
 - 使用指数退避（1s, 2s, 4s）
 - 非临时性错误不重试（4xx，除 429）
 - 依据 StandardError.retryable 决定，不在调用点各自判断状态码
@@ -768,3 +770,9 @@ async function longPolling() {
 - [ ] 组件卸载时取消了未完成的请求
 - [ ] 乐观更新有失败回滚机制，且快照在写入前保存
 - [ ] 轮询在组件卸载时停止
+
+## v2.0 强制修正：useRequestGuard 取消旧请求与可中断退避
+
+- `useRequestGuard.start()` 发起新请求前**必须主动调用旧 `AbortController.abort()`**（单飞覆盖模式），仅靠递增序号丢弃旧响应而不中断网络连接属于违规实现。
+- 退避等待函数必须接入 `AbortSignal`，取消信号到达时立即终止等待，禁止在取消后继续发起下一轮重试。
+- 可运行参考实现见 `frontend/frameworks/vue3/test/src/hooks/useRequestGuard.mjs` 与 `frontend/frameworks/vue3/test/src/services/httpClient.mjs`。

@@ -1,24 +1,21 @@
-# PHP 错误处理
+# PHP 错误与异常处理规范
 
-路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析，首段为 `common/`、`frontend/` 或 `backend/`。见 `<SPEC_ROOT>/README.md`「路径基准」。
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
 
-基准见 `backend/README.md`「分层原则（PHP / Go 共用）」与 `common/principles.md`「逻辑解耦原则」。
+## 规则与正反示例
 
-## 规则
+1. **领域异常统一基类**：继承统一 `DomainException` 携带稳定整型业务错误码 `errorCode` 与安全上下文数组（参考 `backend/php/test/src/Exceptions.php`），禁止裸抛 `new \Exception('fail')`。
+2. **禁吞异常与 SQL 脱敏**：禁止空 `catch (Throwable $e) {}`；仓储层不私自重试，捕获底层 PDO 异常后映射为领域异常且不泄露原始 SQL 绑定参数。
 
-- 服务抛领域异常，仓储抛数据访问异常，控制器不直接捕获底层异常。
-- 统一在异常处理器映射状态码，控制器内禁止拼状态码。
-- 领域异常携带错误码与上下文数组，不携带传输对象与模型敏感字段。
-- 校验失败走表单请求异常，业务冲突走领域异常，不混用。
-- 重试只在服务边界显式决策，仓储内不得自行重试。
-- 记录异常时保留原异常链，禁止吞异常后返回空值。
-- 对外错误负载只含 code 与 message；SQL 只记参数化模板与脱敏参数，禁止拼接后全语句落日志，堆栈不离日志。
+```php
+// ✅ 正例：语义明确、带稳定业务码与安全上下文
+throw new ConflictException('Idempotency key payload mismatch', ['userId' => $input->userId]);
+
+// ❌ 反例：裸抛通用异常或吞掉异常
+try { $this->repo->insert(...); } catch (\Throwable $e) {}
+```
 
 ## 检查清单
 
-- [ ] 异常类型与层职责对应
-- [ ] 状态码映射集中一处
-- [ ] 异常上下文不含敏感信息
-- [ ] 无吞异常与空返回
-- [ ] 重试策略显式可测
-- [ ] 对外负载无堆栈泄露
+- [ ] 全部业务异常继承统一 `DomainException` 并携带业务码
+- [ ] 无空 `catch` 块，异常响应不泄露内部堆栈与 SQL 原文

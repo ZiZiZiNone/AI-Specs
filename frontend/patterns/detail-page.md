@@ -82,3 +82,9 @@
 - frontend/checklists/detailed-check.md「二、架构层次检查」：Page/Hook/Logic/Service 各层条目。
 - frontend/checklists/detailed-check.md「三、状态管理检查」：状态归属、单一来源、无 props 副本。
 - frontend/checklists/detailed-check.md「十一、测试检查」：Logic 单测、边界与错误路径覆盖。
+
+## v2.0 路由切换清旧态与多区块降级
+
+- **路由 `id` 切换防闪现**：从 `/tickets/1` 跳转到 `/tickets/2` 时，**不可**沿用列表页“刷新保留旧数据”策略，必须立即清空旧详情并进入 `loading` 态，防止短暂展示工单 1 的内容。
+- **404 / 403 与 5xx 占位区分**：`404`/`403` 展示明确“不存在/无权限 + 返回列表”，不显示无意义的“重试”按钮；`5xx`/网络超时显示“重试”。
+- **多区块独立加载**：主信息与次要区块（如操作日志、关联附件）拆分独立五态，次要区块失败时局部降级，不阻断主详情展示。

@@ -1,24 +1,25 @@
-# PHP 命名约定
+# PHP 命名规范
 
-路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析，首段为 `common/`、`frontend/` 或 `backend/`。见 `<SPEC_ROOT>/README.md`「路径基准」。
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
 
-基准见 `common/rules/naming.md`「跨语言规则」与 `backend/README.md`「分层原则（PHP / Go 共用）」。
+跨语言语义原则见 `common/rules/naming.md`「跨语言规则」。
 
-## 规则
+## 规则与正反示例
 
-- 控制器用资源复数命名，方法限于资源动作，自定义动作用业务动词。
-- 服务以服务后缀结尾，方法用业务动词，不用泛化动词。
-- 仓储以仓储后缀结尾，方法用查询语义，禁止业务动词。
-- DTO 以数据后缀结尾且为只读，字段用驼峰命名，禁止直接复用请求类。
-- 模型用单数大写驼峰，表名复数蛇形，枚举用单数。
-- 异常以异常后缀结尾，错误码常量集中于领域枚举，不散落字符串。
-- 测试类与被测类同名加测试后缀，数据集方法有统一前缀。
+1. **PSR-4 命名空间与文件名严格一致**：类名 `PascalCase`、方法与属性 `camelCase`、类常量 `UPPER_SNAKE_CASE`；接口统一 `*Interface` 后缀（如 `TransactionManagerInterface`）。
+2. **只读 DTO 与单位后缀**：传输与查询对象使用 `final readonly class`（如 `OrderInput`、`ListOrdersQuery`），金额与时间字段显式带 `*Cents` / `*Ts` / `*Seconds`。
+
+```php
+// ✅ 正例
+final readonly class ListOrdersQuery {
+    public function __construct(public string $userId = '', public int $page = 1) {}
+}
+
+// ❌ 反例：无类型关联数组四处透传
+function listOrders(array $params) { ... }
+```
 
 ## 检查清单
 
-- [ ] 层后缀与职责一致
-- [ ] 方法名表达业务或查询语义
-- [ ] 无泛化动词命名
-- [ ] DTO 与请求类分离
-- [ ] 枚举与错误码集中
-- [ ] 测试命名可定位被测单元
+- [ ] 命名空间与目录路径完全符合 PSR-4
+- [ ] 接口带 `Interface` 后缀，核心载荷封装为 `readonly` DTO

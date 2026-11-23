@@ -1,67 +1,136 @@
-// Package logic 承载订单业务规则：去重、作用域与载荷一致性、事务边界、失败语义。
 package logic
 
 import (
 	"context"
+	"errors"
+	"fmt"
+	"strings"
+	"time"
 
-	"spectest.local/backend-go-test/internal/dao"
-	"spectest.local/backend-go-test/internal/model"
-	"spectest.local/backend-go-test/internal/service"
+	"example.com/ai-specs/order-slice/api"
+	"example.com/ai-specs/order-slice/internal/dao"
+	"example.com/ai-specs/order-slice/internal/model"
 )
 
-// OrderLogic 订单业务实现，依赖经构造函数注入接口。
+const DefaultIdempotencyTTL = 24 * time.Hour
+
+type nopLogger struct{}
+
+func (nopLogger) Info(context.Context, string, map[string]any) {}
+func (nopLogger) Warn(context.Context, string, map[string]any) {}
+
 type OrderLogic struct {
-	db     dao.Transactor
-	orders dao.OrderDAO
+	repo   dao.OrderRepo
+	tx     dao.TxManager
+	logger dao.Logger
+	nowFn  func() time.Time
+	ttl    time.Duration
 }
 
-// NewOrderLogic 构造业务实现。
-func NewOrderLogic(db dao.Transactor, orders dao.OrderDAO) *OrderLogic {
-	return &OrderLogic{db: db, orders: orders}
-}
-
-// 编译期保证接口满足。
-var _ service.OrderService = (*OrderLogic)(nil)
-
-// Create 创建订单。去重记录与业务行同事务落子；唯一冲突后，
-// 在失败事务之外的新读路径回读首次结果，不在已冲突事务内继续查询；
-// 回读时比对用户与关键载荷，同键异载荷返回冲突，不跨作用域复用结果。
-func (s *OrderLogic) Create(ctx context.Context, in model.CreateOrderInput) (model.OrderResult, error) {
-	if err := in.Validate(); err != nil {
-		return model.OrderResult{}, err
+func NewOrderLogic(repo dao.OrderRepo, tx dao.TxManager, logger dao.Logger, nowFn func() time.Time) *OrderLogic {
+	if logger == nil {
+		logger = nopLogger{}
 	}
-	var result model.OrderResult
-	err := s.db.Transact(ctx, func(ctx context.Context) error {
-		res, err := s.orders.Insert(ctx, in)
-		if err != nil {
-			return err
+	if nowFn == nil {
+		nowFn = time.Now
+	}
+	return &OrderLogic{repo: repo, tx: tx, logger: logger, nowFn: nowFn, ttl: DefaultIdempotencyTTL}
+}
+
+func validateCreateReq(req api.CreateOrderRequest) error {
+	if strings.TrimSpace(req.UserID) == "" || strings.TrimSpace(req.ItemID) == "" ||
+		strings.TrimSpace(req.IdempotencyKey) == "" || req.Quantity <= 0 || req.UnitPriceCents <= 0 {
+		return fmt.Errorf("create order validation: %w", model.ErrInvalidInput)
+	}
+	return nil
+}
+
+func (l *OrderLogic) createWithinTx(txCtx context.Context, req api.CreateOrderRequest, now time.Time) (model.Order, error) {
+	payloadHash := model.ComputePayloadHash(model.PayloadInput{
+		UserID: req.UserID, ItemID: req.ItemID, Quantity: req.Quantity,
+		UnitPriceCents: req.UnitPriceCents, CouponCode: req.CouponCode,
+	})
+	existing, findErr := l.repo.FindByIdempotencyKey(txCtx, req.UserID, req.IdempotencyKey, now)
+	if findErr == nil {
+		if existing.PayloadHash != payloadHash {
+			l.logger.Warn(txCtx, "order.create.idempotency_mismatch", map[string]any{
+				"requestId": dao.RequestIDFromContext(txCtx), "userId": req.UserID,
+			})
+			return model.Order{}, fmt.Errorf("idempotency key payload mismatch: %w", model.ErrConflict)
 		}
-		result = res
+		return *existing, nil
+	}
+	if !errors.Is(findErr, model.ErrNotFound) {
+		return model.Order{}, fmt.Errorf("lookup idempotency key: %w", findErr)
+	}
+
+	ord := &model.Order{
+		UserID: req.UserID, ItemID: req.ItemID, Quantity: req.Quantity,
+		UnitPriceCents: req.UnitPriceCents, TotalCents: int64(req.Quantity) * req.UnitPriceCents,
+		CouponCode: req.CouponCode, Status: "created", IdempotencyKey: req.IdempotencyKey,
+		PayloadHash: payloadHash, IdemExpiresAt: now.Add(l.ttl), CreatedAt: now,
+	}
+	if insErr := l.repo.Insert(txCtx, ord); insErr != nil {
+		return model.Order{}, fmt.Errorf("insert order: %w", insErr)
+	}
+	return *ord, nil
+}
+
+func (l *OrderLogic) Create(ctx context.Context, req api.CreateOrderRequest) (api.OrderResponse, error) {
+	if err := validateCreateReq(req); err != nil {
+		return api.OrderResponse{}, err
+	}
+	now := l.nowFn().UTC()
+	var result model.Order
+	err := l.tx.Transact(ctx, func(txCtx context.Context) error {
+		ord, txErr := l.createWithinTx(txCtx, req, now)
+		if txErr != nil {
+			return txErr
+		}
+		result = ord
 		return nil
 	})
-	if dao.IsDuplicateKey(err) {
-		first, ferr := s.orders.FindByIdempotencyKey(ctx, in.IdempotencyKey)
-		if ferr != nil {
-			return model.OrderResult{}, ferr
-		}
-		if first.UserID != in.UserID || first.AmountCents != in.AmountCents || first.CouponCode != in.CouponCode {
-			return model.OrderResult{}, model.ErrConflict
-		}
-		return first, nil
-	}
 	if err != nil {
-		return model.OrderResult{}, err
+		return api.OrderResponse{}, err
 	}
-	return result, nil
+	l.logger.Info(ctx, "order.create.ok", map[string]any{
+		"requestId": dao.RequestIDFromContext(ctx), "orderId": result.ID,
+	})
+	return toOrderResponse(result), nil
 }
 
-// List 列表透传：分页整形在业务层，查询收敛数据层。
-func (s *OrderLogic) List(ctx context.Context, filter model.OrderFilter) ([]model.OrderResult, int, error) {
-	if filter.Page < 1 {
-		filter.Page = 1
+func (l *OrderLogic) List(ctx context.Context, req api.ListOrdersRequest) (api.ListOrdersResponse, error) {
+	page := req.Page
+	if page < 1 {
+		page = 1
 	}
-	if filter.PageSize < 1 || filter.PageSize > 100 {
-		filter.PageSize = 20
+	pageSize := req.PageSize
+	if pageSize <= 0 {
+		pageSize = model.DefaultPageSize
+	} else if pageSize > model.MaxPageSize {
+		pageSize = model.MaxPageSize
 	}
-	return s.orders.List(ctx, filter)
+
+	res, err := l.repo.List(ctx, model.OrderFilter{
+		UserID: req.UserID, Status: req.Status, Page: page, PageSize: pageSize,
+		SortBy: req.SortBy, SortOrder: req.SortOrder,
+	})
+	if err != nil {
+		return api.ListOrdersResponse{}, fmt.Errorf("list orders: %w", err)
+	}
+	items := make([]api.OrderResponse, 0, len(res.Items))
+	for _, ord := range res.Items {
+		items = append(items, toOrderResponse(ord))
+	}
+	return api.ListOrdersResponse{
+		Items: items,
+		Page:  api.PageMeta{Page: res.Page, PageSize: res.PageSize, Total: res.Total, TotalPages: res.TotalPages},
+	}, nil
+}
+
+func toOrderResponse(o model.Order) api.OrderResponse {
+	return api.OrderResponse{
+		ID: o.ID, UserID: o.UserID, ItemID: o.ItemID, Quantity: o.Quantity,
+		TotalCents: o.TotalCents, CouponCode: o.CouponCode, Status: o.Status, CreatedAt: o.CreatedAt,
+	}
 }

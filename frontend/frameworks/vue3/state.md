@@ -1,5 +1,7 @@
 # Vue 3 状态
 
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
+
 Vue 3 侧状态实现细则。归属决策见 frontend/rules/store.md，本文只讲 Vue 侧怎么落。
 
 ## 归属到实现的映射
@@ -122,3 +124,9 @@ const session = useSessionStore();   // 组件被绑死在 store 上
 - [ ] store 内无可由 URL 承载的状态
 - [ ] 展示组件未 import store
 - [ ] reactive 解构经 toRefs
+
+## v2.0 Pinia 生产陷阱与 SSR 隔离
+
+- **解构状态必用 `storeToRefs()`**：直接解构 Pinia store 的响应式属性会丢失响应性；动作方法（actions）可直接解构。
+- **Setup Store 无内置 `$reset()`**：使用 `defineStore('id', () => { ... })` 语法时必须显式提供 `reset()` 方法，并在用户登出与切换租户时统一调用清空。
+- **SSR 跨请求污染红线**：若启用 SSR/Nuxt，严禁在模块顶层创建共享可变 `ref` 或单例缓存，所有请求级状态必须挂载在每次请求独立的 Pinia 实例中。

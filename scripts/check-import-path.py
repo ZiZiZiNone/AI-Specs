@@ -1,51 +1,31 @@
 #!/usr/bin/env python3
-"""导入路径校验脚本（frontend/rules/import-path.md 的可执行形态）。
+"""导入路径校验脚本 v2.0（frontend/rules/import-path.md 的可执行形态）。
 
-规则（逐条对应 frontend/rules/import-path.md）：
-- 禁用相对：`from './…'`、`from '../…'` 一律 FAIL，含同目录；
-  覆盖静态 import / export … from / 动态 import() / require()。
-- `@/` 须带文件后缀或以 `/index` 结尾，否则 FAIL；
-  第三方裸包与 `@scope/pkg` 形态放行；CSS `@import` / `url()` 不扫。
-- 别名唯一性不在本脚本判定（新增别名走配置评审）。
+v2.0 升级：
+- 正确跳过多行块注释 /* ... */，减少误报；
+- 支持 --json 输出结构化结果供 CI 消费；
+- 覆盖 .ts/.tsx/.js/.jsx/.mts/.cts/.mjs/.vue。
 
-扫描范围：必须显式传入业务源码目录（业务项目传入自家 src/ 或 miniprogram/）。
-跳过：.git、node_modules、dist、build、miniprogram_npm。
-
-用法：python scripts/check-import-path.py <TARGET_DIR> [--verbose]
-退出码：0 通过；1 有 FAIL；未传目录时退出码 2。
+用法：python3 scripts/check-import-path.py <TARGET_DIR> [--verbose] [--json]
+退出码：0 通过；1 有 FAIL；未传有效目录退出码 2。
 """
+import json
 import os
 import re
 import sys
 
-TARGET_ARG = sys.argv[1] if len(sys.argv) > 1 and not sys.argv[1].startswith("-") else None
-if TARGET_ARG is None:
-    print("用法：python scripts/check-import-path.py <业务源码目录> [--verbose]")
-    sys.exit(2)
-TARGET = os.path.abspath(TARGET_ARG)
-if not os.path.isdir(TARGET):
-    print(f"目标不是目录：{TARGET}")
-    sys.exit(2)
-
 SKIP_DIRS = {".git", "node_modules", "dist", "build", "miniprogram_npm"}
-SCAN_EXT = (".ts", ".tsx", ".js", ".jsx", ".mts", ".cts", ".vue")
-
+SCAN_EXT = (".ts", ".tsx", ".js", ".jsx", ".mts", ".cts", ".mjs", ".vue")
 RE_IMPORT = re.compile(
     r"""(?:import\s+(?:[^'"]*?\s+from\s+)?|export\s+[^'"]*?\s+from\s+|"""
     r"""import\s*\(\s*|require\s*\(\s*)(['"])(\.[^'"]*|@\/[^'"]*)\1"""
 )
 RE_AT = re.compile(r"^@/(.+)$")
-VERBOSE = "--verbose" in sys.argv
-
-# 真实文件后缀（一律带后缀；`*.logic` 这类点分命名不是后缀）
-SUFFIXES = (".ts", ".tsx", ".js", ".jsx", ".mts", ".cts", ".vue", ".json",
+SUFFIXES = (".ts", ".tsx", ".js", ".jsx", ".mts", ".cts", ".mjs", ".vue", ".json",
             ".css", ".scss", ".less")
 
-fails = []
-checked = 0
 
-
-def at_ok(spec):
+def at_ok(spec: str) -> bool:
     m = RE_AT.match(spec)
     if not m:
         return True
@@ -56,34 +36,65 @@ def at_ok(spec):
     return tail.endswith(SUFFIXES)
 
 
-def main():
-    global checked
-    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    for dirpath, dirnames, filenames in os.walk(TARGET):
+def scan_dir(target_dir: str, verbose: bool = False):
+    fails = []
+    checked = 0
+    for dirpath, dirnames, filenames in os.walk(target_dir):
         dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS]
         for fn in sorted(filenames):
             if not fn.endswith(SCAN_EXT):
                 continue
             path = os.path.join(dirpath, fn)
-            rel = os.path.relpath(path, root).replace(os.sep, "/")
+            rel = os.path.relpath(path, target_dir).replace(os.sep, "/")
             with open(path, encoding="utf-8") as f:
                 text = f.read()
             checked += 1
+            in_block_comment = False
             for i, line in enumerate(text.splitlines(), 1):
                 s = line.strip()
+                if in_block_comment:
+                    if "*/" in s:
+                        in_block_comment = False
+                    continue
+                if s.startswith("/*"):
+                    if "*/" not in s:
+                        in_block_comment = True
+                    continue
                 if s.startswith("//") or s.startswith("*"):
                     continue
                 for m in RE_IMPORT.finditer(line):
                     spec = m.group(2)
                     if spec.startswith("."):
-                        fails.append(f"{rel}:{i}: FAIL 相对导入 {spec}（须改 @/ 绝对路径）")
+                        fails.append({"file": rel, "line": i, "spec": spec,
+                                      "reason": f"相对导入 {spec}（须改 @/ 绝对路径）"})
                     elif not at_ok(spec):
-                        fails.append(f"{rel}:{i}: FAIL @/ 缺后缀 {spec}（须带文件后缀或 /index 结尾）")
-                    elif VERBOSE:
+                        fails.append({"file": rel, "line": i, "spec": spec,
+                                      "reason": f"@/ 缺后缀 {spec}（须带文件后缀或 /index 结尾）"})
+                    elif verbose:
                         print(f"{rel}:{i}: ok {spec}")
-    print(f"共 {checked} 个文件：FAIL {len(fails)}")
-    for line in fails:
-        print(line)
+    return checked, fails
+
+
+def main():
+    args = [a for a in sys.argv[1:] if not a.startswith("-")]
+    if not args:
+        print("用法：python3 scripts/check-import-path.py <业务源码目录> [--verbose] [--json]")
+        return 2
+    target = os.path.abspath(args[0])
+    if not os.path.isdir(target):
+        print(f"目标不是目录：{target}")
+        return 2
+
+    as_json = "--json" in sys.argv
+    verbose = "--verbose" in sys.argv
+    checked, fails = scan_dir(target, verbose=verbose and not as_json)
+
+    if as_json:
+        print(json.dumps({"checked": checked, "failCount": len(fails), "fails": fails}, ensure_ascii=False, indent=2))
+    else:
+        print(f"共 {checked} 个文件：FAIL {len(fails)}")
+        for f in fails:
+            print(f"{f['file']}:{f['line']}: FAIL {f['reason']}")
     return 1 if fails else 0
 
 

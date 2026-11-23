@@ -1,49 +1,70 @@
-// Package model 定义订单用例的纯数据结构，不依赖任何宿主与框架。
 package model
 
-import "errors"
+import (
+	"crypto/sha256"
+	"encoding/hex"
+	"errors"
+	"fmt"
+	"time"
+)
 
-// ErrValidation 参数校验失败。
-var ErrValidation = errors.New("invalid order input")
+var (
+	ErrInvalidInput      = errors.New("invalid input")
+	ErrConflict          = errors.New("idempotency conflict")
+	ErrNotFound          = errors.New("order not found")
+	ErrUnknownSortField  = errors.New("unknown sort field")
+	ErrNestedTransaction = errors.New("nested transaction not supported")
+)
 
-// ErrNotFound 按键查询无结果。
-var ErrNotFound = errors.New("order not found")
+const (
+	DefaultPageSize = 20
+	MaxPageSize     = 100
+)
 
-// ErrConflict 同键载荷不一致：用户、金额等关键载荷与首次结果不符。
-var ErrConflict = errors.New("idempotency payload conflict")
-
-// CreateOrderInput 创建订单输入，字段均为业务含义，不含传输对象。
-type CreateOrderInput struct {
-	IdempotencyKey string
-	UserID         string
-	AmountCents    int64
-	CouponCode     string
-}
-
-// Validate 校验输入。需防重放的创建必须带幂等键：空键直接拒绝，
-// 不旁路去重，否则无键请求会互相碰撞。
-func (in CreateOrderInput) Validate() error {
-	if in.IdempotencyKey == "" {
-		return ErrValidation
-	}
-	if in.UserID == "" || in.AmountCents <= 0 {
-		return ErrValidation
-	}
-	return nil
-}
-
-// OrderResult 订单创建结果，含全部比对载荷。
-type OrderResult struct {
+type Order struct {
+	Seq            int64
 	ID             string
-	IdempotencyKey string
 	UserID         string
-	AmountCents    int64
+	ItemID         string
+	Quantity       int
+	UnitPriceCents int64
+	TotalCents     int64
+	CouponCode     string
+	Status         string
+	IdempotencyKey string
+	PayloadHash    string
+	IdemExpiresAt  time.Time
+	CreatedAt      time.Time
+}
+
+type OrderFilter struct {
+	UserID    string
+	Status    string
+	Page      int
+	PageSize  int
+	SortBy    string
+	SortOrder string
+}
+
+type PageResult struct {
+	Items      []Order
+	Total      int
+	Page       int
+	PageSize   int
+	TotalPages int
+}
+
+type PayloadInput struct {
+	UserID         string
+	ItemID         string
+	Quantity       int
+	UnitPriceCents int64
 	CouponCode     string
 }
 
-// OrderFilter 列表过滤结构，分页从 1 起计。
-type OrderFilter struct {
-	UserID   string
-	Page     int
-	PageSize int
+// ComputePayloadHash 对全部关键业务载荷生成确定性哈希，避免新增字段漏检。
+func ComputePayloadHash(in PayloadInput) string {
+	raw := fmt.Sprintf("u=%s|i=%s|q=%d|p=%d|c=%s", in.UserID, in.ItemID, in.Quantity, in.UnitPriceCents, in.CouponCode)
+	sum := sha256.Sum256([]byte(raw))
+	return hex.EncodeToString(sum[:])
 }

@@ -1,5 +1,7 @@
 # 胖页面
 
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
+
 对齐关系见 `frontend/rules/core-principles.md`「FE-101 页面薄层原则」，本文件阈值数字全部引用该文件原文，不自立阈值。
 
 ## 定义

@@ -1,24 +1,17 @@
-# Go 样例工程
+# Go 最小可运行参考切片（v2.0）
 
-路径基准：本文路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
 
-本目录为 `backend/go/` 最小可运行切片：创建订单（幂等键 + 事务边界），只用标准库，零第三方依赖。
+零第三方依赖的标准库 Go 工程，演示 `BE-101` 至 `BE-107` 的完整落地：
+- 薄入口 `api/`（带 `json` tag）与 `internal/controller/`（不碰底层 `model.OrderFilter` 透传）
+- `internal/logic/` 承载业务规则、分页上限截断（`> 100` 截断为 `100`）、全字段载荷哈希幂等校验、`%w` 错误包装与 `Logger` 注入
+- `internal/dao/` 内存 Fake 演示复合幂等键 `(user_id, idempotency_key)` + TTL 过期、`defer` panic 回滚守卫、嵌套事务拦截、`ctx.Err()` 检查、白名单排序与数值序分页
 
-## 运行
+## 运行验证命令
 
 ```bash
 cd backend/go/test
-go build ./...
+gofmt -l .
 go vet ./...
-go test ./... -race -count=1
+go test -race -v ./...
 ```
-
-## 证明内容
-
-- 控制器只做绑定、调用、响应（`internal/controller/order.go`）。
-- 服务经 `Transact` 闭包显式定界，去重记录与业务行同事务落子（`internal/logic/order.go`）。
-- 唯一冲突后在失败事务之外的新读路径回读首次结果（同上）。
-- 空幂等键直接拒绝，不旁路去重（`internal/model/order.go`「Validate」+ 并发与空键测试）。
-- 测试：串行重放、失败回滚、空键拒绝、8 协程并发重放（`go test -race` 通过）。
-
-内存事务为串行化演示实现，真实隔离级别与持久化语义以各项目数据库实测为准。

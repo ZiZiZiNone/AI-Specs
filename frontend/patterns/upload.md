@@ -80,3 +80,9 @@ UI → Logic → Upload Service，收敛出口为 Upload Service 的上传方法
 - 「使用 AbortController 取消旧请求，且 signal 已实际下传到请求」
 - 「临时性错误自动重试（最多 3 次）」
 - 「重试期间外部取消能立即中断」
+
+## v2.0 大文件分片、安全校验与资源释放
+
+- **完整状态机**：大文件上传补充 `hashing`（计算内容摘要用于秒传/断点续传）、`paused`（用户暂停）、`merging`（服务端合并分片）状态。
+- **安全校验**：不仅校验扩展名与 `file.type`，关键上传须在客户端/服务端校验文件头 Magic Number 并严格限制单文件大小与并发上传队列上限（如 ≤ 3）。
+- **预览内存释放**：凡使用 `URL.createObjectURL(file)` 生成本地预览图，组件卸载或移除文件时必须调用 `URL.revokeObjectURL(url)`。

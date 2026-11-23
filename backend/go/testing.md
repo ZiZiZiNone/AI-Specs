@@ -1,23 +1,24 @@
-# Go 单元测试
+# Go 测试规范
 
-路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析，首段为 `common/`、`frontend/` 或 `backend/`。见 `<SPEC_ROOT>/README.md`「路径基准」。
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
 
-基准见 `common/principles.md`「逻辑解耦原则」与 `backend/README.md`「分层原则（PHP / Go 共用）」。方法见 `common/rules/test.md`「规则」。未验证声明见 `common/protocol/final-gate.md`「无法验证时的处理」。
+通用原则见 `common/rules/test.md`「规则」，无法执行时按 `common/protocol/final-gate.md`「无法验证时的处理」声明。
 
-## 规则
+## 规则与正反示例
 
-- 逻辑单元测试不起服务、不依赖网络与真实数据库，外部依赖用接口替身注入。
-- 优先覆盖业务规则、关键分支、边界值与错误路径，临界点本身必测，不为凑数写断言。
-- 测试命名描述行为与条件，一个测试只验一个行为（允许为同一行为写多断言），失败时可直接定位规则。
-- 输入输出用明确的数据结构构造，不传宿主对象，不测私有实现细节，只测行为结果。
-- 测试命令用 `go test ./...`（竞态检测见 `backend/go/concurrency.md`，覆盖率用 `go test -cover`），命令与结果可复现，一次通过即视为已验证。
-- 环境缺失导致无法执行时显式声明未验证项与补跑命令，不以写完测试替代通过测试。
+1. **命名与表驱动测试**：函数名严格遵守 `Test<Unit>_<Scenario>_<Expected>`；多边界场景使用表驱动（Table-Driven）+ `t.Run(tc.name, ...)`。
+2. **时间与并发确定性**：注入 `nowFn func() time.Time` 代替直接调 `time.Now()`；并发包必跑 `go test -race -v ./...`（参考 `backend/go/test/internal/logic/order_test.go`）。
+
+```go
+// ✅ 正例：行为命名 + 注入固定时钟 + 竞态检测
+func TestOrderCreate_IdempotencyExpiresAfterTTL(t *testing.T) {
+    current := time.Date(2026, 11, 23, 8, 0, 0, 0, time.UTC)
+    svc := logic.NewOrderLogic(store, store, nil, func() time.Time { return current })
+    ...
+}
+```
 
 ## 检查清单
 
-- [ ] 逻辑测试可脱离宿主运行
-- [ ] 关键分支与边界均有断言
-- [ ] 命名描述行为且单行为单测
-- [ ] 未测实现细节只测行为
-- [ ] 执行命令与结果可复现
-- [ ] 未验证项已显式声明
+- [ ] 测试命令已实跑 `go test -race ./...` 且全绿
+- [ ] 覆盖正常路径、边界截断、异常回滚与并发重放

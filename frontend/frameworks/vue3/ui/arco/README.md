@@ -1,5 +1,7 @@
 # Arco Design Vue
 
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
+
 Arco 与本规范的边界约定。核心冲突有三处：自带校验、Table 内部状态、命令式 API。
 以下取舍已定，不再逐次决策。
 
@@ -72,7 +74,7 @@ Arco `a-table` 的 `sortable`、内置 `pagination`、`rowSelection` 都会持�
 
 **约定**：
 - `:pagination="false"`，分页用独立 `a-pagination`，状态来自 URL / Logic。
-- 排序用 `sortable.defaultSortOrder` 由外部状态推导当前方向，
+- 排序用 `sortable.sortOrder（受控属性，严禁使用仅初始化生效的 defaultSortOrder 导致外部重置筛选后表头高亮不同步）` 由外部状态推导当前方向，
   变更经 `@change` 上报，不依赖组件内部记忆。
 - 多选的 `selectedKeys` 受控传入，不用组件内部选中态。
 - 单元格渲染保持简单；状态/优先级等映射调 Logic 的常量表，不在模板里写三元链。
@@ -82,7 +84,7 @@ Arco `a-table` 的 `sortable`、内置 `pagination`、`rowSelection` 都会持�
 function sortableOf(field: TicketSortField): TableSortable {
   return {
     sortDirections: ['ascend', 'descend'],
-    defaultSortOrder:
+    sortOrder（受控属性，严禁使用仅初始化生效的 defaultSortOrder 导致外部重置筛选后表头高亮不同步）:
       props.sortBy === field ? (props.sortOrder === 'asc' ? 'ascend' : 'descend') : '',
     sorter: true,
   };
@@ -175,3 +177,8 @@ import { IconPlus, IconRefresh } from '@arco-design/web-vue/es/icon';
 - [ ] 弹窗禁用遮罩关闭并自定义关闭确认，开启 unmount-on-close
 - [ ] 首屏用 a-skeleton，空态有具体文案与引导
 - [ ] 颜色文字用 Arco CSS 变量，无第二套调色板
+
+## v2.0 Arco 表单回车提交与弹窗挂载修正
+
+- **保留单行输入 Enter 提交体验**：允许在 `<a-form @submit.prevent="handleSubmit">` 绑定唯一提交处理器（仍禁用 `a-form` 内置 `rules` 校验，所有校验与防重入锁收敛在 `useTicketForm.submit` 中），避免破坏无障碍键盘回车提交。
+- **浮层挂载容器**：抽屉/弹窗内的下拉选择与日期选择器按需配置 `popup-container`，避免滚动容器裁剪错位。

@@ -1,23 +1,23 @@
-# PHP 性能规范
+# PHP 性能与内存规范
 
-路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析，首段为 `common/`、`frontend/` 或 `backend/`。见 `<SPEC_ROOT>/README.md`「路径基准」。
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
 
-基准见 `backend/README.md`「分层原则（PHP / Go 共用）」与 `common/principles.md`「单向依赖原则」。
+## 规则与正反示例
 
-## 规则
+1. **消除 N+1 与大结果集 OOM**：关联查询使用预加载（Eager Loading）；大批量导出与历史回填必须使用游标/分块（`chunkById` / Generator `yield`），严禁 `fetchAll()` 一次性把十万行加载进 PHP 内存。
+2. **缓存与常驻内存防泄漏**：遵循 `backend/patterns/caching.md`；在 Swoole/Octane 常驻进程模式下，严禁在静态属性中缓存请求级数据导致内存持续增长与跨请求串号。
 
-- 列表接口强制分页与最大条数，禁止无限制全量查询。
-- 杜绝循环内查询，关联预加载或批量查询在仓储内一次完成。
-- 热点读加缓存，失效策略与服务写路径同处一处维护。
-- 大导出走分块游标与队列，禁止一次加载全表进内存。
-- 为外键与筛选字段建索引，上线前验证慢查询。
-- 缓存生产必开，发布流程自动预热。
+```php
+// ✅ 正例：分批流式处理大表
+foreach ($repo->cursorById($batchSize = 500) as $batch) {
+    processBatch($batch);
+}
+
+// ❌ 反例：循环内逐条查库（N+1）
+foreach ($orders as $o) { $o->user = $userRepo->find($o->userId); }
+```
 
 ## 检查清单
 
-- [ ] 分页上限齐备
-- [ ] 无循环查询
-- [ ] 缓存失效同处维护
-- [ ] 大数据已分块
-- [ ] 索引经验证
-- [ ] 生产缓存已开启
+- [ ] 无循环内 DB/HTTP 查询，大导出与回填均采用分块或流式游标
+- [ ] 常驻内存模式无静态请求态缓存泄漏

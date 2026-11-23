@@ -1,23 +1,26 @@
-# Go 命名约定
+# Go 命名规范
 
-路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析，首段为 `common/`、`frontend/` 或 `backend/`。见 `<SPEC_ROOT>/README.md`「路径基准」。
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
 
-通用命名抽象见 `common/rules/naming.md`「跨语言规则」。此处只定 Go 可执行落点。输入输出形态依据见 `common/principles.md`「逻辑解耦原则」。
+跨语言语义原则见 `common/rules/naming.md`「跨语言规则」。
 
-## 规则
+## 规则与正反示例
 
-- 包名短小写单数：`user`、`order`，不与标准库撞名，不用大杂烩包名。
-- 导出类型用完整名词，接口职责明确，接口与实现命名可区分。
-- 函数用动词开头，布尔函数加肯定前缀。
-- 哨兵错误以 `Err` 开头并集中在各包 `errors.go`，调用方用错误判定分支。
-- 常量集中 `const` 块定义，DTO 字段与序列化标签显式对齐。
-- 文件名用蛇形小写并与主类型对应，测试文件 `*_test.go` 与被测文件一一对应。
+1. **首字母缩写保持大小写一致**：`UserID`、`HTTPClient`、`URLPath`（禁止 `UserId`、`HttpClient`）；包名全小写单词无下划线（`order`、`dao`，禁止 `order_service`）。
+2. **DTO 必带 `json` tag**：`api/` 下全部请求/响应结构体显式声明 camelCase `json:"..."` 标签；接口单方法优先 `-er` 后缀（`Reader`、`OrderSaver`）。
+
+```go
+// ✅ 正例
+type CreateOrderRequest struct {
+    UserID         string `json:"userId"`
+    UnitPriceCents int64  `json:"unitPriceCents"`
+}
+
+// ❌ 反例：缩写大小写不一致且缺 json tag
+type CreateOrderReq struct { UserId string; Price float64 }
+```
 
 ## 检查清单
 
-- [ ] 包名短且无杂烩包
-- [ ] 接口与实现命名可区分
-- [ ] 错误变量前缀统一
-- [ ] DTO 字段均有显式标签
-- [ ] 无标准库同名包
-- [ ] 文件名与主类型一致
+- [ ] 包名简短全小写无下划线，无 `utils`/`common` 垃圾桶包
+- [ ] `api/` DTO 全部携带明确 `json` tag，金额与时间带单位后缀

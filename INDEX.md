@@ -2,30 +2,53 @@
 
 路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
 
-确定性检索入口。引用一律编号 + 文件路径 + 原文逐字摘录，可被 `grep -F` 命中，见 COM-011 `common/rules/constitution.md`「编号 + 文件路径 + 原文逐字摘录」。
+确定性检索入口。引用一律「编号 + 文件路径 + 原文逐字摘录」，可被 `grep -F` 命中，见 COM-011 `common/rules/constitution.md`「编号 + 文件路径 + 原文逐字摘录」。
 
 ## 编号定义源
 
-- COM-007 至 COM-012：`common/rules/constitution.md`（宪法）
-- FE-000 至 FE-005：`AGENTS.md`（行为规则）
-- FE-101 至 FE-104：`frontend/rules/core-principles.md`（`## FE-101` 至 `## FE-104`）
+本库全部条款级编号仅由以下四处唯一定义（与 `AGENTS.md`、`common/rules/constitution.md`、`scripts/check-citations.py` 严格一致）：
+
+- `COM-007` 至 `COM-018`：`common/rules/constitution.md`（宪法；`COM-001` 至 `COM-006` 为历史预留号，不启用）
+- `FE-000` 至 `FE-005`：`AGENTS.md`（AI 行为规则）
+- `FE-101` 至 `FE-104`：`frontend/rules/core-principles.md`（`## FE-101` 至 `## FE-104` 前端核心原则）
+- `BE-101` 至 `BE-108`：`backend/rules/core-principles.md`（`## BE-101` 至 `## BE-108` 后端核心原则）
 
 ## 按需查阅
 
+### 通用规范（`common/`）
+- 引用可验伪：COM-011 `common/rules/constitution.md`「编号 + 文件路径 + 原文逐字摘录」
+- 授权面与任务边界：COM-012 `common/protocol/task-boundary.md`「授权面」
+- 安全红线与防幻觉：COM-013 / COM-014 / COM-015 `common/rules/constitution.md`、`common/rules/security.md`、`common/rules/ai-safety.md`
+- 可观测性与日志脱敏：COM-017 `common/rules/observability.md`
+- 向后兼容与数据演进：COM-016 `common/rules/compatibility.md`
+- 接口契约与分页幂等：`common/rules/api-contract.md`「响应信封」
+- 需求完整度分级：`common/protocol/requirement-completeness.md`「阻塞项与非阻塞项判定」
+- 交付总门禁：`common/protocol/final-gate.md`
+
+### 前端规范（`frontend/`）
 - 薄入口与量化：FE-101 `frontend/rules/core-principles.md`「FE-101 页面薄层原则」
 - 组件解耦与调用边界：FE-102 `frontend/rules/core-principles.md`「FE-102 组件完全解耦原则」
 - 逻辑解耦：FE-103 `frontend/rules/core-principles.md`「FE-103 逻辑完全解耦原则」
 - 单向数据流：FE-104 `frontend/rules/core-principles.md`「FE-104 单向数据流原则」
-- 架构分层：`frontend/rules/architecture.md`「规则」
-- 状态归属：`frontend/rules/store.md`「状态归属决策」
-- 接口契约：`common/rules/api-contract.md`「响应信封」
-- 引用可验伪：COM-011 `common/rules/constitution.md`「编号 + 文件路径 + 原文逐字摘录」
-- 授权面：COM-012 `common/rules/constitution.md`「每个任务都有授权面」
-- 事务边界与迁移：Go 见 `backend/go/transaction.md`「规则」；PHP 见 `backend/php/transaction.md`「规则」
+- 架构分层与状态归属：`frontend/rules/architecture.md`「规则」、`frontend/rules/store.md`「状态归属决策」
+- 前端安全、无障碍、性能、精度：`frontend/rules/security.md`、`frontend/rules/accessibility.md`、`frontend/rules/performance.md`、`frontend/rules/i18n-precision.md`
+- 前端框架与可运行参考测试：`frontend/frameworks/vue3/`、`frontend/frameworks/react/`、`frontend/frameworks/miniprogram/`
+
+### 后端规范（`backend/`）
+- 后端核心红线：BE-101 至 BE-108 `backend/rules/core-principles.md`
+- 事务边界与迁移：Go 见 `backend/go/transaction.md`「规则」；PHP 见 `backend/php/transaction.md`「规则」；在线 DDL 见 `backend/patterns/migration-online-ddl.md`
+- 认证与鉴权防越权：`backend/patterns/authz-security.md`
+- 并发锁、缓存、韧性、可观测、异步 Outbox：`backend/patterns/concurrency-locking.md`、`backend/patterns/caching.md`、`backend/patterns/resilience.md`、`backend/patterns/observability.md`、`backend/patterns/outbox-async.md`
 - 分层、事务、重试与复用决策：`backend/protocol/decision-trees.md`（按章取用）
-- 后端标准模式：`backend/patterns/`（列表查询、创建幂等、多表写事务）
-- 后端反模式：`backend/anti-patterns/`（胖控制器、全局数据访问、万能服务、仓储越界）
-- 后端示例：`backend/examples/golden/service-slice.md` 与 `backend/examples/golden/anti-examples.md`
+- 后端标准模式与反模式：`backend/patterns/`、`backend/anti-patterns/`
+- 后端六大语言子树与可运行测试：`backend/go/`、`backend/php/`、`backend/python/`、`backend/typescript/`、`backend/java/`、`backend/rust/`
+
+### 自动化门禁（`scripts/`）
+- 全量一键门禁：`scripts/check-all.py`
+- 引用验伪：`scripts/check-citations.py`
+- 结构一致性：`scripts/check-spec-integrity.py`
+- 安全基线扫描：`scripts/check-security-hygiene.py`
+- 导入路径校验：`scripts/check-import-path.py`
 
 ## 知识库结论
 

@@ -1,23 +1,16 @@
-# Laravel 测试差异
+# Laravel 13 测试差异规范
 
-路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析，首段为 `common/`、`frontend/` 或 `backend/`。见 `<SPEC_ROOT>/README.md`「路径基准」。
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
 
-基准见 `backend/README.md`「分层原则（PHP / Go 共用）」与 `common/principles.md`「逻辑解耦原则」。方法见 `common/rules/test.md`「规则」。
+## Laravel 专属约束
 
-## 规则
-
-- 服务单测用替身仓储，不启动应用内核与数据库。
-- 特性测试用内存数据库加事务，禁止依赖本地固定数据库状态。
-- 传输特性测试只断言接线与结构，不复制服务分支矩阵。
-- 队列、邮件、通知一律伪造断言，不发真实外部调用。
-- 时间随机数用框架伪造能力固定，不写不稳定断言。
-- 外部接口用伪造隔离，失败用例覆盖超时与错误码。
+1. **纯单元测试 vs 特性测试分离**：Service 核心逻辑优先纯 PHPUnit/Pest 单测（注入内存 Repository Fake，不启动 Laravel 容器，毫秒级运行）；HTTP 契约、中间件鉴权与数据库事务回滚放 Feature Test（使用 `RefreshDatabase`）。
+2. **内置 Fake 工具防外部副作用**：
+   - 出向 HTTP 必须使用 `Http::fake()` + `Http::preventStrayRequests()`；
+   - 队列/事件/邮件使用 `Queue::fake()` / `Event::fake()` / `Mail::fake()`；
+   - 时间相关逻辑使用 `Carbon::setTestNow(...)` 固定时钟，用例结束自动恢复。
 
 ## 检查清单
 
-- [ ] 单测脱离内核
-- [ ] 数据库可隔离回滚
-- [ ] 特性测试无分支重复
-- [ ] 外部调用已伪造
-- [ ] 时间随机已固定
-- [ ] 外部失败已覆盖
+- [ ] 测试配置启用 `Http::preventStrayRequests()`，零真实外网请求
+- [ ] 时间敏感用例全部使用 `Carbon::setTestNow()` 固定时间

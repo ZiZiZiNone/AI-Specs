@@ -2,213 +2,200 @@ package dao
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"sort"
 	"sync"
+	"time"
 
-	"spectest.local/backend-go-test/internal/model"
+	"example.com/ai-specs/order-slice/internal/model"
 )
 
-// txKey 为事务在上下文中的键，不导出。
-type txKey struct{}
+type txCtxKey struct{}
 
-// memTx 单事务暂存区：失败即丢弃，成功即原子落子。
 type memTx struct {
-	staged     []model.OrderResult
-	stagedKeys map[string]struct{}
+	stagedOrders map[string]model.Order
+	stagedKeys   map[string]string
 }
 
-func withTx(ctx context.Context, tx *memTx) context.Context {
-	return context.WithValue(ctx, txKey{}, tx)
+// MemOrderStore 线程安全的内存仓储与事务实现。
+type MemOrderStore struct {
+	mu        sync.Mutex
+	seq       int64
+	orders    map[string]model.Order
+	byScope   map[string]string
+	Rollbacks int
 }
 
-func getTx(ctx context.Context) *memTx {
-	tx, _ := ctx.Value(txKey{}).(*memTx)
-	return tx
-}
-
-// MemStore 内存实现：事务体经独立串行锁执行，仅用于演示与测试，非生产实现。
-// 真实隔离级别、连接池与持久化语义以各项目数据库实测为准。
-type MemStore struct {
-	txMu        sync.Mutex
-	mu          sync.Mutex
-	rows        map[string]model.OrderResult
-	byKey       map[string]string
-	insertCalls int
-	rollbacks   int
-	failInsert  error
-	seq         int
-}
-
-// NewMemStore 创建空内存存储。
-func NewMemStore() *MemStore {
-	return &MemStore{
-		rows:  make(map[string]model.OrderResult),
-		byKey: make(map[string]string),
+func NewMemOrderStore() *MemOrderStore {
+	return &MemOrderStore{
+		orders:  make(map[string]model.Order),
+		byScope: make(map[string]string),
 	}
 }
 
-// FailInsertWith 使下一次 Insert 注错，用于回滚测试。
-func (s *MemStore) FailInsertWith(err error) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	s.failInsert = err
+func scopeKey(userID, key string) string {
+	return userID + ":" + key
 }
 
-// Transact 串行执行闭包：失败丢弃本事务暂存并计数回滚，成功原子落子。
-// 闭包体内的数据操作按次持有数据锁，本方法不跨闭包持锁，故无死锁。
-// 不支持嵌套事务，嵌套调用直接返回错误。
-func (s *MemStore) Transact(ctx context.Context, fn func(ctx context.Context) error) error {
-	s.txMu.Lock()
-	defer s.txMu.Unlock()
+// Transact 执行带 defer panic 回滚守卫与嵌套事务拦截的原子事务。
+func (s *MemOrderStore) Transact(ctx context.Context, fn func(ctx context.Context) error) (err error) {
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	if getTx(ctx) != nil {
-		return errors.New("nested transaction not supported")
+	if ctx.Value(txCtxKey{}) != nil {
+		return model.ErrNestedTransaction
 	}
-	tx := &memTx{stagedKeys: make(map[string]struct{})}
-	if err := fn(withTx(ctx, tx)); err != nil {
-		s.mu.Lock()
-		s.rollbacks++
+
+	s.mu.Lock()
+	tx := &memTx{stagedOrders: make(map[string]model.Order), stagedKeys: make(map[string]string)}
+	txCtx := context.WithValue(ctx, txCtxKey{}, tx)
+	committed := false
+	defer func() {
+		if r := recover(); r != nil {
+			s.Rollbacks++
+			s.mu.Unlock()
+			panic(r)
+		}
+		if !committed {
+			s.Rollbacks++
+		}
 		s.mu.Unlock()
+	}()
+
+	if err = fn(txCtx); err != nil {
 		return err
 	}
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	for k := range tx.stagedKeys {
-		if _, ok := s.byKey[k]; ok {
-			s.rollbacks++
-			return &DuplicateKeyError{Key: k}
-		}
+	for id, ord := range tx.stagedOrders {
+		s.orders[id] = ord
 	}
-	for _, row := range tx.staged {
-		s.rows[row.ID] = row
-		s.byKey[row.IdempotencyKey] = row.ID
+	for sk, id := range tx.stagedKeys {
+		s.byScope[sk] = id
 	}
+	committed = true
 	return nil
 }
 
-// Insert 写入订单，幂等键全局唯一；空键直接拒绝，不落存储；冲突返回 DuplicateKeyError。
-func (s *MemStore) Insert(ctx context.Context, in model.CreateOrderInput) (model.OrderResult, error) {
-	if in.IdempotencyKey == "" {
-		return model.OrderResult{}, model.ErrValidation
+func (s *MemOrderStore) hasActiveKeyLocked(sk string, now time.Time) bool {
+	existingID, exists := s.byScope[sk]
+	if !exists {
+		return false
 	}
+	existing := s.orders[existingID]
+	return existing.IdemExpiresAt.IsZero() || existing.IdemExpiresAt.After(now)
+}
+
+func (s *MemOrderStore) Insert(ctx context.Context, o *model.Order) error {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	sk := scopeKey(o.UserID, o.IdempotencyKey)
+	if tx, ok := ctx.Value(txCtxKey{}).(*memTx); ok {
+		if s.hasActiveKeyLocked(sk, o.CreatedAt) || tx.stagedKeys[sk] != "" {
+			return model.ErrConflict
+		}
+		s.seq++
+		o.Seq, o.ID = s.seq, fmt.Sprintf("ord-%d", s.seq)
+		tx.stagedOrders[o.ID], tx.stagedKeys[sk] = *o, o.ID
+		return nil
+	}
+
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	s.insertCalls++
-	if s.failInsert != nil {
-		err := s.failInsert
-		s.failInsert = nil
-		return model.OrderResult{}, err
-	}
-	if _, ok := s.byKey[in.IdempotencyKey]; ok {
-		return model.OrderResult{}, &DuplicateKeyError{Key: in.IdempotencyKey}
-	}
-	if tx := getTx(ctx); tx != nil {
-		if _, ok := tx.stagedKeys[in.IdempotencyKey]; ok {
-			return model.OrderResult{}, &DuplicateKeyError{Key: in.IdempotencyKey}
-		}
+	if s.hasActiveKeyLocked(sk, o.CreatedAt) {
+		return model.ErrConflict
 	}
 	s.seq++
-	row := model.OrderResult{
-		ID:             fmt.Sprintf("ord-%d", s.seq),
-		IdempotencyKey: in.IdempotencyKey,
-		UserID:         in.UserID,
-		AmountCents:    in.AmountCents,
-		CouponCode:     in.CouponCode,
-	}
-	if tx := getTx(ctx); tx != nil {
-		tx.staged = append(tx.staged, row)
-		tx.stagedKeys[in.IdempotencyKey] = struct{}{}
-		return row, nil
-	}
-	s.rows[row.ID] = row
-	s.byKey[row.IdempotencyKey] = row.ID
-	return row, nil
+	o.Seq, o.ID = s.seq, fmt.Sprintf("ord-%d", s.seq)
+	s.orders[o.ID], s.byScope[sk] = *o, o.ID
+	return nil
 }
 
-// FindByIdempotencyKey 按键回读，先查本事务暂存，再查已提交。
-func (s *MemStore) FindByIdempotencyKey(ctx context.Context, key string) (model.OrderResult, error) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	if tx := getTx(ctx); tx != nil {
-		for _, row := range tx.staged {
-			if row.IdempotencyKey == key {
-				return row, nil
-			}
-		}
-	}
-	id, ok := s.byKey[key]
-	if !ok {
-		return model.OrderResult{}, model.ErrNotFound
-	}
-	return s.rows[id], nil
-}
-
-// List 过滤加分页：页码从 1 起计，页大小服务端截断上限，空页返空数组。
-func (s *MemStore) List(ctx context.Context, filter model.OrderFilter) ([]model.OrderResult, int, error) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
+func (s *MemOrderStore) FindByIdempotencyKey(ctx context.Context, userID, key string, now time.Time) (*model.Order, error) {
 	if err := ctx.Err(); err != nil {
-		return nil, 0, err
+		return nil, err
 	}
-	var all []model.OrderResult
-	for _, row := range s.rows {
-		if filter.UserID != "" && row.UserID != filter.UserID {
-			continue
+	sk := scopeKey(userID, key)
+	if tx, ok := ctx.Value(txCtxKey{}).(*memTx); ok {
+		if id, exists := tx.stagedKeys[sk]; exists {
+			ord := tx.stagedOrders[id]
+			return &ord, nil
 		}
-		all = append(all, row)
+		if s.hasActiveKeyLocked(sk, now) {
+			ord := s.orders[s.byScope[sk]]
+			return &ord, nil
+		}
+		return nil, model.ErrNotFound
 	}
-	sort.Slice(all, func(i, j int) bool { return all[i].ID < all[j].ID })
-	total := len(all)
-	page, pageSize := filter.Page, filter.PageSize
-	if page < 1 {
-		page = 1
+
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if !s.hasActiveKeyLocked(sk, now) {
+		return nil, model.ErrNotFound
 	}
-	if pageSize < 1 || pageSize > 100 {
-		pageSize = 20
+	ord := s.orders[s.byScope[sk]]
+	return &ord, nil
+}
+
+func resolveSortBy(raw string) (string, error) {
+	if raw == "" {
+		return "created_at", nil
+	}
+	if raw == "created_at" || raw == "total_cents" {
+		return raw, nil
+	}
+	return "", fmt.Errorf("sortBy %q: %w", raw, model.ErrUnknownSortField)
+}
+
+func sortOrders(matched []model.Order, sortBy string, desc bool) {
+	sort.Slice(matched, func(i, j int) bool {
+		less := matched[i].Seq < matched[j].Seq
+		if sortBy == "total_cents" && matched[i].TotalCents != matched[j].TotalCents {
+			less = matched[i].TotalCents < matched[j].TotalCents
+		}
+		if desc {
+			return !less
+		}
+		return less
+	})
+}
+
+func paginateOrders(matched []model.Order, page, pageSize int) model.PageResult {
+	total := len(matched)
+	totalPages := 0
+	if total > 0 {
+		totalPages = (total + pageSize - 1) / pageSize
 	}
 	start := (page - 1) * pageSize
 	if start >= total {
-		return []model.OrderResult{}, total, nil
+		return model.PageResult{Items: []model.Order{}, Total: total, Page: page, PageSize: pageSize, TotalPages: totalPages}
 	}
 	end := start + pageSize
 	if end > total {
 		end = total
 	}
-	return all[start:end], total, nil
+	items := make([]model.Order, end-start)
+	copy(items, matched[start:end])
+	return model.PageResult{Items: items, Total: total, Page: page, PageSize: pageSize, TotalPages: totalPages}
 }
 
-// RowCount 已提交行数，测试断言用。
-func (s *MemStore) RowCount() int {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	return len(s.rows)
-}
-
-// InsertCalls Insert 调用次数，测试断言用。
-func (s *MemStore) InsertCalls() int {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	return s.insertCalls
-}
-
-// RollbackCalled 是否发生过回滚，测试断言用。
-func (s *MemStore) RollbackCalled() bool {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	return s.rollbacks > 0
-}
-
-// FindStoredKey 直查已提交键，测试断言用。
-func (s *MemStore) FindStoredKey(key string) (model.OrderResult, bool) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	id, ok := s.byKey[key]
-	if !ok {
-		return model.OrderResult{}, false
+func (s *MemOrderStore) List(ctx context.Context, filter model.OrderFilter) (model.PageResult, error) {
+	if err := ctx.Err(); err != nil {
+		return model.PageResult{}, err
 	}
-	return s.rows[id], true
+	sortBy, err := resolveSortBy(filter.SortBy)
+	if err != nil {
+		return model.PageResult{}, err
+	}
+
+	s.mu.Lock()
+	matched := make([]model.Order, 0, len(s.orders))
+	for _, ord := range s.orders {
+		if (filter.UserID == "" || ord.UserID == filter.UserID) && (filter.Status == "" || ord.Status == filter.Status) {
+			matched = append(matched, ord)
+		}
+	}
+	s.mu.Unlock()
+
+	sortOrders(matched, sortBy, filter.SortOrder == "desc")
+	return paginateOrders(matched, filter.Page, filter.PageSize), nil
 }

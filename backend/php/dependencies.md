@@ -1,23 +1,24 @@
-# PHP 依赖管理
+# PHP 依赖与 Composer 管理规范
 
-路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析，首段为 `common/`、`frontend/` 或 `backend/`。见 `<SPEC_ROOT>/README.md`「路径基准」。
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
 
-基准见 `backend/README.md`「分层原则（PHP / Go 共用）」与 `common/principles.md`「模块解耦原则」。
+## 规则与正反示例
 
-## 规则
+1. **依赖倒置（`BE-102`）**：Service 构造函数仅依赖接口（如 `OrderRepositoryInterface`、`TransactionManagerInterface`、`LoggerInterface`），绝不硬编码依赖具体存储实现。
+2. **锁文件与安全审计**：应用项目必须提交 `composer.lock`，CI 定期运行 `composer audit`（`COM-014`）。
 
-- 全部第三方包经包管理器声明，禁止复制源码进仓与动态拉取。
-- 服务依赖仓储接口而非具体类，容器绑定在服务提供者集中配置。
-- 逻辑层禁止调用容器静态方法与服务定位器，依赖全部经构造传入。
-- 新增扩展先评估维护状态与版本兼容，不引入无人维护包。
-- 提交锁定文件，升级依赖逐个升级并跑全量测试。
-- 框架版本升级单独分支验证，不与业务改动混排。
+```php
+// ✅ 正例：依赖抽象接口
+public function __construct(
+    private readonly OrderRepositoryInterface $repo,
+    private readonly TransactionManagerInterface $tx,
+) {}
+
+// ❌ 反例：直接依赖具体实现类
+public function __construct(private readonly MemoryOrderRepository $repo) {}
+```
 
 ## 检查清单
 
-- [ ] 无源码复制依赖
-- [ ] 面向接口注入
-- [ ] 无服务定位器
-- [ ] 新包已评估兼容
-- [ ] 锁定文件已提交
-- [ ] 升级经过测试验证
+- [ ] `composer.lock` 已锁定版本并通过 `composer audit`
+- [ ] 核心服务全部通过接口构造注入，无静态 Facade 强耦合

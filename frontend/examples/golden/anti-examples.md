@@ -1,283 +1,144 @@
-# 负向示例集
+# 前端负向反例对照集（Vue 3 + 微信小程序，v2.1）
 
 路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
 
-来源：本文件内联反例，代码即载体。各节语言标签以节内代码块为准，反例为 React 18 + TS，正例为 Vue 3 + TS，不混标。
-用途：这些是真实产出的违规代码，用于识别常见偏离。每条给出违反条目与正确做法。
-
-说明：本文件内联记录了「不加约束时 AI 会怎么写」，是校验规范有效性的对照组。
-
----
+本文件已按 `FE-005` 彻底清除历史 React 18 遗留代码，全部改为 **Vue 3 + TypeScript** 与 **微信小程序** 双栈对照，同时保留全库引用的稳定章节标题。
 
 ## 1. 页面直接调用 Service
 
-违反：FE-103 `frontend/rules/core-principles.md`「FE-103 逻辑完全解耦原则」、 `frontend/rules/architecture.md`「依赖只能向下：Page/Component→Hook→Logic→Service；禁止反向依赖。」
+```ts
+// ❌ 反例：页面组件直接拼装参数、发 fetch、做业务判断（违背 FE-101）
+async function load() {
+  const res = await fetch('/api/v1/tickets?page=' + page.value);
+  const json = await res.json();
+  items.value = json.data.items;
+  canCancel.value = items.value.every((t: Ticket) => t.status === 'open');
+}
 
-来源：`pages/UserListPage.tsx:16, 155-190`
-
-```typescript
-// ❌ 页面 import Service，并在事件处理里直接发请求 + 手写反馈
-import * as userService from '../services/user.service';
-
-const handleDelete = useCallback(async (userId: string) => {
-  const confirmed = window.confirm('确定要删除该用户吗？此操作无法撤销。');
-  if (!confirmed) return;
-
-  const result = await userService.deleteUser(userId);
-  if (result.success) {
-    alert('删除成功');
-    await refreshUsers();
-  } else {
-    alert(result.error?.message || '删除失败');
-  }
-}, [refreshUsers]);
+// ✅ 正例：页面只调 useTicketList()，查询序列化与业务判断下沉 logic/
+import { useTicketList } from '@/hooks/useTicketList.ts';
+const { state, items, reload } = useTicketList(queryRef);
 ```
-
-问题：删除的编排（确认→请求→反馈→刷新→页码修正）落在页面里，
-换一个入口（详情页删除）就要复制一遍；且 `window.confirm`/`alert` 不可测试。
-
-**正确做法**：编排进 Hook，页面只调用。参见 `frontend/examples/golden/list-page.md`「6. 页面只做组装」（原文："页面内仅 1 个函数、状态全部来自 Hook。"）。
-
-```typescript
-// ✅ 页面（React 写法，反例同语言正例）
-const rowOps = useTicketRowOperations({ rows, query, total, reload, goToPage });
-// <TicketTable rows={rows} onRemove={rowOps.remove} />
-```
-
----
 
 ## 2. 展示型组件自己加载数据
 
-违反：FE-102 `frontend/rules/core-principles.md`「FE-102 组件完全解耦原则」「禁止组件内发起业务数据请求（列表/详情/提交/删除）」
+```ts
+// ❌ 反例：弹窗/表格展示组件内部发请求或读写全局 Store（违背 FE-102）
+import { useUserStore } from '@/store/user.ts';
+const store = useUserStore();
+onMounted(() => fetchTicketDetail(props.id));
 
-来源：`components/UserFormModal.tsx:44-67`
-
-```typescript
-// ❌ 弹窗组件内部发请求取详情（React 写法）
-const loadUserDetail = async (userId: string) => {
-  setIsLoadingDetail(true);
-  const result = await userService.fetchUserDetail(userId);
-  setIsLoadingDetail(false);
-  if (result.success && result.data) {
-    setInitialData({ name: result.data.name, /* … */ });
-  } else {
-    setLoadError(result.error?.message || '加载用户信息失败');
-  }
-};
+// ✅ 正例：纯受控组件，通过 props 接收数据、通过 emit 发出动作意图
+const props = defineProps<{ ticket: TicketDetail | null; loading: boolean }>();
+const emit = defineEmits<{ submit: [payload: TicketSubmitPayload]; close: [] }>();
 ```
-
-问题：组件与接口绑定，无法在其他数据源下复用，也无法单独渲染测试；
-详情加载失败的错误态被埋在组件内部，页面无法感知。
-
-**正确做法**：数据由 Hook 取，组件通过 props 接收 `initialValues` / `isLoading` / `errorMessage`。
-
----
 
 ## 3. 竞态保护形似而无实效
 
-违反：`frontend/rules/async-operations.md`「竞态条件处理」「signal 必须真正传给请求，否则 abort 不会中断任何东西」
+```ts
+// ❌ 反例：只把 controller 放进 Set 从未 abort 上一个，或未将 signal 传给 fetch
+controllers.add(controller);
+fetch(url); // 未传 signal
 
-来源：`hooks/useUserList.ts:28-45`
-
-```typescript
-// ❌ 建了 AbortController 但 signal 从未传给请求（React 写法）
-abortControllerRef.current = new AbortController();
-currentParamsRef.current = params;
-
-const result = await userService.fetchUserList(params);  // 没有 signal
-
-// ❌ 比较对象引用：两次相同条件的加载会误判为过期
-if (currentParamsRef.current !== params) return;
+// ✅ 正例：发起新请求前先 activeController?.abort()，并将 signal 透传给请求
+import { createRequestGuard } from '@/hooks/useRequestGuard.mjs';
+const { signal, isStale } = guard.start();
+const res = await requestJson({ fetchImpl: fetch, url, signal });
+if (isStale()) return;
 ```
-
-三处失效：
-- `signal` 未下传，`abort()` 不会中断任何请求。
-- Service 签名 `fetchUserList(params)` 根本不接受 `signal`，缺口在接口设计层。
-- 用对象引用做新旧判定，语义不稳定（同值不同引用 / 同引用重复调用）。
-
-**正确做法**：Service 统一接受 `{ signal }`，Hook 用单调序号判定。
-参见 `frontend/examples/golden/list-page.md`「4. 竞态双保险」（原文："仅靠 AbortController 无法覆盖"；"期间又发起了新请求，本次结果作废"）。
-
----
 
 ## 4. 每个接口重复 try-catch
 
-违反：`frontend/rules/async-operations.md`「捕获必须收敛到唯一的请求出口（统一封装的 httpClient / request），」
-
-来源：`services/user.service.ts` —— 10 个函数各写一遍：
-
-```typescript
-// ❌ ×10
-export async function fetchUserList(params: UserListParams) {
-  try {
-    const response = await axios.get('/api/users', { params, timeout: 10000 });
-    return { success: true, data: response.data.data };
-  } catch (error) {
-    return { success: false, error: transformError(error) };
-  }
+```ts
+// ❌ 反例：每个页面/Hook 各自 try/catch 且忽略 HTTP 200 非零业务码，或在 Service 层弹 Toast
+try {
+  const resp = await fetch('/api/v1/orders');
+  if (resp.status >= 400) throw new Error('fail');
+} catch (e) {
+  showToast(String(e));
 }
+
+// ✅ 正例：唯一 try/catch 与 HTTP 200 code===0 校验收敛在 httpClient，Service 只返标准错误对象
+const res = await requestJson({ fetchImpl: fetch, url: '/api/v1/orders' });
+if (!res.ok) return res;
 ```
-
-问题：`timeout: 10000` 在 10 处硬编码；新增接口靠复制，
-漏写 try-catch 就会抛到调用方；错误归一规则随时间漂移。
-
-**正确做法**：单一 `httpClient` 承担 try-catch/超时/重试，业务方法只描述接口语义。
-参见 `frontend/examples/golden/service-layer.md`「1. 统一请求出口承担 try-catch」（原文："业务方法只描述接口语义，不再包裹 try-catch"）。
-
----
 
 ## 5. retryable 计算了但没人用
 
-违反：`frontend/rules/error-handling.md`「是否可重试；须被重试逻辑真实消费，不可只标不用」、 `frontend/anti-patterns/hidden-side-effect.md`「调用方无感知即被改全局、发请求、写状态，就是隐藏副作用。」
+```ts
+// ❌ 反例：算了 retryable 但未接入可中断退避循环，或对 POST 盲目重试
+const retryable = resp.status === 503;
+// 后面直接 return error，或 delay(ms) 不监听 AbortSignal
 
-来源：`services/user.service.ts:30,40,56,68,…`
-
-```typescript
-// ❌ 每个错误都标了 retryable，但全项目没有一处读取它
-return { code: 'TIMEOUT', message: '请求超时', type: 'network', retryable: true };
+// ✅ 正例：仅 GET / 幂等请求在可重试状态码下使用 delayWithSignal(ms, signal) 退避重试
+const shouldContinue = await delayWithSignal(baseDelayMs * (2 ** attempt), signal);
+if (!shouldContinue || signal?.aborted) return { ok: false, error: CANCELED_ERROR };
 ```
-
-问题：字段成为装饰。规范要求的不是"有这个字段"，而是"重试策略由它驱动"。
-
-这是「无消费者产物」的典型形态，判据见 `common/protocol/task-boundary.md`「消费者判据（四问）」（原文："判定方式：指名消费者。指不出即为装饰性代码，删除。"）。
-
-**正确做法**：`retryable` 作为重试循环的判据，并与幂等性共同决定是否重试。
-参见 `frontend/examples/golden/service-layer.md`「3. 幂等性决定是否重试」（原文："对 POST 重试会重复创建资源（重复工单/订单）"）。
-
----
 
 ## 6. 受控组件自持一份状态
 
-违反：FE-104 `frontend/rules/core-principles.md`「FE-104 单向数据流原则」「依赖只能向下：Page/Component → Hook → Logic → Service」、 `frontend/rules/store.md`「需刷新保持的状态一律以 URL 为唯一来源，不得以 Store 作为替代。」
+```ts
+// ❌ 反例：筛选栏或弹窗把 props.keyword 拷贝进本地 ref 后自行维护，外部重置时不同步
+const localKeyword = ref(props.keyword); // 外部 reset 后视图残留旧值
 
-来源：`components/UserFilter.tsx:43-45`
-
-```typescript
-// ❌ props 传入初值后组件另存三份 state，与 URL 形成双写入点
-export const UserFilter: React.FC<UserFilterProps> = ({
-  keyword: initialKeyword, role: initialRole, status: initialStatus, onFilterChange,
-}) => {
-  const [keyword, setKeyword] = useState(initialKeyword);
-  const [role, setRole] = useState<UserRole | undefined>(initialRole);
-  const [status, setStatus] = useState<UserStatus | undefined>(initialStatus);
+// ✅ 正例：受控输入直接绑定 props 并 emit 更新，路由/父级保持单一数据源（FE-104）
+const props = defineProps<{ keyword: string }>();
+const emit = defineEmits<{ 'update:keyword': [value: string] }>();
 ```
-
-问题：`initialXxx` 命名暴露了它只在挂载时取一次——
-浏览器前进/后退、外部重置筛选时，URL 变了而组件内部不变。
-
-**正确做法**：筛选条件以 URL 为唯一来源，组件全受控（`value` + `onChange`）。
-仅"输入中的草稿值"可短暂本地持有，防抖后立即上报。参见 `frontend/examples/golden/list-page.md`「1. 筛选条件以 URL 为唯一来源」（原文："以 URL 为唯一来源后，该类 bug 从结构上消失。"）。
-
----
 
 ## 7. 校验层放弃类型
 
-违反：`frontend/rules/typescript.md`「禁止无理由 any，确实需要时用 unknown 或明确窄化。」
+```ts
+// ❌ 反例：校验函数用 any / Object.assign 合并残留旧错，且未剔除隐藏字段
+function validate(v: any) { Object.assign(errors, runRules(v)); }
 
-来源：`logic/userValidation.logic.ts:14`
-
-```typescript
-// ❌ validator 参数为 any，规则写错字段名不会被发现（React 写法）
-export interface ValidationRule {
-  validator?: (value: any, formData?: Partial<UserFormData>) => boolean;
-  message: string;
-}
+// ✅ 正例：强类型泛型规则表，全量替换 errors 并通过 toSubmitPayload 裁剪隐藏字段
+state.errors = validateTicketForm(state.values);
+await submitFn(toSubmitPayload(state.values));
 ```
 
-**正确做法**：规则表按字段泛型化，`validator` 拿到该字段的精确类型。
+## 8. 路由守卫首屏未就绪放行与不安全相对导入
 
-```typescript
-// ✅
-export type ValidationRules<T> = { [K in keyof T]?: ValidationRule<T[K]>[] };
-export interface ValidationRule<V> {
-  validator?: (value: V) => boolean;
-  message: string;
-}
+```ts
+// ❌ 反例：首屏刷新 session.user 未就绪直接 return true 绕过鉴权；使用相对导入
+import { parseTicketQuery } from '../logic/ticketQuery.logic';
+if (!session.user) return true;
+
+// ✅ 正例：单飞等待 ensureLoaded()；统一 @/ 绝对路径加扩展名
+import { parseTicketQuery } from '@/logic/ticketQuery.logic.mjs';
+await session.ensureLoaded();
+if (to.meta.requiresAuth && !session.user) return { name: 'login' };
 ```
 
----
+## 9. 小程序整数组 setData 刷写与 Service 层弹 Toast
 
-## 8. 注释复述代码
+```ts
+// ❌ 反例：每翻一页整包覆写几百条数组（易超 1024KB 上限），且在 Service 层调 wx.showToast
+this.setData({ list: [...this.data.list, ...newItems] });
 
-违反：`AGENTS.md`「行为规则（B = Behavior）」、 `common/rules/comment.md`「注释写"为什么这么做"，不写"这行做了什么"。」
-
-来源：`logic/userValidation.logic.ts`、`pages/UserListPage.tsx` 多处
-
-```typescript
-// ❌ 说的都是代码本身已经写明的事
-// 必填验证
-if (rule.required && isEmpty(value)) return rule.message;
-
-// 处理筛选变化
-const handleFilterChange = useCallback(/* … */);
+// ✅ 正例：二维分页路径增量写入，10 层页面栈经 navigateSafe 自动降级 redirectTo
+this.setData({ [`listPages[${pageIndex}]`]: newItems, loadingMore: false });
 ```
-
-对照一条有价值的注释（本文件内联，原文："非必填字段留空时跳过后续规则，否则空值会撞上格式校验"）：
-
-```typescript
-// ✅ 解释了不这样写会出什么问题
-// 非必填字段留空时跳过后续规则，否则空值会撞上格式校验
-if (isEmptyValue(value)) return null;
-```
-
----
-
-## 9. useEffect 依赖注释掩盖问题
-
-违反：`frontend/rules/async-operations.md`「竞态条件处理」「上述两种方案**须同时使用**：AbortController 负责中断在途请求，」
-
-来源：`pages/UserListPage.tsx:44-46`
-
-```typescript
-// ❌ 用注释解释为何要漏依赖，而不是消除漏依赖的必要性
-useEffect(() => {
-  loadUsers(listParams);
-}, [searchParams]); // 依赖 searchParams 而不是 listParams，避免重复渲染
-```
-
-问题：`listParams` 每次渲染都是新对象，所以只能挂 `searchParams`——
-根因是"从 URL 解析出的对象没有稳定标识"，注释只是绕开它。
-
-**正确做法**：让查询条件本身成为稳定派生值（`computed` / `useMemo` 依赖序列化串），
-或把加载触发放进以 URL 字符串为依赖的 Hook 内部。
-
----
 
 ## 10. 页面承担 13 个函数
 
-违反：FE-101 `frontend/rules/core-principles.md`「FE-101 页面薄层原则」「页面内直接定义的函数不超过 3 个」
+```ts
+// ❌ 反例：单个 .vue 页面堆砌分页、筛选、弹窗、批量删除、导出、权限判断等十余个函数
+// 违反 FE-101 页面薄层量化上限，逻辑无法独立单测
 
-来源：`pages/UserListPage.tsx` —— `updateURLParams`、`handleFilterChange`、
-`handleResetFilter`、`handleSort`、`handlePageChange`、`handlePageSizeChange`、
-`handleCreate`、`handleEdit`、`handleModalClose`、`handleFormSubmit`、
-`handleView`、`handleDelete`、`handleToggleStatus`。
-
-**正确做法**：按关注点分组抽 Hook（查询编排 / 行操作 / 弹窗），
-每个 Hook 须有独立关注点，不是把函数搬个位置。
-判据见 `frontend/protocol/decision-trees.md`「二之二、Hook 拆分决策」（原文："问：是否只是把页面函数原样搬了进来？"）。
-
----
+// ✅ 正例：按职责拆分为 useTicketList / useTicketForm / ticketQuery.logic / ticketPermission.logic
+```
 
 ## 11. Logic 层空转
 
-违反：`frontend/rules/architecture.md`「Logic：业务规则、状态流转、副作用编排，可复用、可测试。」、 `common/rules/business-rule.md`「业务规则进入Logic。」
+```ts
+// ❌ 反例：建了 logic/ 目录却只放空壳转发，真实业务判断（如状态跃迁、金额浮点计算）仍散落在页面模板与组件中
+// 既造成目录形式主义，又导致规则多处漂移
 
-现象：4 个 Hook 全部直接调 Service，Logic 只做 URL 解析与参数拼装，
-业务规则（谁能删、什么状态能改优先级、删除末页最后一条后去哪页）散落在页面与组件里。
+// ✅ 正例：所有状态机、表单校验、权限判据、分页回退算法（resolvePageAfterRemoval）沉淀在纯函数 logic/ 并配单元测试
+```
 
-**正确做法**：可判定的业务规则一律下沉 Logic 并可单测。
-参见 `frontend/examples/golden/list-page.md`「2. 改筛选必回第一页」（原文："删除末页最后一条后退回上一页，避免停在空页。"）、
-`frontend/examples/golden/form-validation.md`「4. 动态可见性与隐藏字段」（原文："提交载荷剔除隐藏字段残留，避免把上次填的回访时间带给后端。"）。
+## 12. 缺少可运行的最小验证闭环
 
----
-
-## 12. 缺少可运行的最小闭环
-
-违反：`common/protocol/final-gate.md`「无法验证时的处理」（原文："明确声明哪些验证项**未执行**（构建 / 类型检查 / 测试 / 运行）。"）
-
-现象：22 个 `.tsx/.ts` 源文件齐备，但没有 `package.json`、`tsconfig.json`、`main.tsx`，
-`axios` 从未声明为依赖——项目从一开始就不可能通过构建。
-
-**正确做法**：工程骨架先于业务代码；无法执行构建时，须按
-`common/protocol/final-gate.md`「无法验证时的处理」（原文："明确声明哪些验证项**未执行**（构建 / 类型检查 / 测试 / 运行）。"）显式声明未验证项，
-不得以"代码已写完"当作完成。
+- ❌ 反例：文档示例从未编译或运行，长期隐藏编译报错、竞态泄漏与 XSS/浮点精度缺陷（违背 `common/protocol/final-gate.md`「无法验证时的处理」）。
+- ✅ 正例：关键机制均同步落入 `frontend/frameworks/vue3/test/` 与 `frontend/frameworks/miniprogram/test/`，由 `scripts/check-all.py` 12 项门禁自动实跑验证。

@@ -1,14 +1,13 @@
-// Package service 定义业务层接口，由 logic 实现。
 package service
 
 import (
 	"context"
 
-	"spectest.local/backend-go-test/internal/model"
+	"example.com/ai-specs/order-slice/api"
 )
 
-// OrderService 订单用例接口。
+// OrderService 订单服务对外抽象契约。
 type OrderService interface {
-	Create(ctx context.Context, in model.CreateOrderInput) (model.OrderResult, error)
-	List(ctx context.Context, filter model.OrderFilter) ([]model.OrderResult, int, error)
+	Create(ctx context.Context, req api.CreateOrderRequest) (api.OrderResponse, error)
+	List(ctx context.Context, req api.ListOrdersRequest) (api.ListOrdersResponse, error)
 }

@@ -1,5 +1,7 @@
 # 自检
 
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
+
 边界/架构/状态/异步/命名/模式/测试/类型/反模式检查。
 
 完整版见 `frontend/checklists/detailed-check.md`「适用性判定」。本文件为速查版，措辞与详细版逐条对齐；缺省处以详细版为准。本速查每条仍须按三种结论记录，不适用附一句话原因。
@@ -43,3 +45,6 @@
 ### 验证（不可用"不适用"跳过；措辞与 `frontend/checklists/detailed-check.md`「测试执行」对齐，缺省处以详细版为准）
 - [ ] 构建、类型检查、测试已实际执行并通过。
 - [ ] 执行不了时，已按 `common/protocol/final-gate.md`「无法验证时的处理」"禁止默认视为通过"显式声明未验证项与风险。
+
+- [ ] 安全、无障碍、性能与精度基线达标（无未净化 `v-html`、无硬编码密钥、无裸浮点算金额、卸载已清理副作用；见 `frontend/rules/security.md`、`frontend/rules/accessibility.md`、`frontend/rules/performance.md`、`frontend/rules/i18n-precision.md`）
+- [ ] 符合 `COM-013` 至 `COM-018`，并通过 `scripts/check-import-path.py` 与 `scripts/check-security-hygiene.py`

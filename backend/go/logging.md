@@ -1,23 +1,23 @@
-# Go 日志记录
+# Go 日志规范（COM-017 / BE-106）
 
-路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析，首段为 `common/`、`frontend/` 或 `backend/`。见 `<SPEC_ROOT>/README.md`「路径基准」。
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
 
-基准见 `common/principles.md`「模块解耦原则」与 `backend/README.md`「分层原则（PHP / Go 共用）」。新增字段取舍见 `common/protocol/task-boundary.md`「消费者判据（四问）」。
+## 规则与正反示例
 
-## 规则
+1. **结构化 JSON 日志 + 上下文透传**：使用 `log/slog`（或抽象 `Logger` 接口）输出结构化键值，自动挂载 `requestId`/`traceId` 并在响应头回写 `X-Request-Id`。
+2. **严禁明文记录凭证与 PII**：敏感结构体实现 `slog.LogValuer` 脱敏输出；4xx 业务拒绝记 `Warn/Info`，仅 5xx 故障记 `Error`。
 
-- 日志记录器经参数或构造函数显式传入逻辑单元，逻辑单元不直调全局日志访问点。
-- 日志分级固定为调试、信息、告警、错误四档，错误必带请求标识与业务码，调试不入生产默认输出。
-- 请求入口生成请求标识并透传全链路，响应体回写标识，下游只透传不重造。
-- 日志写结构化字段，不拼接长文本；口令、令牌与个人敏感信息默认不记，确需记则字段白名单加脱敏。
-- 新增日志字段先指明直接消费者，无消费者的字段不加，采样与保留策略由业务项目声明。
-- 业务错误与系统故障分开记录，业务失败记信息或告警，只有不可恢复故障记错误。
+```go
+// ✅ 正例：通过 slog.LogValuer 自动脱敏，防止误打明文
+type SecretToken string
+func (SecretToken) LogValue() slog.Value { return slog.StringValue("[REDACTED]") }
+
+// ❌ 反例：fmt.Printf 裸打非结构化日志并泄露明文 token
+fmt.Printf("login user=%s token=%s
+", user, token)
+```
 
 ## 检查清单
 
-- [ ] 日志对象显式传入无全局直调
-- [ ] 分级正确且请求标识贯通
-- [ ] 敏感信息已脱敏
-- [ ] 新增字段均有指明消费者
-- [ ] 结构化字段可检索
-- [ ] 错误与业务失败未混级
+- [ ] 无 `fmt.Print*` / 全局裸 `log.Printf` 混入业务代码
+- [ ] 敏感字段具备脱敏处理，4xx 未误记 `Error`

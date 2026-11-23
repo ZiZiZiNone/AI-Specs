@@ -1,23 +1,14 @@
-# GoFrame 日志差异
+# GoFrame v2.10 日志差异规范
 
-路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析，首段为 `common/`、`frontend/` 或 `backend/`。见 `<SPEC_ROOT>/README.md`「路径基准」。
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
 
-基准见 `backend/README.md`「现有子目录」与「分层原则（PHP / Go 共用）」。
+## GoFrame 专属约束
 
-## 规则
-
-- 只写框架差异：框架日志能力收敛在基础设施边界，逻辑单元经参数接收记录器，不直调全局日志访问点。
-- 请求标识由入口中间件生成并透传，逻辑单元只透传不重造，响应与日志用同一标识关联。
-- 日志输出形态与落盘策略集中配置，逻辑单元不决定输出目标，测试时可注入内存实现断言。
-- 敏感载荷默认不记，确需记则字段白名单加脱敏；请求体过大截断记录，截断阈值显式声明，截断只控体积不作脱敏。
-- 新增日志字段先过消费者判据，无消费者不加。
-- 错误日志带业务码与调用链上下文，业务失败与系统故障分级记录，不混为同一级别。
+1. **必须使用带上下文链式调用 `g.Log().Ctx(ctx)`**：利用 GoFrame 内置 `gtrace` 自动注入 `TraceId` / `SpanId`，并配合入口中间件在 `ctx` 与响应头双向透传 `X-Request-Id`。
+2. **自定义脱敏 Handler**：为 `glog.Logger` 注册统一 `SetHandlers(...)` 脱敏处理器，输出 JSON 格式并拦截 `password`/`token`/`authorization`/`phone` 等敏感字段明文落盘（`COM-017`）。
+3. **逻辑层解耦日志库**：核心 `internal/logic` 优先依赖最小 `Logger` 接口（见 `backend/go/test/internal/dao/dao.go`），在装配层用 GoFrame `glog` 适配器实现。
 
 ## 检查清单
 
-- [ ] 逻辑单元无全局日志直调
-- [ ] 请求标识全链路一致
-- [ ] 输出目标集中配置
-- [ ] 敏感信息已脱敏截断
-- [ ] 新增字段均有消费者
-- [ ] 分级正确可检索关联
+- [ ] 全部服务端日志输出 JSON 且携带 `TraceId` 与 `requestId`
+- [ ] 已注册敏感字段脱敏 Handler，4xx 未误记 `Error`

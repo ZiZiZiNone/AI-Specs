@@ -1,23 +1,39 @@
 <?php
-
 declare(strict_types=1);
 
-namespace BackendPhpTest;
+namespace App;
 
-// 订单入口：只做组装与转发，无业务分支。
-class OrderController
+final class OrderController
 {
-    public function __construct(private OrderService $svc) {}
+    public function __construct(private readonly OrderService $service) {}
 
-    /** @param array{idempotencyKey: string, userId: string, amountCents: int} $request */
-    public function create(array $request): array
+    /**
+     * @param array{userId: string, itemId: string, quantity: int, unitPriceCents: int, idempotencyKey: string, couponCode?: string} $payload
+     */
+    public function create(array $payload): OrderResult
     {
-        $result = $this->svc->create(new OrderInput(
-            idempotencyKey: (string) ($request['idempotencyKey'] ?? ''),
-            userId: (string) ($request['userId'] ?? ''),
-            amountCents: (int) ($request['amountCents'] ?? 0),
-            couponCode: (string) ($request['couponCode'] ?? ''),
+        return $this->service->create(new OrderInput(
+            userId: (string) ($payload['userId'] ?? ''),
+            itemId: (string) ($payload['itemId'] ?? ''),
+            quantity: (int) ($payload['quantity'] ?? 0),
+            unitPriceCents: (int) ($payload['unitPriceCents'] ?? 0),
+            idempotencyKey: (string) ($payload['idempotencyKey'] ?? ''),
+            couponCode: (string) ($payload['couponCode'] ?? ''),
         ));
-        return ['id' => $result->id, 'userId' => $result->userId, 'amountCents' => $result->amountCents, 'couponCode' => $result->couponCode];
+    }
+
+    /**
+     * @param array{userId?: string, page?: int, pageSize?: int, sortBy?: string, sortOrder?: string} $query
+     * @return array{items: list<OrderResult>, page: array{page: int, pageSize: int, total: int, totalPages: int}}
+     */
+    public function list(array $query): array
+    {
+        return $this->service->list(new ListOrdersQuery(
+            userId: (string) ($query['userId'] ?? ''),
+            page: (int) ($query['page'] ?? 1),
+            pageSize: (int) ($query['pageSize'] ?? OrderService::DEFAULT_PAGE_SIZE),
+            sortBy: (string) ($query['sortBy'] ?? 'created_at'),
+            sortOrder: (string) ($query['sortOrder'] ?? 'asc'),
+        ));
     }
 }

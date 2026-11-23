@@ -1,42 +1,49 @@
-// Package api 为入口 DTO：只做输入输出形态，不含业务规则。
 package api
 
-import (
-	"spectest.local/backend-go-test/internal/model"
-)
+import "time"
 
-// CreateOrderRequest 创建订单请求。
+// CreateOrderRequest 创建订单接口请求 DTO。
 type CreateOrderRequest struct {
-	IdempotencyKey string
-	UserID         string
-	AmountCents    int64
-	CouponCode     string
+	UserID         string `json:"userId"`
+	ItemID         string `json:"itemId"`
+	Quantity       int    `json:"quantity"`
+	UnitPriceCents int64  `json:"unitPriceCents"`
+	CouponCode     string `json:"couponCode,omitempty"`
+	IdempotencyKey string `json:"idempotencyKey"`
 }
 
-// ToInput 转为业务输入。
-func (r CreateOrderRequest) ToInput() model.CreateOrderInput {
-	return model.CreateOrderInput{
-		IdempotencyKey: r.IdempotencyKey,
-		UserID:         r.UserID,
-		AmountCents:    r.AmountCents,
-		CouponCode:     r.CouponCode,
-	}
-}
-
-// OrderResponse 订单响应。
+// OrderResponse 单个订单响应 DTO。
 type OrderResponse struct {
-	ID          string
-	UserID      string
-	AmountCents int64
-	CouponCode  string
+	ID         string    `json:"id"`
+	UserID     string    `json:"userId"`
+	ItemID     string    `json:"itemId"`
+	Quantity   int       `json:"quantity"`
+	TotalCents int64     `json:"totalCents"`
+	CouponCode string    `json:"couponCode,omitempty"`
+	Status     string    `json:"status"`
+	CreatedAt  time.Time `json:"createdAt"`
 }
 
-// ToResponse 转为响应形态。
-func ToResponse(res model.OrderResult) OrderResponse {
-	return OrderResponse{
-		ID:          res.ID,
-		UserID:      res.UserID,
-		AmountCents: res.AmountCents,
-		CouponCode:  res.CouponCode,
-	}
+// ListOrdersRequest 列表查询请求 DTO。
+type ListOrdersRequest struct {
+	UserID    string `json:"userId"`
+	Status    string `json:"status,omitempty"`
+	Page      int    `json:"page"`
+	PageSize  int    `json:"pageSize"`
+	SortBy    string `json:"sortBy,omitempty"`
+	SortOrder string `json:"sortOrder,omitempty"`
+}
+
+// PageMeta 分页元信息（对齐 common/rules/api-contract.md）。
+type PageMeta struct {
+	Page       int `json:"page"`
+	PageSize   int `json:"pageSize"`
+	Total      int `json:"total"`
+	TotalPages int `json:"totalPages"`
+}
+
+// ListOrdersResponse 列表查询响应 DTO（对齐 common/rules/api-contract.md）。
+type ListOrdersResponse struct {
+	Items []OrderResponse `json:"items"`
+	Page  PageMeta        `json:"page"`
 }

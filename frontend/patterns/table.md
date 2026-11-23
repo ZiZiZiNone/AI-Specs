@@ -19,7 +19,7 @@
 
 与 frontend/patterns/list-page.md 的分工一致：列表页的 Table 只负责渲染数据与事件回调，取数与状态归取数 Hook。
 
-调用边界引自 frontend/protocol/decision-trees.md："界线在于：**Hook 里不写业务判断**。谁能删、什么状态可改、删完去哪一页，这些一律下沉 Logic；Hook 只负责调用顺序、UI 状态与错误分流。"表格上报的回调正是由 Hook 接住、交 Logic 判定后再回写的对象。
+调用边界引自 frontend/protocol/decision-trees.md（界线在于 Hook 里不写业务判断）表格上报的回调正是由 Hook 接住、交 Logic 判定后再回写的对象。
 
 ## 状态归属
 
@@ -77,3 +77,9 @@ props 规模按 frontend/protocol/decision-trees.md 组件拆分决策执行："
 - frontend/checklists/detailed-check.md「二、架构层次检查」：Component 层（职责单一、props 上限、行数上限、不直访接口）。
 - frontend/checklists/detailed-check.md「三、状态管理检查」：受控组件无 props 副本、单一来源。
 - frontend/checklists/detailed-check.md「十一、测试检查」：关键组件交互测试、命名描述行为。
+
+## v2.0 批量操作部分失败与选中态联动
+
+- **批量操作部分失败**：批量提交返回明细 `{ succeededIds, failedItems: [{ id, reason }] }`，保留失败项选中态并展示逐项原因与“仅重试失败项”动作，禁止整批笼统报错。
+- **筛选/翻页选中态策略**：变更筛选条件或排序时默认清空选中态（跨页多选需显式展示“已跨页选中 N 项”横幅并提供一键清空）。
+- **批量删除页码修正**：当前页删除 `removedCount` 条后若剩余条数为 0 且 `page > 1`，须按 `Math.max(1, Math.ceil((total - removedCount) / pageSize))` 计算目标页码而非写死 `page - 1`。

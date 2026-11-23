@@ -1,24 +1,28 @@
 <?php
-
 declare(strict_types=1);
 
-namespace BackendPhpTest;
+namespace App;
 
-// 创建订单输入：纯业务结构，不含传输对象。
 final readonly class OrderInput
 {
     public function __construct(
-        public string $idempotencyKey,
         public string $userId,
-        public int $amountCents,
+        public string $itemId,
+        public int $quantity,
+        public int $unitPriceCents,
+        public string $idempotencyKey,
         public string $couponCode = '',
     ) {}
 
-    // 需防重放的创建必须带幂等键：空键直接拒绝，不旁路去重。
-    public function validate(): void
+    public function payloadHash(): string
     {
-        if ($this->idempotencyKey === '' || $this->userId === '' || $this->amountCents <= 0) {
-            throw new ValidationException('invalid order input');
-        }
+        return hash('sha256', sprintf(
+            'u=%s|i=%s|q=%d|p=%d|c=%s',
+            $this->userId,
+            $this->itemId,
+            $this->quantity,
+            $this->unitPriceCents,
+            $this->couponCode,
+        ));
     }
 }

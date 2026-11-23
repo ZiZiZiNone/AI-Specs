@@ -1,149 +1,115 @@
 <?php
-
 declare(strict_types=1);
 
-namespace BackendPhpTest;
+namespace App;
 
-// 内存仓储：幂等键全局唯一；事务内写入先进暂存，提交原子落子，失败丢弃。
-// 仅用于演示与测试，非生产实现。
-class MemoryOrderRepository implements OrderRepositoryInterface
+final class MemoryOrderRepository implements OrderRepositoryInterface
 {
-    /** @var array<string, OrderResult> */
-    private array $rows = [];
-
-    /** @var array<string, string> 幂等键到主键 */
-    private array $byKey = [];
-
-    /** @var OrderResult[]|null 非空即在事务内 */
-    private ?array $staged = null;
-
-    /** @var array<string, true>|null */
-    private ?array $stagedKeys = null;
-
-    public int $insertCalls = 0;
-
-    public int $rollbacks = 0;
-
-    private ?\Throwable $failInsert = null;
-
     private int $seq = 0;
+    /** @var array<string, OrderResult> */
+    private array $orders = [];
+    /** @var array<string, string> */
+    private array $byScope = [];
 
-    // 下一次 insert 注错，用于回滚测试。
-    public function failInsertWith(\Throwable $e): void
-    {
-        $this->failInsert = $e;
-    }
+    private bool $inTx = false;
+    /** @var array<string, OrderResult> */
+    private array $stagedOrders = [];
+    /** @var array<string, string> */
+    private array $stagedScope = [];
 
-    // 由事务管理器调用：开启暂存。
     public function beginTx(): void
     {
-        $this->staged = [];
-        $this->stagedKeys = [];
+        $this->inTx = true;
+        $this->stagedOrders = [];
+        $this->stagedScope = [];
     }
 
-    // 由事务管理器调用：原子落子；冲突只抛错不清场，清场走统一回滚口。
     public function commitTx(): void
     {
-        foreach ($this->stagedKeys as $k => $_) {
-            if (isset($this->byKey[$k])) {
-                throw new DuplicateKeyException($k);
-            }
+        foreach ($this->stagedOrders as $id => $ord) {
+            $this->orders[$id] = $ord;
         }
-        foreach ($this->staged as $row) {
-            $this->rows[$row->id] = $row;
-            $this->byKey[$row->idempotencyKey] = $row->id;
+        foreach ($this->stagedScope as $sk => $id) {
+            $this->byScope[$sk] = $id;
         }
-        $this->staged = null;
-        $this->stagedKeys = null;
+        $this->stagedOrders = [];
+        $this->stagedScope = [];
+        $this->inTx = false;
     }
 
-    // 由事务管理器调用：丢弃暂存。
     public function rollbackTx(): void
     {
-        $this->staged = null;
-        $this->stagedKeys = null;
-        $this->rollbacks++;
+        $this->stagedOrders = [];
+        $this->stagedScope = [];
+        $this->inTx = false;
     }
 
-    public function inTransaction(): bool
+    private static function scopeKey(string $userId, string $key): string
     {
-        return $this->staged !== null;
+        return $userId . ':' . $key;
     }
 
-    public function insert(OrderInput $in): OrderResult
+    public function insert(OrderInput $input, int $totalCents, int $nowTs, int $ttlSeconds): OrderResult
     {
-        if ($in->idempotencyKey === '') {
-            throw new ValidationException('invalid order input');
+        $sk = self::scopeKey($input->userId, $input->idempotencyKey);
+        if ($this->findByIdempotencyKey($input->userId, $input->idempotencyKey, $nowTs) !== null) {
+            throw new ConflictException('Duplicate idempotency key', ['userId' => $input->userId]);
         }
-        $this->insertCalls++;
-        if ($this->failInsert !== null) {
-            $e = $this->failInsert;
-            $this->failInsert = null;
-            throw $e;
-        }
-        if (isset($this->byKey[$in->idempotencyKey])) {
-            throw new DuplicateKeyException($in->idempotencyKey);
-        }
-        if ($this->stagedKeys !== null && isset($this->stagedKeys[$in->idempotencyKey])) {
-            throw new DuplicateKeyException($in->idempotencyKey);
-        }
+
         $this->seq++;
-        $row = new OrderResult(
-            id: sprintf('ord-%d', $this->seq),
-            idempotencyKey: $in->idempotencyKey,
-            userId: $in->userId,
-            amountCents: $in->amountCents,
-            couponCode: $in->couponCode,
+        $order = new OrderResult(
+            seq: $this->seq, id: 'ord-' . $this->seq, userId: $input->userId,
+            itemId: $input->itemId, quantity: $input->quantity, totalCents: $totalCents,
+            couponCode: $input->couponCode, status: 'created',
+            payloadHash: $input->payloadHash(), idemExpiresAt: $nowTs + $ttlSeconds,
         );
-        if ($this->staged !== null) {
-            $this->staged[] = $row;
-            $this->stagedKeys[$in->idempotencyKey] = true;
-            return $row;
+
+        if ($this->inTx) {
+            $this->stagedOrders[$order->id] = $order;
+            $this->stagedScope[$sk] = $order->id;
+        } else {
+            $this->orders[$order->id] = $order;
+            $this->byScope[$sk] = $order->id;
         }
-        $this->rows[$row->id] = $row;
-        $this->byKey[$row->idempotencyKey] = $row->id;
-        return $row;
+        return $order;
     }
 
-    public function findByIdempotencyKey(string $key): OrderResult
+    public function findByIdempotencyKey(string $userId, string $key, int $nowTs): ?OrderResult
     {
-        if ($this->staged !== null) {
-            foreach ($this->staged as $row) {
-                if ($row->idempotencyKey === $key) {
-                    return $row;
-                }
-            }
+        $sk = self::scopeKey($userId, $key);
+        if ($this->inTx && isset($this->stagedScope[$sk])) {
+            return $this->stagedOrders[$this->stagedScope[$sk]];
         }
-        if (!isset($this->byKey[$key])) {
-            throw new NotFoundException('order not found');
+        if (!isset($this->byScope[$sk])) {
+            return null;
         }
-        return $this->rows[$this->byKey[$key]];
+        $ord = $this->orders[$this->byScope[$sk]];
+        return $ord->idemExpiresAt > $nowTs ? $ord : null;
     }
 
-    public function list(?string $userId, int $page, int $pageSize): array
+    public function list(ListOrdersQuery $query): array
     {
-        $all = array_values(array_filter(
-            $this->rows,
-            static fn (OrderResult $r): bool => $userId === null || $r->userId === $userId,
+        if (!in_array($query->sortBy, ['created_at', 'total_cents'], true)) {
+            throw new InvalidInputException('Unknown sort field', ['sortBy' => $query->sortBy]);
+        }
+        $matched = array_values(array_filter(
+            $this->orders,
+            static fn (OrderResult $o): bool => $query->userId === '' || $o->userId === $query->userId,
         ));
-        usort($all, static fn (OrderResult $a, OrderResult $b): int => $a->id <=> $b->id);
-        $total = count($all);
-        $page = max(1, $page);
-        $pageSize = ($pageSize < 1 || $pageSize > 100) ? 20 : $pageSize;
-        $start = ($page - 1) * $pageSize;
-        if ($start >= $total) {
-            return [[], $total];
-        }
-        return [array_slice($all, $start, $pageSize), $total];
-    }
+        $desc = $query->sortOrder === 'desc';
+        usort($matched, static function (OrderResult $a, OrderResult $b) use ($query, $desc): int {
+            $cmp = $query->sortBy === 'total_cents'
+                ? ($a->totalCents <=> $b->totalCents ?: $a->seq <=> $b->seq)
+                : ($a->seq <=> $b->seq);
+            return $desc ? -$cmp : $cmp;
+        });
 
-    public function rowCount(): int
-    {
-        return count($this->rows);
-    }
-
-    public function hasStoredKey(string $key): bool
-    {
-        return isset($this->byKey[$key]);
+        $total = count($matched);
+        $totalPages = $total > 0 ? (int) ceil($total / $query->pageSize) : 0;
+        $items = array_slice($matched, ($query->page - 1) * $query->pageSize, $query->pageSize);
+        return [
+            'items' => $items,
+            'page' => ['page' => $query->page, 'pageSize' => $query->pageSize, 'total' => $total, 'totalPages' => $totalPages],
+        ];
     }
 }

@@ -1,5 +1,7 @@
 # frontend
 
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
+
 前端专属规范（Vue 3 / 微信小程序）。与 `common/`、`backend/` 平级。
 
 ## 用法
@@ -38,3 +40,12 @@
 
 - React 框架规范已移除（2026-09-03）：本库前端侧当前只覆盖 Vue 3 与微信小程序。
 - 框架目录内涉及 UI 组件库时进入其 `ui/<组件库>/` 二级目录；无对应目录时不套用其他库规范。
+
+## 新增现代前端基线与可运行参考工程（v2.0）
+
+- 通用新增规则：`frontend/rules/security.md`（安全）、`frontend/rules/accessibility.md`（无障碍）、`frontend/rules/performance.md`（性能与内存治理）、`frontend/rules/i18n-precision.md`（国际化与精度）
+- 可运行参考切片与测试（零依赖 Node.js 18+ 原生测试）：
+  - Vue 3 参考切片：`frontend/frameworks/vue3/test/`（执行 `node --test frontend/frameworks/vue3/test/tests/*.test.mjs`）
+  - 小程序参考切片：`frontend/frameworks/miniprogram/test/`（执行 `node --test frontend/frameworks/miniprogram/test/tests/*.test.mjs`）
+
+- React 19 / Next.js 规范与可运行切片：`frontend/frameworks/react/`、`frontend/frameworks/react/test/`

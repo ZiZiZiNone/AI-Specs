@@ -1,22 +1,17 @@
-# PHP 样例工程
+# PHP 最小可运行参考切片（v2.0）
 
-路径基准：本文路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
+路径基准：本文所有裸路径相对规范库根 `<SPEC_ROOT>` 解析。见 `<SPEC_ROOT>/README.md`「路径基准」。
 
-本目录为 `backend/php/` 最小可运行切片：创建订单（幂等键 + 事务边界），零依赖（无 Composer 包），`php test/run.php` 即跑。需 PHP 8.2+（readonly 类）；本机实测 8.4.7。
+零第三方依赖的 PHP 8.2+ 工程，演示 `BE-101` 至 `BE-107` 完整落地：
+- `TransactionManagerInterface` 依赖倒置 + 嵌套事务拦截
+- 复合幂等键 `(user_id, idempotency_key)` + 全字段载荷哈希 + TTL 过期
+- `pageSize > 100` 截断为 `100` + 白名单排序 + `OrderController::list()` / `OrderService::list()` 全链路打通
+- 领域异常统一携带业务错误码与安全上下文；测试脚本无 `global` 变量
 
-## 运行
+## 运行验证命令
 
 ```bash
 cd backend/php/test
-php -l src/OrderService.php && php -l src/MemoryOrderRepository.php
+find src test -name '*.php' -print0 | xargs -0 -n1 php -l
 php test/run.php
 ```
-
-## 落位对照
-
-- 入口：`src/OrderController.php`（组装与转发）。
-- 服务：`src/OrderService.php`（全部业务规则，事务闭包定界）。
-- 仓储：`src/MemoryOrderRepository.php`（查询实现收敛，内存实现）。
-- 测试：`test/run.php`（内存替身，不起服务不连真实库）。
-
-Laravel 形态差异（表单请求、资源类、Eloquent 绑定）见 `backend/php/laravel/`，本样例不引入框架，保持零依赖可跑。
