@@ -6,7 +6,7 @@
 
 ## 门禁清单
 
-1. **行为与宪法合规**：核对 `AGENTS.md`（`FE-000` 至 `FE-005`）与 `common/rules/constitution.md`（`COM-007` 至 `COM-018`），无越权写入、无凭空引文、无硬编码密钥。
+1. **行为与宪法合规**：核对 `AGENTS.md`（`FE-000` 至 `FE-005`）与 `common/rules/constitution.md`（`COM-007` 至 `COM-019`），无越权写入、无凭空引文、无硬编码密钥。
 2. **端专项自检**：
    - 前端：过 `frontend/checklists/self-check.md`（小改动）或 `frontend/checklists/detailed-check.md`（完整交付）。
    - 后端：过 `backend/checklists/self-check.md`「精简自检」或 `backend/checklists/detailed-check.md`「适用性判定」（结合 `backend/rules/core-principles.md` 与反模式核查）。

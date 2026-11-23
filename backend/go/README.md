@@ -32,3 +32,5 @@
 - [ ] GoFrame 差异已在二级目录核对
 - [ ] 通用问题能在 `common/` 找到回链
 - [ ] 无全局单例直连逻辑
+
+- 注释与依赖规范：`backend/go/comments.md`、`backend/go/dependencies.md`

@@ -32,3 +32,5 @@
 - [ ] 无静态门面与全局单例
 - [ ] 未套用其他技术栈规则
 - [ ] 框架目录无重复语言级结论
+
+- 注释与依赖规范：`backend/php/comments.md`、`backend/php/dependencies.md`

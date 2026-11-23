@@ -8,7 +8,7 @@
 
 本库全部条款级编号仅由以下四处唯一定义（与 `AGENTS.md`、`common/rules/constitution.md`、`scripts/check-citations.py` 严格一致）：
 
-- `COM-007` 至 `COM-018`：`common/rules/constitution.md`（宪法；`COM-001` 至 `COM-006` 为历史预留号，不启用）
+- `COM-007` 至 `COM-019`：`common/rules/constitution.md`（宪法；`COM-001` 至 `COM-006` 为历史预留号，不启用）
 - `FE-000` 至 `FE-005`：`AGENTS.md`（AI 行为规则）
 - `FE-101` 至 `FE-104`：`frontend/rules/core-principles.md`（`## FE-101` 至 `## FE-104` 前端核心原则）
 - `BE-101` 至 `BE-108`：`backend/rules/core-principles.md`（`## BE-101` 至 `## BE-108` 后端核心原则）
@@ -23,6 +23,7 @@
 - 向后兼容与数据演进：COM-016 `common/rules/compatibility.md`
 - 接口契约与分页幂等：`common/rules/api-contract.md`「响应信封」
 - 需求完整度分级：`common/protocol/requirement-completeness.md`「阻塞项与非阻塞项判定」
+- 用户沟通结论化与去技术化：COM-019 `common/rules/communication.md`
 - 交付总门禁：`common/protocol/final-gate.md`
 
 ### 前端规范（`frontend/`）
@@ -43,12 +44,19 @@
 - 后端标准模式与反模式：`backend/patterns/`、`backend/anti-patterns/`
 - 后端六大语言子树与可运行测试：`backend/go/`、`backend/php/`、`backend/python/`、`backend/typescript/`、`backend/java/`、`backend/rust/`
 
+### 写作规范（`writing/`，按需 1+1 加载）
+- 写作总入口与场景路由：`writing/README.md`
+- 通用去 AI 味与简明底线：`writing/rules/core.md`
+- 六大场景规范：`writing/rules/report.md`、`writing/rules/article.md`、`writing/rules/copywriting.md`、`writing/rules/web-novel.md`、`writing/rules/documentation.md`、`writing/rules/correspondence.md`
+- 自检清单与正反例对照：`writing/checklists/writing-check.md`、`writing/examples/anti-ai-rewrites.md`
+
 ### 自动化门禁（`scripts/`）
 - 全量一键门禁：`scripts/check-all.py`
 - 引用验伪：`scripts/check-citations.py`
 - 结构一致性：`scripts/check-spec-integrity.py`
 - 安全基线扫描：`scripts/check-security-hygiene.py`
 - 导入路径校验：`scripts/check-import-path.py`
+- 写作与网文专属风格校验：`scripts/check-writing.py`
 
 ## 知识库结论
 

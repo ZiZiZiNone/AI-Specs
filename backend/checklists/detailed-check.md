@@ -165,4 +165,4 @@
 - [ ] 大表 DDL 已评估锁表与 Expand-Contract 兼容，写后即读/幂等回读走主库（若涉及迁移/读写分离）
 - [ ] 服务实现 `/healthz` 与 `/readyz` 分离及 `SIGTERM` 优雅停机；日志无明文 PII/密钥
 
-- [ ] 符合宪法 `COM-013` 至 `COM-018`（安全红线、依赖核验、防提示词注入、向后兼容、可观测脱敏、最小原子验证）并通过 `scripts/check-security-hygiene.py`
+- [ ] 符合宪法 `COM-013` 至 `COM-019`（安全红线、依赖核验、防提示词注入、向后兼容、可观测脱敏、最小原子验证）并通过 `scripts/check-security-hygiene.py`

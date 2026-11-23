@@ -3,7 +3,7 @@
  */
 
 function initialPaginationState() {
-  return { listPages: [], page: 0, hasMore: true, loadingMore: false, errorMessage: null };
+  return { listPages: /** @type {any[]} */ ([]), page: 0, hasMore: true, loadingMore: false, errorMessage: null };
 }
 
 export function createMiniPagination(fetchPage) {

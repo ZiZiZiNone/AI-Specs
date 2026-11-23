@@ -49,3 +49,5 @@
   - 小程序参考切片：`frontend/frameworks/miniprogram/test/`（执行 `node --test frontend/frameworks/miniprogram/test/tests/*.test.mjs`）
 
 - React 19 / Next.js 规范与可运行切片：`frontend/frameworks/react/`、`frontend/frameworks/react/test/`
+
+- 前端接口消费与迁移清单：`frontend/rules/api.md`

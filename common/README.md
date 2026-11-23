@@ -21,7 +21,8 @@
 - `common/principles.md`：极致解耦总纲与四条通用原则（薄入口、模块解耦、逻辑解耦、单向依赖）
 
 ### 通用规则（`common/rules/`）
-- `common/rules/constitution.md`：宪法条款（`COM-007` 至 `COM-018`）与引用验伪细则
+- `common/rules/communication.md`：用户沟通与报告规范（COM-019：结论先行、默认不展过程、白话表达）
+- `common/rules/constitution.md`：宪法条款（`COM-007` 至 `COM-019`）与引用验伪细则
 - `common/rules/api-contract.md`：前后端接口契约（REST、信封、状态码矩阵、分页、幂等、版本化）
 - `common/rules/security.md`：通用安全基线（鉴权默认拒绝、输入校验、密钥治理、防越权）
 - `common/rules/observability.md`：可观测性与隐私脱敏（结构化日志、`requestId`/`traceId`、PII 脱敏）

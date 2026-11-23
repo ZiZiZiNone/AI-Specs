@@ -1,12 +1,12 @@
 # AI-Specs
 
-AI 开发行为与工程规范库（v2.0），覆盖通用工程基线、前端（Vue 3 / 微信小程序）与后端（Go / PHP），配套可执行校验脚本与最小可运行参考切片。纯规范与校验库：不拷贝进业务项目源码，只被**引用**，接入方式见 `INTEGRATION.md`。
+AI 开发行为与工程规范库（v3.0），覆盖通用工程基线、三大前端框架（Vue 3 / React 19 + Next.js / 微信小程序）与六大主流后端语言（Go / PHP / Python / TypeScript-Node / Java / Rust），配套可执行校验脚本与最小可运行参考切片。纯规范与校验库：不拷贝进业务项目源码，只被**引用**，接入方式见 `INTEGRATION.md`。
 
 ## 路径基准
 
 本文件所在目录即规范库根，记作 `<SPEC_ROOT>`。
 
-- 库内裸路径一律相对 `<SPEC_ROOT>` 解析，首段必为 `common/`、`frontend/`、`backend/`、`scripts/` 之一（根目录文件直接写文件名，如 `AGENTS.md`、`INDEX.md`、`INTEGRATION.md`）；
+- 库内裸路径一律相对 `<SPEC_ROOT>` 解析，首段必为 `common/`、`frontend/`、`backend/`、`writing/`、`hooks/`、`scripts/` 之一（根目录文件直接写文件名，如 `AGENTS.md`、`INDEX.md`、`INTEGRATION.md`）；
   例：`common/rules/naming.md` 指 `<SPEC_ROOT>/common/rules/naming.md`。
 - 在业务项目中读取规范时拼成绝对路径 `<SPEC_ROOT>/...`；
   业务项目自己的 `README.md`／`AGENTS.md` 与本库同名文件是两回事，不要混用。
@@ -21,7 +21,9 @@ AI 开发行为与工程规范库（v2.0），覆盖通用工程基线、前端�
 ├── INDEX.md         确定性检索入口（四大编号定义源 + 按需查阅）
 ├── common/          前后端通用：principles.md + rules/（含安全/可观测/AI防线/兼容）+ protocol/
 ├── frontend/        前端专属：rules/ protocol/ patterns/ anti-patterns/ tasks/ checklists/ frameworks/（含可运行 test/）examples/
-├── backend/         后端专属：rules/（BE-101~108）go/ php/ 语言子树（含可运行 test/）+ patterns/ anti-patterns/ protocol/ tasks/ checklists/ examples/
+├── backend/         后端专属：rules/（BE-101~108）go/ php/ python/ typescript/ java/ rust/ 六大语言子树（含可运行 test/）+ patterns/ anti-patterns/ protocol/ tasks/ checklists/ examples/
+├── writing/         按需写作规范（1 套通用底线 + 6 大场景 + 网文「实感克制·规则博弈流」专属风格与全品类适配）
+├── hooks/           跨宿主低 Token Hooks 适配器（SessionStart / PreToolUse / PostToolUse / Stop + 会话状态机）
 ├── scripts/         自动化校验门禁脚本与自测套件（check-all.py / check-citations.py / check-import-path.py / check-spec-integrity.py / check-security-hygiene.py）
 └── .github/         CI 流水线模板（workflows/spec-ci.yml）
 ```
@@ -33,11 +35,11 @@ AI 开发行为与工程规范库（v2.0），覆盖通用工程基线、前端�
 **必读四件**（任何任务开工前按序读完）：
 
 1. `<SPEC_ROOT>/README.md`（本文）
-2. `common/rules/constitution.md`（宪法：`COM-007` 至 `COM-018`）
+2. `common/rules/constitution.md`（宪法：`COM-007` 至 `COM-019`）
 3. `common/principles.md`（四条通用原则 + 极致解耦）
 4. `common/protocol/task-boundary.md`（任务边界：授权面，先于"怎么做"）
 
-其余**按需读取，禁止全量通读**：前端任务从 `frontend/README.md` 进语言子树；后端任务从 `backend/README.md` 与 `backend/rules/core-principles.md` 进语言子树；命中页面/读写/生产模式读对应 `patterns/`；遇决策点读对应端 `decision-trees.md`；写法拿不准读对应端 `examples/golden/`；事务规则读对应语言 `transaction.md`「规则」；完成后过对应 `checklists/` 与 `common/protocol/final-gate.md`。
+其余**按需读取，禁止全量通读**：前端任务从 `frontend/README.md` 进语言子树；写作任务从 `writing/README.md` 按场景 1+1 加载（编码任务 0 Token 不加载）；后端任务从 `backend/README.md` 与 `backend/rules/core-principles.md` 进语言子树；命中页面/读写/生产模式读对应 `patterns/`；遇决策点读对应端 `decision-trees.md`；写法拿不准读对应端 `examples/golden/`；事务规则读对应语言 `transaction.md`「规则」；完成后过对应 `checklists/` 与 `common/protocol/final-gate.md`。
 
 ## 工作流
 

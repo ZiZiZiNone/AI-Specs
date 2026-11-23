@@ -82,8 +82,9 @@ function mapCaughtError(signal, timeoutGuard, canRetry) {
   return { ok: false, error: { kind, code: kind, message } };
 }
 
+/** @param {{ fetchImpl: Function, url: string, method?: string, body?: unknown, signal?: AbortSignal, timeoutMs?: number, maxRetries?: number, baseDelayMs?: number }} opts */
 export async function requestJson({
-  fetchImpl, url, method = 'GET', body, signal, timeoutMs = 5000, maxRetries = 2, baseDelayMs = 20,
+  fetchImpl, url, method = 'GET', body = undefined, signal = undefined, timeoutMs = 5000, maxRetries = 2, baseDelayMs = 20,
 }) {
   const upperMethod = method.toUpperCase();
   const allowedRetries = upperMethod === 'GET' ? maxRetries : 0;

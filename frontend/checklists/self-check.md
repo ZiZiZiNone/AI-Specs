@@ -47,4 +47,4 @@
 - [ ] 执行不了时，已按 `common/protocol/final-gate.md`「无法验证时的处理」"禁止默认视为通过"显式声明未验证项与风险。
 
 - [ ] 安全、无障碍、性能与精度基线达标（无未净化 `v-html`、无硬编码密钥、无裸浮点算金额、卸载已清理副作用；见 `frontend/rules/security.md`、`frontend/rules/accessibility.md`、`frontend/rules/performance.md`、`frontend/rules/i18n-precision.md`）
-- [ ] 符合 `COM-013` 至 `COM-018`，并通过 `scripts/check-import-path.py` 与 `scripts/check-security-hygiene.py`
+- [ ] 符合 `COM-013` 至 `COM-019`，并通过 `scripts/check-import-path.py` 与 `scripts/check-security-hygiene.py`

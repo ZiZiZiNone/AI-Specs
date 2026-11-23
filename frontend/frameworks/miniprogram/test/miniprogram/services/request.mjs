@@ -39,7 +39,7 @@ export function createMiniRequestClient({ wxApi, getToken, refreshToken }) {
     return refreshingPromise;
   }
 
-  return async function request(options, { signal, retriedAuth = false } = {}) {
+  return async function request(options, { signal = undefined, retriedAuth = false } = {}) {
     const res = await executeWxRequest({ wxApi, options, token: getToken(), signal });
     if (!res.ok) return res;
 

@@ -30,8 +30,8 @@ test('httpClient treats HTTP 200 with non-zero code as BIZ_ERROR and never retri
   };
   const res = await requestJson({ fetchImpl, url: '/api/v1/orders', method: 'POST' });
   assert.equal(res.ok, false);
-  assert.equal(res.error.kind, 'BIZ_ERROR');
-  assert.equal(res.error.code, 10401);
+  assert.equal(res.error?.kind, 'BIZ_ERROR');
+  assert.equal(res.error?.code, 10401);
   assert.equal(calls, 1);
 });
 
@@ -54,7 +54,7 @@ test('httpClient aborts retry backoff immediately when signal cancels', async ()
   });
   const elapsed = Date.now() - started;
   assert.equal(res.ok, false);
-  assert.equal(res.error.kind, 'CANCELED');
+  assert.equal(res.error?.kind, 'CANCELED');
   assert.equal(calls, 1, 'must not issue second attempt after abort during backoff');
   assert.ok(elapsed < 250, `backoff was not interrupted promptly (${elapsed}ms)`);
 });
@@ -69,7 +69,7 @@ test('httpClient short-circuits when external signal is already aborted', async 
     signal: controller.signal,
   });
   assert.equal(res.ok, false);
-  assert.equal(res.error.kind, 'CANCELED');
+  assert.equal(res.error?.kind, 'CANCELED');
   assert.equal(calls, 0);
 });
 
@@ -89,7 +89,7 @@ test('ticketQuery supports round-trip URL serialization, sort page reset, and ba
 });
 
 test('ticketForm clears fixed errors, strips hidden fields, guards blur, and locks duplicate submit', async () => {
-  let receivedPayload = null;
+  /** @type {any} */ let receivedPayload = null;
   let submitCalls = 0;
   const form = createTicketFormController(
     { title: '', description: 'desc', needCallback: false, contactPhone: '13800138000', attachments: ['a.png'] },

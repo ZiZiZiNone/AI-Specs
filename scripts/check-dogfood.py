@@ -39,7 +39,7 @@ def check_dogfood(root: Path) -> list[str]:
     fails: list[str] = []
 
     # 1. 100% 路径基准覆盖
-    for top in ("common", "frontend", "backend", "scripts"):
+    for top in ("common", "frontend", "backend", "writing", "scripts"):
         for p in sorted((root / top).rglob("*.md")):
             if "路径基准" not in p.read_text(encoding="utf-8"):
                 fails.append(f"{p.relative_to(root)}: FAIL 缺少「路径基准」声明")
@@ -80,6 +80,19 @@ def check_dogfood(root: Path) -> list[str]:
                         if length > 50:
                             fails.append(f"{rel}:{start}-{i}: FAIL 函数长度 {length} 行 > 50 行：{in_fn}")
                         in_fn = None
+    # 3. 零孤立文档检查（每个非入口 .md 至少被一个 README/INDEX/AGENTS/INTEGRATION 索引）
+    index_corpus = "\n".join(
+        p.read_text(encoding="utf-8")
+        for p in root.rglob("*.md")
+        if p.name in ("README.md", "INDEX.md", "AGENTS.md", "INTEGRATION.md")
+    )
+    for top in ("common", "frontend", "backend", "writing", "scripts"):
+        for p in sorted((root / top).rglob("*.md")):
+            if p.name == "README.md":
+                continue
+            rel = str(p.relative_to(root)).replace("\\", "/")
+            if rel not in index_corpus and p.name not in index_corpus:
+                fails.append(f"{rel}: FAIL 孤立文档（未被任何 README.md 或 INDEX.md 索引）")
     return fails
 
 

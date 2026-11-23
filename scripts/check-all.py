@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""AI-Specs v3.0 全栈统一质量门禁总入口（覆盖 Python / TS / Node / Vue 3 / React / 小程序 / Go / PHP / Java / Rust）。
+"""AI-Specs v3.1 全栈统一质量门禁总入口（覆盖 Python / TS / Node / Vue 3 / React / 小程序 / Go / PHP / Java / Rust）。
 
 用法：python3 scripts/check-all.py [<SPEC_ROOT>]
 退出码：0 全部通过；1 任一项失败。
@@ -37,7 +37,10 @@ def main() -> int:
         ("规范库结构与编号一致性校验", [py, str(ROOT / "scripts/check-spec-integrity.py"), str(ROOT)], None),
         ("规范库狗食自检 (FE-005/<=50L/<=4参/路径基准)", [py, str(ROOT / "scripts/check-dogfood.py"), str(ROOT)], None),
         ("门禁脚本自身单元测试", [py, str(ROOT / "scripts/test-scripts.py")], None),
+        ("通用低 Token Hooks 适配器测试", [py, str(ROOT / "hooks/test_hooks.py")], None),
+        ("写作规范示例与反 AI 味自检", [py, str(ROOT / "scripts/check-writing.py"), str(ROOT / "writing"), "--genre", "auto"], None),
         ("安全基线扫描 (scripts)", [py, str(ROOT / "scripts/check-security-hygiene.py"), str(ROOT / "scripts")], None),
+        ("安全基线扫描 (hooks)", [py, str(ROOT / "scripts/check-security-hygiene.py"), str(ROOT / "hooks")], None),
         ("安全基线扫描 (backend 全部参考切片)", [py, str(ROOT / "scripts/check-security-hygiene.py"), str(ROOT / "backend")], None),
         ("安全基线扫描 (frontend 全部参考切片)", [py, str(ROOT / "scripts/check-security-hygiene.py"), str(ROOT / "frontend/frameworks")], None),
         ("前端导入路径校验 (vue3/test)", [py, str(ROOT / "scripts/check-import-path.py"), str(ROOT / "frontend/frameworks/vue3/test")], None),
@@ -64,18 +67,18 @@ def main() -> int:
         steps.append(("Node/TS 后端参考切片测试", [node_bin, "--test", str(ROOT / "backend/typescript/test/tests/order.test.mjs")], None))
 
     if shutil.which("go"):
-        steps.append(("Go 后端格式化/vet/竞态测试", ["bash", "-c", f"mkdir -p \"$HOME/.cache/go-tmp\" && cd '{ROOT / 'backend/go/test'}' && test -z \"$(gofmt -l .)\" && go vet ./... && GOTMPDIR=\"$HOME/.cache/go-tmp\" go test -race -v ./..."], None))
+        steps.append(("Go 后端格式化/vet/竞态测试", ["bash", "-c", f"mkdir -p \"$HOME/.cache/go-tmp\" && cd '{ROOT / 'backend/go/test'}' && test -z \"$(gofmt -l .)\" && go vet ./... && GOTMPDIR=\"$HOME/.cache/go-tmp\" go test -count=1 -race -v ./..."], None))
     if shutil.which("php"):
         steps.append(("PHP 后端语法与单元测试", ["bash", "-c", f"cd '{ROOT / 'backend/php/test'}' && find src test -name '*.php' -print0 | xargs -0 -n1 php -l && php test/run.php"], None))
     if shutil.which("javac") and shutil.which("java"):
-        steps.append(("Java 17+ 后端编译与单元测试", ["bash", "-c", f"javac -d '{cache_bin}' '{ROOT / 'backend/java/test/OrderSliceTest.java'}' && java -cp '{cache_bin}' OrderSliceTest"], None))
+        steps.append(("Java 17+ 后端编译与单元测试", ["bash", "-c", f"javac -Xlint:all -Werror -d '{cache_bin}' '{ROOT / 'backend/java/test/OrderSliceTest.java'}' && java -cp '{cache_bin}' OrderSliceTest"], None))
     if shutil.which("rustc"):
-        steps.append(("Rust 后端编译与单元测试", ["bash", "-c", f"rustc --test '{ROOT / 'backend/rust/test/src/lib.rs'}' -o '{cache_bin}/rust_order_test' && '{cache_bin}/rust_order_test'"], None))
+        steps.append(("Rust 后端编译与单元测试", ["bash", "-c", f"rustc -D warnings --test '{ROOT / 'backend/rust/test/src/lib.rs'}' -o '{cache_bin}/rust_order_test' && '{cache_bin}/rust_order_test'"], None))
 
     results = [(name, run_step(name, cmd, env)) for name, cmd, env in steps]
     passed = sum(1 for _, ok in results if ok)
     failed = len(results) - passed
-    print("\n================ 全栈门禁汇总 (v3.0) ================")
+    print("\n================ 全栈门禁汇总 (v3.1) ================")
     for name, ok in results:
         print(f"  [{'PASS' if ok else 'FAIL'}] {name}")
     print(f"总计：{passed}/{len(results)} 通过，{failed} 失败")

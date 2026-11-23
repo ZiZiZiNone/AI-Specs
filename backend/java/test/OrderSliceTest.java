@@ -28,6 +28,7 @@ public final class OrderSliceTest {
     record PageResult(List<OrderRecord> items, PageMeta page) {}
 
     static final class DomainException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
         final int errorCode;
         DomainException(int errorCode, String message) {
             super(message);

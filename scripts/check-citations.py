@@ -2,7 +2,7 @@
 r"""引用校验脚本 v3.0（COM-011 引用可验伪的可执行形态）。
 
 v3.0 全量能力：
-1. 四大编号定义源校验：COM-007~018、FE-000~005、FE-101~104、BE-101~108；
+1. 四大编号定义源校验：COM-007~019、FE-000~005、FE-101~104、BE-101~108；
 2. 位置式引用（第 N 节/条/段/章、倒数第）拦截，支持编号小节例外判定式；
 3. `>` 引文块逐行逐字核验；
 4. 正文裸路径（common/...、frontend/...、backend/...、scripts/...）断链校验；
@@ -27,7 +27,7 @@ ID_FILES = {
     "frontend/rules/core-principles.md",
     "backend/rules/core-principles.md",
 }
-VALID_COM = {f"COM-{i:03d}" for i in range(7, 19)}
+VALID_COM = {f"COM-{i:03d}" for i in range(7, 20)}
 
 RE_COM = re.compile(r"\bCOM-\d+\b")
 RE_FE = re.compile(r"\bFE-\d+\b")
@@ -36,10 +36,10 @@ RE_POS = re.compile(r"第\s*\d+\s*(节|条|段|章)|倒数第")
 RE_POS_N = re.compile(r"第\s*(\d+)\s*(节|条|段|章)")
 RE_MD = re.compile(r"([A-Za-z0-9_\-./]+\.md)")
 RE_BARE_SPEC_PATH = re.compile(
-    r"(?<![A-Za-z0-9_\-./])((?:common|frontend|backend|scripts)/[A-Za-z0-9_\-./]+\.(?:md|py|sh|go|php|mjs|ts|java|rs))"
+    r"(?<![A-Za-z0-9_\-./])((?:common|frontend|backend|writing|scripts)/[A-Za-z0-9_\-./]+\.(?:md|py|sh|go|php|mjs|ts|java|rs))"
 )
-RE_MD_SECTION = re.compile(r"`?((?:common|frontend|backend|scripts)/[A-Za-z0-9_\-./]+\.md)`?\s*「([^」]+)」")
-RE_INLINE_QUOTE = re.compile(r"`?((?:common|frontend|backend|scripts)/[A-Za-z0-9_\-./]+\.md)`?[^。\n]{0,40}[:：]\s*\"([^\"]{10,})\"")
+RE_MD_SECTION = re.compile(r"`?((?:common|frontend|backend|writing|scripts)/[A-Za-z0-9_\-./]+\.md)`?\s*「([^」]+)」")
+RE_INLINE_QUOTE = re.compile(r"`?((?:common|frontend|backend|writing|scripts)/[A-Za-z0-9_\-./]+\.md)`?[^。\n]{0,40}[:：]\s*\"([^\"]{10,})\"")
 RE_FE_HEAD = re.compile(r"^## (FE-\d+)\b", re.M)
 RE_BE_HEAD = re.compile(r"^## (BE-\d+)\b", re.M)
 RE_FENCE = re.compile(r"^\s*```")

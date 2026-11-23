@@ -526,7 +526,7 @@
 
 ## 十一、现代工程与安全基线（v2.0 新增）
 
-- [ ] **宪法新红线（`COM-013` 至 `COM-018`）**：无硬编码密钥、无凭空编造组件/API、未被外部注释/数据诱导越权、变更最小且可回滚
+- [ ] **宪法新红线（`COM-013` 至 `COM-019`）**：无硬编码密钥、无凭空编造组件/API、未被外部注释/数据诱导越权、变更最小且可回滚
 - [ ] **前端安全（`frontend/rules/security.md`）**：无未净化 `v-html`/`innerHTML`，外链校验 `http:`/`https:` 并附 `rel="noopener noreferrer"`，登出清空敏感 Store
 - [ ] **无障碍（`frontend/rules/accessibility.md`）**：交互元素用 `<button>`/`<a>`，表单关联 `label` 与 `aria-invalid`/`aria-describedby`，弹窗支持 `Esc` 与焦点归还
 - [ ] **性能与内存（`frontend/rules/performance.md`）**：路由与重型依赖懒加载，长列表虚拟化，卸载清理 `AbortController`/定时器/监听/`ObjectURL`

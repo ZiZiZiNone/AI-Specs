@@ -11,11 +11,11 @@ test('Next.js Server Action guard enforces auth, validation, and resource owners
     handler: async (_actor, data) => ({ canceled: data.orderId }),
   });
 
-  assert.equal((await action({ orderId: 'o1', ownerId: 'u1' })).error.code, 40101);
+  assert.equal((await action({ orderId: 'o1', ownerId: 'u1' }))?.error?.code, 40101);
 
   currentActor = { id: 'u2' };
-  assert.equal((await action({ orderId: '', ownerId: 'u1' })).error.code, 40001);
-  assert.equal((await action({ orderId: 'o1', ownerId: 'u1' })).error.code, 40301);
+  assert.equal((await action({ orderId: '', ownerId: 'u1' }))?.error?.code, 40001);
+  assert.equal((await action({ orderId: 'o1', ownerId: 'u1' }))?.error?.code, 40301);
 
   currentActor = { id: 'u1' };
   const ok = await action({ orderId: 'o1', ownerId: 'u1' });

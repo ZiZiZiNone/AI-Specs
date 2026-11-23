@@ -33,6 +33,7 @@ REQUIRED_FILES = [
     "common/rules/observability.md",
     "common/rules/ai-safety.md",
     "common/rules/compatibility.md",
+    "common/rules/communication.md",
     "frontend/rules/core-principles.md",
     "frontend/rules/security.md",
     "frontend/rules/accessibility.md",
@@ -46,6 +47,16 @@ REQUIRED_FILES = [
     "backend/patterns/migration-online-ddl.md",
     "backend/patterns/observability.md",
     "backend/patterns/outbox-async.md",
+    "writing/README.md",
+    "writing/rules/core.md",
+    "writing/rules/report.md",
+    "writing/rules/article.md",
+    "writing/rules/copywriting.md",
+    "writing/rules/web-novel.md",
+    "writing/rules/documentation.md",
+    "writing/rules/correspondence.md",
+    "writing/checklists/writing-check.md",
+    "writing/examples/anti-ai-rewrites.md",
 ]
 
 
@@ -73,7 +84,7 @@ def check_integrity(root: str):
 
     # 3. 含 .md 文件的规范子目录均有 README.md（排除 common/rules、common/protocol 等由上级 README 索引的平铺规则目录以外的顶层/框架目录）
     required_readme_dirs = [
-        "common", "frontend", "backend", "scripts",
+        "common", "frontend", "backend", "writing", "hooks", "scripts",
         "backend/rules", "backend/patterns", "backend/anti-patterns",
         "backend/go", "backend/go/goframe", "backend/go/test",
         "backend/php", "backend/php/laravel", "backend/php/test",
@@ -92,7 +103,7 @@ def check_integrity(root: str):
         fp = os.path.join(root, fname)
         if os.path.isfile(fp):
             txt = open(fp, encoding="utf-8").read()
-            for token in ("COM-007", "COM-018", "FE-000", "FE-005", "FE-101", "FE-104", "BE-101", "BE-108"):
+            for token in ("COM-007", "COM-019", "FE-000", "FE-005", "FE-101", "FE-104", "BE-101", "BE-108"):
                 if token not in txt:
                     fails.append(f"{fname}: FAIL 编号定义源口径不完整，缺少 {token}")
 
