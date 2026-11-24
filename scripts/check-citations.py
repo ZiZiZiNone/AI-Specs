@@ -36,10 +36,10 @@ RE_POS = re.compile(r"第\s*\d+\s*(节|条|段|章)|倒数第")
 RE_POS_N = re.compile(r"第\s*(\d+)\s*(节|条|段|章)")
 RE_MD = re.compile(r"([A-Za-z0-9_\-./]+\.md)")
 RE_BARE_SPEC_PATH = re.compile(
-    r"(?<![A-Za-z0-9_\-./])((?:common|frontend|backend|writing|scripts)/[A-Za-z0-9_\-./]+\.(?:md|py|sh|go|php|mjs|ts|java|rs))"
+    r"(?<![A-Za-z0-9_\-./])((?:common|frontend|backend|writing|skills|scripts)/[A-Za-z0-9_\-./]+\.(?:md|py|sh|go|php|mjs|ts|java|rs|json))"
 )
-RE_MD_SECTION = re.compile(r"`?((?:common|frontend|backend|writing|scripts)/[A-Za-z0-9_\-./]+\.md)`?\s*「([^」]+)」")
-RE_INLINE_QUOTE = re.compile(r"`?((?:common|frontend|backend|writing|scripts)/[A-Za-z0-9_\-./]+\.md)`?[^。\n]{0,40}[:：]\s*\"([^\"]{10,})\"")
+RE_MD_SECTION = re.compile(r"`?((?:common|frontend|backend|writing|skills|scripts)/[A-Za-z0-9_\-./]+\.md)`?\s*「([^」]+)」")
+RE_INLINE_QUOTE = re.compile(r"`?((?:common|frontend|backend|writing|skills|scripts)/[A-Za-z0-9_\-./]+\.md)`?[^。\n]{0,40}[:：]\s*\"([^\"]{10,})\"")
 RE_FE_HEAD = re.compile(r"^## (FE-\d+)\b", re.M)
 RE_BE_HEAD = re.compile(r"^## (BE-\d+)\b", re.M)
 RE_FENCE = re.compile(r"^\s*```")

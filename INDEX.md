@@ -61,3 +61,9 @@
 ## 知识库结论
 
 轻量确定性索引 Go，向量语义库 No-Go。检索实测 10 问：`grep -F` 10/10 命中，纯编号索引 5/10 命中。向量库不得作为引用源，最多作召回辅助且须经 `grep -F` 复核。
+
+### 独立建议 Skill 库（`skills/`）
+- 按需获取协议与三源兜底入口：`skills/README.md`「AI 按需阅读与获取指令（必读协议）」
+- 跨领域 32+ 精选技能与默认最优路由表：`skills/registry.json`
+- 内包含离线兜底技能：`skills/bundled/ai-specs-writing/SKILL.md`、`skills/bundled/ai-specs-dialogue-scene/SKILL.md`、`skills/bundled/ai-specs-frontend/SKILL.md`、`skills/bundled/ai-specs-backend/SKILL.md`、`skills/bundled/ai-specs-engineering/SKILL.md`
+- 技能库结构与兜底校验：`scripts/check-skills.py`

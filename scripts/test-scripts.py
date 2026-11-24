@@ -79,6 +79,21 @@ class GovernanceScriptsTest(unittest.TestCase):
             self.assertEqual(rules, {"SEC-004", "SEC-006"})
 
 
+    def test_check_skills_catches_missing_fallback(self):
+        import subprocess
+        with tempfile.TemporaryDirectory() as tmp:
+            t = Path(tmp)
+            (t / "skills").mkdir()
+            (t / "skills" / "README.md").write_text("# Skills\n路径基准\n", encoding="utf-8")
+            (t / "skills" / "registry.json").write_text(
+                '{"policy":{"skip_when_user_skill_specified":true,"single_match":"auto_use","multi_match":"ask_with_default","no_response_or_denied_fallback":"default_optimal","prefer_order":["local","bundled","remote"],"local_search_dirs":[]},"domains":{"bad":{"intent_patterns":["test"],"default_optimal":"x","fallback_bundled":"missing","skills":[{"id":"x","source":"remote","repo":"a/b","url":"https://example.com","install":"npx","summary":"s"}]}}}',
+                encoding="utf-8",
+            )
+            res = subprocess.run([sys.executable, str(Path(__file__).resolve().parent / "check-skills.py"), str(t)], capture_output=True, text=True)
+            self.assertNotEqual(res.returncode, 0)
+            self.assertIn("fallback_bundled", res.stdout)
+
+
 if __name__ == "__main__":
     suite = unittest.defaultTestLoader.loadTestsFromTestCase(GovernanceScriptsTest)
     result = unittest.TextTestRunner(verbosity=2).run(suite)

@@ -57,6 +57,13 @@ REQUIRED_FILES = [
     "writing/rules/correspondence.md",
     "writing/checklists/writing-check.md",
     "writing/examples/anti-ai-rewrites.md",
+    "skills/README.md",
+    "skills/registry.json",
+    "skills/bundled/ai-specs-writing/SKILL.md",
+    "skills/bundled/ai-specs-dialogue-scene/SKILL.md",
+    "skills/bundled/ai-specs-frontend/SKILL.md",
+    "skills/bundled/ai-specs-backend/SKILL.md",
+    "skills/bundled/ai-specs-engineering/SKILL.md",
 ]
 
 
@@ -84,7 +91,7 @@ def check_integrity(root: str):
 
     # 3. 含 .md 文件的规范子目录均有 README.md（排除 common/rules、common/protocol 等由上级 README 索引的平铺规则目录以外的顶层/框架目录）
     required_readme_dirs = [
-        "common", "frontend", "backend", "writing", "hooks", "scripts",
+        "common", "frontend", "backend", "writing", "skills", "hooks", "scripts",
         "backend/rules", "backend/patterns", "backend/anti-patterns",
         "backend/go", "backend/go/goframe", "backend/go/test",
         "backend/php", "backend/php/laravel", "backend/php/test",

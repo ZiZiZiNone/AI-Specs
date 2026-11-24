@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""AI-Specs v3.1 全栈统一质量门禁总入口（覆盖 Python / TS / Node / Vue 3 / React / 小程序 / Go / PHP / Java / Rust）。
+"""AI-Specs v3.2 全栈统一质量门禁总入口（覆盖 Python / TS / Node / Vue 3 / React / 小程序 / Go / PHP / Java / Rust）。
 
 用法：python3 scripts/check-all.py [<SPEC_ROOT>]
 退出码：0 全部通过；1 任一项失败。
@@ -39,6 +39,7 @@ def main() -> int:
         ("门禁脚本自身单元测试", [py, str(ROOT / "scripts/test-scripts.py")], None),
         ("通用低 Token Hooks 适配器测试", [py, str(ROOT / "hooks/test_hooks.py")], None),
         ("写作规范示例与反 AI 味自检", [py, str(ROOT / "scripts/check-writing.py"), str(ROOT / "writing"), "--genre", "auto"], None),
+        ("独立建议 Skill 库与三源兜底校验", [py, str(ROOT / "scripts/check-skills.py"), str(ROOT)], None),
         ("安全基线扫描 (scripts)", [py, str(ROOT / "scripts/check-security-hygiene.py"), str(ROOT / "scripts")], None),
         ("安全基线扫描 (hooks)", [py, str(ROOT / "scripts/check-security-hygiene.py"), str(ROOT / "hooks")], None),
         ("安全基线扫描 (backend 全部参考切片)", [py, str(ROOT / "scripts/check-security-hygiene.py"), str(ROOT / "backend")], None),
@@ -78,7 +79,7 @@ def main() -> int:
     results = [(name, run_step(name, cmd, env)) for name, cmd, env in steps]
     passed = sum(1 for _, ok in results if ok)
     failed = len(results) - passed
-    print("\n================ 全栈门禁汇总 (v3.1) ================")
+    print("\n================ 全栈门禁汇总 (v3.2) ================")
     for name, ok in results:
         print(f"  [{'PASS' if ok else 'FAIL'}] {name}")
     print(f"总计：{passed}/{len(results)} 通过，{failed} 失败")

@@ -39,7 +39,7 @@ def check_dogfood(root: Path) -> list[str]:
     fails: list[str] = []
 
     # 1. 100% 路径基准覆盖
-    for top in ("common", "frontend", "backend", "writing", "scripts"):
+    for top in ("common", "frontend", "backend", "writing", "skills", "scripts"):
         for p in sorted((root / top).rglob("*.md")):
             if "路径基准" not in p.read_text(encoding="utf-8"):
                 fails.append(f"{p.relative_to(root)}: FAIL 缺少「路径基准」声明")
@@ -86,7 +86,7 @@ def check_dogfood(root: Path) -> list[str]:
         for p in root.rglob("*.md")
         if p.name in ("README.md", "INDEX.md", "AGENTS.md", "INTEGRATION.md")
     )
-    for top in ("common", "frontend", "backend", "writing", "scripts"):
+    for top in ("common", "frontend", "backend", "writing", "skills", "scripts"):
         for p in sorted((root / top).rglob("*.md")):
             if p.name == "README.md":
                 continue

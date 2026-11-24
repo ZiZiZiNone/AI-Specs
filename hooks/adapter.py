@@ -70,6 +70,107 @@ def detect_writing_genre(prompt: str) -> tuple[str | None, str | None]:
     return None, None
 
 
+USER_SKILL_RE = re.compile(
+    r"(?:^|\s)/[a-z][a-z0-9_-]{1,40}(?:\s|$)|(?:使用|调用|启用|按|用)\s*[a-z0-9_-]{2,40}\s*(?:skill|技能)",
+    re.I,
+)
+RESET_SKILL_RE = re.compile(r"重选\s*skill|切换\s*skill|清除\s*skill|重置\s*skill", re.I)
+DEFAULT_PICK_RE = re.compile(r"按默认|用默认|默认最优|就默认")
+
+
+def _find_local_skill(skill_id: str, search_dirs: list[str], cwd: str) -> str | None:
+    for d in search_dirs:
+        base = Path(d).expanduser() if d.startswith("~") else (Path(cwd) / d)
+        cand = base / skill_id / "SKILL.md"
+        if cand.is_file():
+            return str(cand)
+    return None
+
+
+def _update_pinned_skills(prompt: str, state: dict[str, Any], domains: dict[str, Any]) -> list[str]:
+    if RESET_SKILL_RE.search(prompt):
+        state["skill_choices"] = {}
+        return []
+    choices = state.setdefault("skill_choices", {})
+    newly_pinned: list[str] = []
+    if DEFAULT_PICK_RE.search(prompt):
+        for did in state.get("last_skill_domains") or []:
+            if did in domains:
+                choices[did] = domains[did].get("default_optimal", "")
+                newly_pinned.append(did)
+        return newly_pinned
+    p_low = prompt.lower()
+    for did, cfg in domains.items():
+        for sk in cfg.get("skills") or []:
+            sid = sk.get("id", "")
+            if sid and re.search(rf"(?:选|用|启用|采用|切到|选择)\s*{re.escape(sid.lower())}\b", p_low):
+                choices[did] = sid
+                newly_pinned.append(did)
+    return newly_pinned
+
+
+def _format_domain_hint(did: str, cfg: dict[str, Any], ctx: dict[str, Any], state: dict[str, Any]) -> str:
+    skills = cfg.get("skills") or []
+    search_dirs = ctx.get("_skill_dirs") or []
+    max_choices = int(ctx.get("_max_choices") or 3)
+    default_id = cfg.get("default_optimal", "")
+    fb_id = cfg.get("fallback_bundled", "")
+    fb_path = next((s.get("path", "") for s in skills if s.get("id") == fb_id), "")
+    pinned = (state.get("skill_choices") or {}).get(did)
+    if pinned:
+        sk = next((s for s in skills if s.get("id") == pinned), None)
+        if sk:
+            loc = _find_local_skill(pinned, search_dirs, ctx["cwd"])
+            src = f"local:{loc}" if loc else f"{sk['source']}:{sk.get('path') or sk.get('install') or pinned}"
+            return f"[AI-Specs] skill_domain={did} | pinned={pinned}({src}) | fallback={fb_path} | action=auto_use"
+    local_hits = [(s["id"], _find_local_skill(s["id"], search_dirs, ctx["cwd"])) for s in skills]
+    local_hits = [(sid, lp) for sid, lp in local_hits if lp]
+    if local_hits:
+        best = next(((sid, lp) for sid, lp in local_hits if sid == default_id), local_hits[0])
+        return f"[AI-Specs] skill_domain={did} | local={best[0]}({best[1]}) | action=auto_use"
+    if len(skills) == 1:
+        only = skills[0]
+        ref = only.get("path") or only.get("install") or only["id"]
+        return f"[AI-Specs] skill_domain={did} | single={only['id']}({only['source']}:{ref}) | action=auto_use"
+    top = [f"{s['id']}({s['source']})" for s in skills[:max_choices]]
+    return (
+        f"[AI-Specs] skill_domain={did} | choices={','.join(top)} "
+        f"| default={default_id} | fallback={fb_path} | policy=ask_or_default_optimal"
+    )
+
+
+def resolve_skill_recommendations(ctx: dict[str, Any], state: dict[str, Any]) -> list[str]:
+    """无用户 Skill 时按需查 skills/registry.json，支持多域复合匹配、本地优先与会话内选择记忆。"""
+    prompt = ctx["prompt"]
+    if not prompt or USER_SKILL_RE.search(prompt):
+        return []
+    reg_path = SPEC_ROOT / "skills" / "registry.json"
+    if not reg_path.is_file():
+        return []
+    reg = json.loads(reg_path.read_text(encoding="utf-8"))
+    policy = reg.get("policy") or {}
+    domains = reg.get("domains") or {}
+    newly_pinned = _update_pinned_skills(prompt, state, domains)
+
+    ctx_meta = {
+        "cwd": ctx["cwd"],
+        "_skill_dirs": policy.get("local_search_dirs") or [],
+        "_max_choices": int(policy.get("max_choices") or 3),
+    }
+    p_low = prompt.lower()
+    matched = [
+        did for did, cfg in domains.items()
+        if any(re.search(pat, p_low) for pat in (cfg.get("intent_patterns") or []))
+    ]
+    for did in newly_pinned:
+        if did not in matched:
+            matched.append(did)
+    matched = matched[:3]
+    if matched:
+        state["last_skill_domains"] = matched
+    return [_format_domain_hint(did, domains[did], ctx_meta, state) for did in matched]
+
+
 def normalize_payload(raw: dict[str, Any], cli_event: str | None) -> dict[str, Any]:
     tool_in = raw.get("tool_input") or raw.get("input") or {}
     if not isinstance(tool_in, dict):
@@ -142,6 +243,7 @@ def handle_user_prompt(ctx: dict[str, Any], state: dict[str, Any]) -> tuple[int,
         hints.append("[AI-Specs] mode=READ_ONLY (COM-012: 只读审查档，禁止修改文件)")
     if genre and rule_path:
         hints.append(f"[AI-Specs] writing={genre} | load=writing/rules/core.md,{rule_path}")
+    hints.extend(resolve_skill_recommendations(ctx, state))
     return 0, "\n".join(hints), ""
 
 

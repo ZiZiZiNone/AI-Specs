@@ -1,0 +1,437 @@
+{
+  "version": "1.0.0",
+  "policy": {
+    "skip_when_user_skill_specified": true,
+    "single_match": "auto_use",
+    "multi_match": "ask_with_default",
+    "max_choices": 3,
+    "no_response_or_denied_fallback": "default_optimal",
+    "prefer_order": [
+      "local",
+      "bundled",
+      "remote"
+    ],
+    "local_search_dirs": [
+      "~/.agents/skills",
+      ".claude/skills",
+      ".cursor/skills",
+      ".github/skills"
+    ]
+  },
+  "domains": {
+    "dialogue": {
+      "label": "台词与剧本对白",
+      "intent_patterns": [
+        "台词|对白|潜台词|剧本|分场|对手戏|人物声线|编剧",
+        "(?:写|润色|改写).{0,10}(?:对话|台词|剧本)"
+      ],
+      "default_optimal": "sw-dialogue",
+      "fallback_bundled": "ai-specs-dialogue-scene",
+      "skills": [
+        {
+          "id": "sw-dialogue",
+          "source": "remote",
+          "repo": "jtydhr88/screenwriting-skills",
+          "url": "https://github.com/jtydhr88/screenwriting-skills/blob/main/plugins/screenwriting/skills/sw-dialogue/SKILL.md",
+          "install": "npx skills add jtydhr88/screenwriting-skills",
+          "summary": "融合麦基《对白》与陆军剧作理论，专攻潜台词、动作性与遮名测试"
+        },
+        {
+          "id": "dialogue-and-voice",
+          "source": "remote",
+          "repo": "hojiahao/cinefoundry",
+          "url": "https://github.com/hojiahao/cinefoundry/blob/main/.agents/skills/dialogue-and-voice/SKILL.md",
+          "install": "npx skills add hojiahao/cinefoundry",
+          "summary": "影视/配音级台词交付，用物理动作与标点控制呼吸节奏和潜台词"
+        },
+        {
+          "id": "screenwriter-skill",
+          "source": "remote",
+          "repo": "gaojesse999/ai-scripts",
+          "url": "https://github.com/gaojesse999/ai-scripts/blob/main/skills/screenwriter-skill/SKILL.md",
+          "install": "npx skills add gaojesse999/ai-scripts",
+          "summary": "覆盖人物声线（Want/Need/Hamartia/Voice）、节拍表与价值转向审计"
+        },
+        {
+          "id": "write-screenplay-skill",
+          "source": "remote",
+          "repo": "egguy886/write-screenplay-skill",
+          "url": "https://github.com/egguy886/write-screenplay-skill/blob/main/README.md",
+          "install": "git clone https://github.com/egguy886/write-screenplay-skill.git",
+          "summary": "双语剧本与每句对白附带中文潜台词行的强潜台词校对模式"
+        },
+        {
+          "id": "ai-specs-dialogue-scene",
+          "source": "bundled",
+          "path": "skills/bundled/ai-specs-dialogue-scene/SKILL.md",
+          "summary": "仓库内包含离线兜底：台词潜台词、动作性与感官描写基线"
+        }
+      ]
+    },
+    "description_fiction": {
+      "label": "叙事描写、感官与长篇小说",
+      "intent_patterns": [
+        "描写|场景描写|感官描写|环境描写|人物刻画|动作描写|画面感|镜头感",
+        "(?:写|创作|续写|改写|润色).{0,14}(?:小说|网文|章节|开篇|场景)|黄金三章|故事大纲"
+      ],
+      "default_optimal": "book-writer",
+      "fallback_bundled": "ai-specs-dialogue-scene",
+      "skills": [
+        {
+          "id": "book-writer",
+          "source": "remote",
+          "repo": "kshanxs/book-writer-skill",
+          "url": "https://github.com/kshanxs/book-writer-skill/blob/main/book-writer/SKILL.md",
+          "install": "npx skills add kshanxs/book-writer-skill",
+          "summary": "支持 Sensory（感官）/ Dialogue（对白）/ Prose（叙事质感）专项精修通道与 Book Memory"
+        },
+        {
+          "id": "novel-writing",
+          "source": "remote",
+          "repo": "wgwtest/novel-writing",
+          "url": "https://github.com/wgwtest/novel-writing",
+          "install": "npx skills add wgwtest/novel-writing",
+          "summary": "防止长篇描写塌缩成流水账总结，强调因果主干、具身化动作与自然留白"
+        },
+        {
+          "id": "story-skills",
+          "source": "remote",
+          "repo": "danjdewhurst/story-skills",
+          "url": "https://github.com/danjdewhurst/story-skills",
+          "install": "npx skills add danjdewhurst/story-skills",
+          "summary": "端到端连续性编译器：Story Bible、场景追踪与 voice-style 声线对齐"
+        },
+        {
+          "id": "writers-room-story-engine",
+          "source": "remote",
+          "repo": "jackterror/writers-room-story-engine",
+          "url": "https://github.com/jackterror/writers-room-story-engine/blob/main/SKILL.md",
+          "install": "npx skills add jackterror/writers-room-story-engine",
+          "summary": "编剧室级故事诊断路由，拦截被动主角、设定倾倒与无转向场景"
+        },
+        {
+          "id": "creative-writing-skill",
+          "source": "remote",
+          "repo": "xbraindance/Creative-writing-skill",
+          "url": "https://github.com/xbraindance/Creative-writing-skill",
+          "install": "npx skills add xbraindance/Creative-writing-skill",
+          "summary": "Verbalized Sampling 打破创意坍缩（一次 5+ 异质前提）+ 自动 Wiki 沉淀"
+        },
+        {
+          "id": "ai-specs-dialogue-scene",
+          "source": "bundled",
+          "path": "skills/bundled/ai-specs-dialogue-scene/SKILL.md",
+          "summary": "仓库内包含离线兜底：五感物性显影、零过滤词与连载网文节奏校验"
+        },
+        {
+          "id": "ai-specs-writing",
+          "source": "bundled",
+          "path": "skills/bundled/ai-specs-writing/SKILL.md",
+          "summary": "仓库内包含中文连载网文「实感克制·规则博弈流」与六大写作规范总兜底"
+        }
+      ]
+    },
+    "writing": {
+      "label": "综合专业写作与去 AI 味",
+      "intent_patterns": [
+        "去\\s*ai\\s*味|去ai腔|润色文章|改写文章|深度文章|公众号|专栏文章",
+        "(?:写|起草|撰写|生成).{0,12}(?:报告|方案|复盘|总结|备忘录|文章|长文|邮件|公告|函件)"
+      ],
+      "default_optimal": "ai-specs-writing",
+      "fallback_bundled": "ai-specs-writing",
+      "skills": [
+        {
+          "id": "ai-specs-writing",
+          "source": "bundled",
+          "path": "skills/bundled/ai-specs-writing/SKILL.md",
+          "summary": "仓库内包含默认最优：覆盖六大写作场景、意图对齐门禁与 check-writing.py 校验"
+        },
+        {
+          "id": "pro-writing-craft",
+          "source": "local",
+          "summary": "本地用户已安装的专业多体裁写作技能（若宿主已启用则优先直调）"
+        },
+        {
+          "id": "stop-slop",
+          "source": "remote",
+          "repo": "hardikpandya/stop-slop",
+          "url": "https://github.com/hardikpandya/stop-slop",
+          "install": "npx skills add hardikpandya/stop-slop",
+          "summary": "显式禁用词库与句式库（phrases.md/structures.md），强力清除英文及通用 AI 味"
+        },
+        {
+          "id": "great-writer",
+          "source": "remote",
+          "repo": "d-wwei/great-writer",
+          "url": "https://github.com/d-wwei/great-writer/blob/main/SKILL.md",
+          "install": "npx skills add d-wwei/great-writer",
+          "summary": "面向中文长文的 6 阶段 9 模式写作流，强调具体读者视角与节奏不对称"
+        },
+        {
+          "id": "humanizer",
+          "source": "remote",
+          "repo": "blader/humanizer",
+          "url": "https://github.com/blader/humanizer",
+          "install": "npx skills add blader/humanizer",
+          "summary": "基于维基百科 AI 写作特征指南，清除浮夸象征、三段排比与空洞归因"
+        },
+        {
+          "id": "avoid-ai-writing",
+          "source": "remote",
+          "repo": "conorbronsdon/avoid-ai-writing",
+          "url": "https://github.com/conorbronsdon/avoid-ai-writing",
+          "install": "npx skills add conorbronsdon/avoid-ai-writing",
+          "summary": "支持仅检测、原地改写与 5 种语气预设，防范改写后滑向碎句 AI 腔"
+        },
+        {
+          "id": "ux-writing-skill",
+          "source": "remote",
+          "repo": "content-designer/ux-writing-skill",
+          "url": "https://github.com/content-designer/ux-writing-skill",
+          "install": "npx skills add content-designer/ux-writing-skill",
+          "summary": "产品界面微文案（报错提示、空状态、按钮与引导文案）专用规范"
+        }
+      ]
+    },
+    "copywriting_marketing": {
+      "label": "营销宣传稿与增长文案",
+      "intent_patterns": [
+        "宣传稿|营销文案|推广文案|落地页文案|详情页文案|广告文案|品牌软文|种草文案|seo|转化文案"
+      ],
+      "default_optimal": "marketingskills-copywriting",
+      "fallback_bundled": "ai-specs-writing",
+      "skills": [
+        {
+          "id": "marketingskills-copywriting",
+          "source": "remote",
+          "repo": "coreyhaines31/marketingskills",
+          "url": "https://github.com/coreyhaines31/marketingskills",
+          "install": "npx skills add coreyhaines31/marketingskills",
+          "summary": "53 个增长与转化文案技能合集（落地页、AI-SEO、竞品页与共享产品定位上下文）"
+        },
+        {
+          "id": "ai-specs-writing",
+          "source": "bundled",
+          "path": "skills/bundled/ai-specs-writing/SKILL.md",
+          "summary": "仓库内包含离线兜底：施瓦茨五阶段认知 + PAS/FAB/AIDA 宣传稿规范"
+        }
+      ]
+    },
+    "design_ui": {
+      "label": "UI/UX 视觉设计与审美打磨",
+      "intent_patterns": [
+        "ui\\s*设计|ux\\s*设计|界面设计|视觉设计|页面设计|设计系统|配色方案|字体搭配|原型设计|figma|海报设计|审美打磨|落地页设计"
+      ],
+      "default_optimal": "frontend-design",
+      "fallback_bundled": "ai-specs-frontend",
+      "skills": [
+        {
+          "id": "frontend-design",
+          "source": "remote",
+          "repo": "anthropics/skills",
+          "url": "https://github.com/anthropics/skills/blob/main/skills/frontend-design/SKILL.md",
+          "install": "npx skills add anthropics/skills --skill frontend-design",
+          "summary": "Anthropic 官方前端设计技能：先立视觉方向、字体与色彩计划，消除 AI 模板脸"
+        },
+        {
+          "id": "ui-ux-pro-max",
+          "source": "remote",
+          "repo": "nextlevelbuilder/ui-ux-pro-max-skill",
+          "url": "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill",
+          "install": "npx skills add nextlevelbuilder/ui-ux-pro-max-skill",
+          "summary": "本地 BM25 设计智库（79 风格/192 配色/74 字体/119 UX 规则），先产出 MASTER.md"
+        },
+        {
+          "id": "impeccable",
+          "source": "remote",
+          "repo": "pbakaus/impeccable",
+          "url": "https://github.com/pbakaus/impeccable/blob/main/.claude/skills/impeccable/SKILL.md",
+          "install": "npx skills add pbakaus/impeccable",
+          "summary": "23 个设计总监级打磨与审计命令，支持真实浏览器多尺寸截图验收"
+        },
+        {
+          "id": "taste-skill",
+          "source": "remote",
+          "repo": "Leonxlnx/taste-skill",
+          "url": "https://github.com/Leonxlnx/taste-skill/blob/main/skills/taste-skill/SKILL.md",
+          "install": "npx skills add Leonxlnx/taste-skill",
+          "summary": "对标 figma.com / x.ai 商业官网质感，先写实感文案再按屏编排并做浏览器验收"
+        },
+        {
+          "id": "web-design-guidelines",
+          "source": "remote",
+          "repo": "vercel-labs/agent-skills",
+          "url": "https://github.com/vercel-labs/agent-skills/blob/main/skills/web-design-guidelines/SKILL.md",
+          "install": "npx skills add vercel-labs/agent-skills --skill web-design-guidelines",
+          "summary": "Vercel 官方 100+ 条 Web 界面、无障碍访问与交互合规审计规则"
+        },
+        {
+          "id": "canvas-design",
+          "source": "remote",
+          "repo": "anthropics/skills",
+          "url": "https://github.com/anthropics/skills",
+          "install": "npx skills add anthropics/skills --skill canvas-design",
+          "summary": "Anthropic 官方平面视觉技能：将审美简报转化为画廊级静态视觉与 PDF 海报"
+        },
+        {
+          "id": "theme-factory",
+          "source": "remote",
+          "repo": "anthropics/skills",
+          "url": "https://github.com/anthropics/skills/blob/main/skills/theme-factory/SKILL.md",
+          "install": "npx skills add anthropics/skills --skill theme-factory",
+          "summary": "10 套专业配色与字体主题一键套用，适配幻灯片、文档与 HTML 页面"
+        },
+        {
+          "id": "brand-guidelines",
+          "source": "remote",
+          "repo": "anthropics/skills",
+          "url": "https://github.com/anthropics/skills",
+          "install": "npx skills add anthropics/skills --skill brand-guidelines",
+          "summary": "品牌色板与字体规范模板，可替换为自有品牌色保证跨产物视觉一致"
+        },
+        {
+          "id": "figma-mcp-skills",
+          "source": "remote",
+          "repo": "figma/mcp-server-guide",
+          "url": "https://github.com/figma/mcp-server-guide/blob/main/skills/figma-design-to-code/SKILL.md",
+          "install": "npx skills add figma/mcp-server-guide",
+          "summary": "Figma 官方前置规范：保证设计稿 1:1 转代码并复用已发布设计系统组件"
+        },
+        {
+          "id": "ai-specs-frontend",
+          "source": "bundled",
+          "path": "skills/bundled/ai-specs-frontend/SKILL.md",
+          "summary": "仓库内包含离线兜底：前端薄层解耦、无障碍、性能与组件架构规范"
+        }
+      ]
+    },
+    "frontend_engineering": {
+      "label": "前端工程与框架性能",
+      "intent_patterns": [
+        "(?:vue\\s*3|react|next\\.js|nextjs|小程序|前端架构|前端性能|组件重构|前端代码)"
+      ],
+      "default_optimal": "ai-specs-frontend",
+      "fallback_bundled": "ai-specs-frontend",
+      "skills": [
+        {
+          "id": "ai-specs-frontend",
+          "source": "bundled",
+          "path": "skills/bundled/ai-specs-frontend/SKILL.md",
+          "summary": "仓库内包含默认最优：FE-101~104、Vue 3/React/小程序规范与导入路径校验"
+        },
+        {
+          "id": "vercel-react-best-practices",
+          "source": "remote",
+          "repo": "vercel-labs/agent-skills",
+          "url": "https://github.com/vercel-labs/agent-skills",
+          "install": "npx skills add vercel-labs/agent-skills --skill react-best-practices",
+          "summary": "Vercel 官方 React/Next.js 57 条性能优化与渲染架构规范"
+        },
+        {
+          "id": "vercel-composition-patterns",
+          "source": "remote",
+          "repo": "vercel-labs/agent-skills",
+          "url": "https://github.com/vercel-labs/agent-skills",
+          "install": "npx skills add vercel-labs/agent-skills --skill composition-patterns",
+          "summary": "React 复杂组件组合与状态抽象设计模式"
+        }
+      ]
+    },
+    "backend_engineering": {
+      "label": "后端工程、研发流程与安全审查",
+      "intent_patterns": [
+        "后端架构|接口设计|数据库迁移|事务并发|系统排障|根因定位|tdd|测试驱动|代码审查|code\\s*review|安全审计|漏洞扫描"
+      ],
+      "default_optimal": "superpowers",
+      "fallback_bundled": "ai-specs-backend",
+      "skills": [
+        {
+          "id": "superpowers",
+          "source": "remote",
+          "repo": "obra/superpowers",
+          "url": "https://github.com/obra/superpowers",
+          "install": "npx skills add obra/superpowers",
+          "summary": "15 个工程级研发技能：brainstorming 先对齐、writing-plans、TDD 与 4 阶段系统化调试"
+        },
+        {
+          "id": "mattpocock-skills",
+          "source": "remote",
+          "repo": "mattpocock/skills",
+          "url": "https://github.com/mattpocock/skills",
+          "install": "npx skills add mattpocock/skills",
+          "summary": "56 个实战工程技能，其中 grill-me 专治需求模糊时的深度反问盘点"
+        },
+        {
+          "id": "code-review-and-quality",
+          "source": "remote",
+          "repo": "addyosmani/agent-skills",
+          "url": "https://github.com/addyosmani/agent-skills/blob/main/skills/code-review-and-quality/SKILL.md",
+          "install": "npx skills add addyosmani/agent-skills",
+          "summary": "按正确性、可读性、架构、性能、安全 5 轴执行结构化代码评审"
+        },
+        {
+          "id": "semgrep-skills",
+          "source": "remote",
+          "repo": "semgrep/skills",
+          "url": "https://github.com/semgrep/skills",
+          "install": "npx skills add semgrep/skills",
+          "summary": "Semgrep 静态安全规则与漏洞修复指导技能"
+        },
+        {
+          "id": "unitone-security-skills",
+          "source": "remote",
+          "repo": "UnitOneAI/SecuritySkills",
+          "url": "https://github.com/UnitOneAI/SecuritySkills",
+          "install": "npx skills add UnitOneAI/SecuritySkills",
+          "summary": "开源应用与 AI/LLM Top 10 安全审计技能集"
+        },
+        {
+          "id": "ai-specs-backend",
+          "source": "bundled",
+          "path": "skills/bundled/ai-specs-backend/SKILL.md",
+          "summary": "仓库内包含离线兜底：BE-101~108 与 Go/PHP/Python/TS/Java/Rust 六语言规范"
+        }
+      ]
+    },
+    "product_docs": {
+      "label": "产品规划、办公文档与技能发现",
+      "intent_patterns": [
+        "prd|产品需求文档|用户故事|产品路线图|生成\\s*(?:word|docx|ppt|pptx|excel|xlsx|pdf)|找\\s*skill|推荐\\s*skill|安装\\s*skill"
+      ],
+      "default_optimal": "anthropic-document-skills",
+      "fallback_bundled": "ai-specs-engineering",
+      "skills": [
+        {
+          "id": "anthropic-document-skills",
+          "source": "remote",
+          "repo": "anthropics/skills",
+          "url": "https://github.com/anthropics/skills",
+          "install": "npx skills add anthropics/skills",
+          "summary": "Anthropic 官方文档四件套（docx/pdf/pptx/xlsx）工业级生成与校验工作流"
+        },
+        {
+          "id": "product-manager-skills",
+          "source": "remote",
+          "repo": "deanpeters/Product-Manager-Skills",
+          "url": "https://github.com/deanpeters/Product-Manager-Skills",
+          "install": "npx skills add deanpeters/Product-Manager-Skills",
+          "summary": "覆盖用户故事、PRD、发现调研与路线图的产品经理技能框架"
+        },
+        {
+          "id": "find-skills",
+          "source": "remote",
+          "repo": "vercel-labs/skills",
+          "url": "https://github.com/vercel-labs/skills",
+          "install": "npx skills add vercel-labs/skills --skill find-skills",
+          "summary": "skills.sh 官方开放技能检索与跨端安装工具（npx skills find / add）"
+        },
+        {
+          "id": "ai-specs-engineering",
+          "source": "bundled",
+          "path": "skills/bundled/ai-specs-engineering/SKILL.md",
+          "summary": "仓库内包含离线兜底：通用工程宪法、任务边界分析与自动化门禁体系"
+        }
+      ]
+    }
+  }
+}

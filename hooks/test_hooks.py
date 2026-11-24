@@ -292,6 +292,119 @@ class HooksAdapterTest(unittest.TestCase):
         # 4. 文档居高临下措辞拦截
         self.assertTrue(any(r == "WR-GENRE-STRUCT" for r, _ in wr.check_text("导出报表其实非常简单，只需轻松点击即可。", "documentation")))
 
+    def test_skill_library_three_source_routing_and_fallback(self) -> None:
+        # 1. 用户已显式指定个人 Skill -> 零干扰跳过建议库
+        c0, o0, e0 = adapter.dispatch(
+            {"session_id": self.sid, "prompt": "/my-dialogue-skill 帮我润色这段台词"},
+            "UserPromptSubmit",
+        )
+        self.assertEqual((c0, e0), (0, ""))
+        self.assertNotIn("skill_domain=", o0)
+
+        # 2. 未指定用户 Skill 且命中台词领域 -> 输出多候选 + 默认最优 + 内包含兜底
+        c1, o1, e1 = adapter.dispatch(
+            {"session_id": self.sid, "prompt": "帮我打磨这场对手戏的台词潜台词"},
+            "UserPromptSubmit",
+        )
+        self.assertEqual((c1, e1), (0, ""))
+        self.assertIn("skill_domain=dialogue", o1)
+        self.assertIn("default=sw-dialogue", o1)
+        self.assertIn("fallback=skills/bundled/ai-specs-dialogue-scene/SKILL.md", o1)
+
+        # 3. 命中 UI/UX 设计领域 -> 默认 frontend-design + 内包含前端兜底
+        c2, o2, e2 = adapter.dispatch(
+            {"session_id": self.sid, "prompt": "帮我做一套 SaaS 落地页的界面设计与配色方案"},
+            "UserPromptSubmit",
+        )
+        self.assertEqual((c2, e2), (0, ""))
+        self.assertIn("skill_domain=design_ui", o2)
+        self.assertIn("default=frontend-design", o2)
+        self.assertIn("fallback=skills/bundled/ai-specs-frontend/SKILL.md", o2)
+
+        # 4. 本地目录已安装默认最优 Skill 时，自动识别为 local 并直接引导调用
+        with tempfile.TemporaryDirectory() as tmp:
+            loc = Path(tmp) / ".claude" / "skills" / "sw-dialogue"
+            loc.mkdir(parents=True)
+            (loc / "SKILL.md").write_text("---\nname: sw-dialogue\n---\n", encoding="utf-8")
+            c3, o3, e3 = adapter.dispatch(
+                {"session_id": self.sid, "cwd": tmp, "prompt": "帮我改写这段剧本对白"},
+                "UserPromptSubmit",
+            )
+            self.assertEqual((c3, e3), (0, ""))
+            self.assertIn("local=sw-dialogue", o3)
+            self.assertIn("action=auto_use", o3)
+
+
+    def test_skill_library_multi_domain_and_session_pinning(self) -> None:
+        sid = self.sid + "-pin"
+        # 1. 跨领域单句同时命中台词 + UI 设计，复合输出两条路由
+        c1, o1, e1 = adapter.dispatch(
+            {"session_id": sid, "prompt": "帮我润色这段对手戏台词，再做个落地页界面设计"},
+            "UserPromptSubmit",
+        )
+        self.assertEqual((c1, e1), (0, ""))
+        self.assertIn("skill_domain=dialogue", o1)
+        self.assertIn("skill_domain=design_ui", o1)
+
+        # 2. 用户明确选定 impeccable 后，同会话再触发界面设计直接 pinned 直用，不再重复多选
+        adapter.dispatch({"session_id": sid, "prompt": "选 impeccable 来打磨这个界面设计"}, "UserPromptSubmit")
+        c2, o2, e2 = adapter.dispatch(
+            {"session_id": sid, "prompt": "继续优化这个页面的界面设计和字体搭配"},
+            "UserPromptSubmit",
+        )
+        self.assertEqual((c2, e2), (0, ""))
+        self.assertIn("pinned=impeccable", o2)
+        self.assertIn("action=auto_use", o2)
+        self.assertNotIn("choices=", o2)
+
+        # 3. 重选 skill 后恢复多选菜单；回复“按默认”自动锁定 default_optimal
+        adapter.dispatch({"session_id": sid, "prompt": "重选 skill"}, "UserPromptSubmit")
+        c3, o3, _ = adapter.dispatch(
+            {"session_id": sid, "prompt": "帮我改写这段剧本台词"},
+            "UserPromptSubmit",
+        )
+        self.assertEqual(c3, 0)
+        self.assertIn("choices=", o3)
+        adapter.dispatch({"session_id": sid, "prompt": "按默认继续"}, "UserPromptSubmit")
+        c4, o4, _ = adapter.dispatch(
+            {"session_id": sid, "prompt": "再润色下一场对手戏对白"},
+            "UserPromptSubmit",
+        )
+        self.assertEqual(c4, 0)
+        self.assertIn("pinned=sw-dialogue", o4)
+
+
+    def test_skill_library_short_reply_pin_and_non_default_local_priority(self) -> None:
+        sid = self.sid + "-adv"
+        # 1. 短回复“选 impeccable”（不重复领域词）当轮即回显 pinned 指令
+        adapter.dispatch({"session_id": sid, "prompt": "帮我做落地页界面设计"}, "UserPromptSubmit")
+        c1, o1, e1 = adapter.dispatch({"session_id": sid, "prompt": "选 impeccable"}, "UserPromptSubmit")
+        self.assertEqual((c1, e1), (0, ""))
+        self.assertIn("skill_domain=design_ui", o1)
+        self.assertIn("pinned=impeccable", o1)
+
+        # 2. 短回复“按默认”当轮即回显 default_optimal 的 pinned 指令
+        adapter.dispatch({"session_id": sid, "prompt": "重选 skill"}, "UserPromptSubmit")
+        adapter.dispatch({"session_id": sid, "prompt": "帮我改写这段台词"}, "UserPromptSubmit")
+        c2, o2, e2 = adapter.dispatch({"session_id": sid, "prompt": "按默认"}, "UserPromptSubmit")
+        self.assertEqual((c2, e2), (0, ""))
+        self.assertIn("skill_domain=dialogue", o2)
+        self.assertIn("pinned=sw-dialogue", o2)
+
+        # 3. 本地安装了非 default_optimal 的同域技能（impeccable）时，仍遵循 local 优先直用
+        with tempfile.TemporaryDirectory() as tmp:
+            loc = Path(tmp) / ".claude" / "skills" / "impeccable"
+            loc.mkdir(parents=True)
+            (loc / "SKILL.md").write_text("---\nname: impeccable\n---\n", encoding="utf-8")
+            c3, o3, e3 = adapter.dispatch(
+                {"session_id": sid + "-loc", "cwd": tmp, "prompt": "帮我做个 SaaS 界面设计"},
+                "UserPromptSubmit",
+            )
+            self.assertEqual((c3, e3), (0, ""))
+            self.assertIn("local=impeccable", o3)
+            self.assertIn("action=auto_use", o3)
+
+
 if __name__ == "__main__":
     suite = unittest.defaultTestLoader.loadTestsFromTestCase(HooksAdapterTest)
     res = unittest.TextTestRunner(verbosity=2).run(suite)
